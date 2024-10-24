@@ -10,7 +10,9 @@ namespace command {
 #define REGISTRY_COMMAND_MULTIPROC(COMMAND, UUID) \
     const QUuidEx COMMAND = command::Pool::Registry{UUID, #COMMAND, true};
 
-REGISTRY_COMMAND_SINGLPROC(ImageDetect,  "a17e5c5b-8a44-494b-85ff-ab68809148e3")
+REGISTRY_COMMAND_SINGLPROC(TrackInformation,  "50dc6d0c-a0aa-48e6-81be-a10e2998dee3")
+REGISTRY_COMMAND_SINGLPROC(SnapshotInfo,      "0d629902-bc81-4ace-a5c0-7cab38ec240d")
+REGISTRY_COMMAND_SINGLPROC(MetaSettings,      "4b04e2b8-6957-4c4a-949b-8a17f5f47cb5")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -41,55 +43,135 @@ void DetectRect::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector DetectClass::toRaw() const
+bserial::RawVector TrackObject::toRaw() const
 {
     B_SERIALIZE_V1(stream)
-    stream << name;
-    stream << rects;
+    stream << id;
+    stream << globalId;
+    stream << status;
+    stream << isValidated;
+    stream << timeDetect;
+    stream << timeComplete;
+    stream << score;
     B_SERIALIZE_RETURN
 }
 
-void DetectClass::fromRaw(const bserial::RawVector& vect)
+void TrackObject::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
-    stream >> name;
-    stream >> rects;
+    stream >> id;
+    stream >> globalId;
+    stream >> status;
+    stream >> isValidated;
+    stream >> timeDetect;
+    stream >> timeComplete;
+    stream >> score;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector ImageItem::toRaw() const
+bserial::RawVector MetaClass::toRaw() const
 {
     B_SERIALIZE_V1(stream)
+//    stream << index;
     stream << name;
-    stream << data;
-    stream << tag;
+    stream << isSkip;
+    stream << threshScore;
+    stream << threshNMS;
+    stream << threshIOU;
+    stream << threshTTL;
+    stream << validateTime;
+    stream << validateSaturate;
+    stream << rectsLimits;
+    stream << isPaint;
+    stream << color;
+    B_SERIALIZE_RETURN
+}
+
+void MetaClass::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+//    stream >> index;
+    stream >> name;
+    stream >> isSkip;
+    stream >> threshScore;
+    stream >> threshNMS;
+    stream >> threshIOU;
+    stream >> threshTTL;
+    stream >> validateTime;
+    stream >> validateSaturate;
+    stream >> rectsLimits;
+    stream >> isPaint;
+    stream >> color;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector TrackClass::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << index;
+    stream << meta;
+    stream << objects;
+    B_SERIALIZE_RETURN
+}
+
+void TrackClass::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> index;
+    stream >> meta;
+    stream >> objects;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector TrackInformation::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << timeResponse;
     stream << classes;
     B_SERIALIZE_RETURN
 }
 
-void ImageItem::fromRaw(const bserial::RawVector& vect)
+void TrackInformation::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
-    stream >> name;
-    stream >> data;
-    stream >> tag;
+    stream >> timeResponse;
     stream >> classes;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector ImageDetect::toRaw() const
+bserial::RawVector SnapshotInfo::toRaw() const
 {
     B_SERIALIZE_V1(stream)
-    stream << images;
-    stream << returnImages;
+    stream << timeRequest;
+    stream << timeResponse;
+    stream << information;
     B_SERIALIZE_RETURN
 }
 
-void ImageDetect::fromRaw(const bserial::RawVector& vect)
+void SnapshotInfo::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
-    stream >> images;
-    stream >> returnImages;
+    stream >> timeRequest;
+    stream >> timeResponse;
+    stream >> information;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector MetaSettings::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << method;
+    stream << newSettings;
+    stream << actualSettings;
+    B_SERIALIZE_RETURN
+}
+
+void MetaSettings::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> method;
+    stream >> newSettings;
+    stream >> actualSettings;
     B_DESERIALIZE_END
 }
 
