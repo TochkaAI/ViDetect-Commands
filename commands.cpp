@@ -10,9 +10,10 @@ namespace command {
 #define REGISTRY_COMMAND_MULTIPROC(COMMAND, UUID) \
     const QUuidEx COMMAND = command::Pool::Registry{UUID, #COMMAND, true};
 
-REGISTRY_COMMAND_SINGLPROC(TrackInformation,  "50dc6d0c-a0aa-48e6-81be-a10e2998dee3")
-REGISTRY_COMMAND_SINGLPROC(SnapshotInfo,      "0d629902-bc81-4ace-a5c0-7cab38ec240d")
-REGISTRY_COMMAND_SINGLPROC(MetaSettings,      "4b04e2b8-6957-4c4a-949b-8a17f5f47cb5")
+REGISTRY_COMMAND_SINGLPROC(ModelInfo,        "d8f7f3f5-2965-4b1a-9508-3e18f85d0fcc")
+REGISTRY_COMMAND_SINGLPROC(TrackersInfo,     "d6272e50-b3e7-4d7d-b45e-e22440c78315")
+REGISTRY_COMMAND_SINGLPROC(TrackerEvent,     "50dc6d0c-a0aa-48e6-81be-a10e2998dee3")
+REGISTRY_COMMAND_SINGLPROC(TrackersSnapshot, "0d629902-bc81-4ace-a5c0-7cab38ec240d")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -20,6 +21,56 @@ REGISTRY_COMMAND_SINGLPROC(MetaSettings,      "4b04e2b8-6957-4c4a-949b-8a17f5f47
 } // namespace command
 
 namespace data {
+
+bserial::RawVector ModelClass::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << index;
+    stream << name;
+    stream << skip;
+    stream << scoreThresh;
+    stream << nmsThresh;
+    B_SERIALIZE_RETURN
+}
+
+void ModelClass::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> index;
+    stream >> name;
+    stream >> skip;
+    stream >> scoreThresh;
+    stream >> nmsThresh;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector ModelInfoA::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << file;
+    stream << type;
+    stream << typeStr;
+    stream << imageChannels;
+    stream << inputSize;
+    stream << input;
+    stream << output;
+    stream << classes;
+    B_SERIALIZE_RETURN
+}
+
+void ModelInfoA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> file;
+    stream >> type;
+    stream >> typeStr;
+    stream >> imageChannels;
+    stream >> inputSize;
+    stream >> input;
+    stream >> output;
+    stream >> classes;
+    B_DESERIALIZE_END
+}
 
 bserial::RawVector DetectRect::toRaw() const
 {
@@ -43,16 +94,58 @@ void DetectRect::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+bserial::RawVector TrackerInfo::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << classIndex;
+    stream << className;
+    stream << iouThresh;
+    stream << ttlThresh;
+    stream << validateTime;
+    stream << validateSaturation;
+    stream << rectsTimeLimit;
+    stream << rectsCountLimit;
+    B_SERIALIZE_RETURN
+}
+
+void TrackerInfo::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> classIndex;
+    stream >> className;
+    stream >> iouThresh;
+    stream >> ttlThresh;
+    stream >> validateTime;
+    stream >> validateSaturation;
+    stream >> rectsTimeLimit;
+    stream >> rectsCountLimit;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector TrackersInfoA::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << items;
+    B_SERIALIZE_RETURN
+}
+
+void TrackersInfoA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> items;
+    B_DESERIALIZE_END
+}
+
 bserial::RawVector TrackObject::toRaw() const
 {
     B_SERIALIZE_V1(stream)
     stream << id;
     stream << globalId;
-    stream << status;
     stream << isValidated;
     stream << timeDetect;
     stream << timeComplete;
-    stream << score;
+    stream << rects;
+    stream << averageRect;
     B_SERIALIZE_RETURN
 }
 
@@ -61,117 +154,63 @@ void TrackObject::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_V1(vect, stream)
     stream >> id;
     stream >> globalId;
-    stream >> status;
     stream >> isValidated;
     stream >> timeDetect;
     stream >> timeComplete;
-    stream >> score;
+    stream >> rects;
+    stream >> averageRect;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector MetaClass::toRaw() const
+bserial::RawVector TrackerEvent::toRaw() const
 {
     B_SERIALIZE_V1(stream)
-//    stream << index;
-    stream << name;
-    stream << isSkip;
-    stream << threshScore;
-    stream << threshNMS;
-    stream << threshIOU;
-    stream << threshTTL;
-    stream << validateTime;
-    stream << validateSaturate;
-    stream << rectsLimits;
-    stream << isPaint;
-    stream << color;
+    stream << classIndex;
+    stream << className;
+    stream << event;
+    stream << object;
     B_SERIALIZE_RETURN
 }
 
-void MetaClass::fromRaw(const bserial::RawVector& vect)
+void TrackerEvent::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
-//    stream >> index;
-    stream >> name;
-    stream >> isSkip;
-    stream >> threshScore;
-    stream >> threshNMS;
-    stream >> threshIOU;
-    stream >> threshTTL;
-    stream >> validateTime;
-    stream >> validateSaturate;
-    stream >> rectsLimits;
-    stream >> isPaint;
-    stream >> color;
+    stream >> classIndex;
+    stream >> className;
+    stream >> event;
+    stream >> object;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackClass::toRaw() const
+bserial::RawVector TrackerSnapshot::toRaw() const
 {
     B_SERIALIZE_V1(stream)
-    stream << index;
-    stream << meta;
+    stream << classIndex;
+    stream << className;
     stream << objects;
     B_SERIALIZE_RETURN
 }
 
-void TrackClass::fromRaw(const bserial::RawVector& vect)
+void TrackerSnapshot::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
-    stream >> index;
-    stream >> meta;
+    stream >> classIndex;
+    stream >> className;
     stream >> objects;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackInformation::toRaw() const
+bserial::RawVector TrackersSnapshotA::toRaw() const
 {
     B_SERIALIZE_V1(stream)
-    stream << timeResponse;
-    stream << classes;
+    stream << items;
     B_SERIALIZE_RETURN
 }
 
-void TrackInformation::fromRaw(const bserial::RawVector& vect)
+void TrackersSnapshotA::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
-    stream >> timeResponse;
-    stream >> classes;
-    B_DESERIALIZE_END
-}
-
-bserial::RawVector SnapshotInfo::toRaw() const
-{
-    B_SERIALIZE_V1(stream)
-    stream << timeRequest;
-    stream << timeResponse;
-    stream << information;
-    B_SERIALIZE_RETURN
-}
-
-void SnapshotInfo::fromRaw(const bserial::RawVector& vect)
-{
-    B_DESERIALIZE_V1(vect, stream)
-    stream >> timeRequest;
-    stream >> timeResponse;
-    stream >> information;
-    B_DESERIALIZE_END
-}
-
-bserial::RawVector MetaSettings::toRaw() const
-{
-    B_SERIALIZE_V1(stream)
-    stream << method;
-    stream << newSettings;
-    stream << actualSettings;
-    B_SERIALIZE_RETURN
-}
-
-void MetaSettings::fromRaw(const bserial::RawVector& vect)
-{
-    B_DESERIALIZE_V1(vect, stream)
-    stream >> method;
-    stream >> newSettings;
-    stream >> actualSettings;
+    stream >> items;
     B_DESERIALIZE_END
 }
 
