@@ -39,6 +39,17 @@ extern const QUuidEx TrackersConfig;
 extern const QUuidEx TrackerEvent;
 
 /**
+  Возвращает информацию об эмитируемых событиях для всех трекеров
+*/
+extern const QUuidEx TrackersEventInfo;
+
+/**
+  Команда выполняет подписку на получение событий TrackerEvent от системы
+  трекирования
+*/
+extern const QUuidEx TrackersEventSubscript;
+
+/**
   Возвращает текущее состояние трекируемых объектов во всех трекерах
 */
 extern const QUuidEx TrackersSnapshot;
@@ -74,6 +85,12 @@ enum class TrackEvent : quint32
 };
 
 inline uint qHash(TrackEvent te) {return static_cast<uint>(te);}
+
+inline QDataStream& operator>> (QDataStream& s, pproto::TrackEvent& te)
+    {return bserial::detail::getFromStreamEnum(s, te);}
+
+inline QDataStream& operator<< (QDataStream& s, const pproto::TrackEvent te)
+    {return bserial::detail::putToStreamEnum(s, te);}
 
 //---------------- Структуры данных используемые в сообщениях ----------------
 
@@ -269,7 +286,10 @@ struct TrackerEvent : Data<&command::TrackerEvent,
     // Наименованеи класса модели
     QString className;
 
-    TrackEvent  event = {TrackEvent::Unknown};
+    // Эмитируемое событие
+    TrackEvent event = {TrackEvent::Unknown};
+
+    // Трекируемый объект
     TrackObject object;
 
     DECLARE_B_SERIALIZE_FUNC
@@ -282,6 +302,54 @@ struct TrackerEvent : Data<&command::TrackerEvent,
     J_SERIALIZE_END
 };
 
+struct TrackersEventInfoA : Data<&command::TrackersEventInfo,
+                                  Message::Type::Answer>
+{
+    struct Item
+    {
+        // Порядковый индекс расположения класса в выходном слое модели
+        qint32 classIndex = {-1};
+
+        // Наименованеи класса модели
+        QString className;
+
+        // Набор событий
+        QSet<pproto::TrackEvent> events;
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "class_index" , classIndex )
+            J_SERIALIZE_MAP_ITEM( "class_name"  , className  )
+            J_SERIALIZE_MAP_ITEM( "events"      , events     )
+        J_SERIALIZE_END
+    };
+
+    QList<Item> items;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "items", items )
+};
+
+struct TrackersEventSubscript : Data<&command::TrackersEventSubscript,
+                                      Message::Type::Command>
+{
+    // Список индексов классов в выходном слое модели, для которых будет выпол-
+    // нена подписка на события. Если список пустой - события будут  подписаны
+    // для всех классов
+    QList<qint32> classIndexes;
+
+    // Набор событий
+    QSet<pproto::TrackEvent> events;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "class_indexes" , classIndexes )
+        J_SERIALIZE_MAP_ITEM( "events"       , events        )
+    J_SERIALIZE_END
+};
+
 struct TrackerSnapshot
 {
     // Порядковый индекс расположения класса в выходном слое модели
@@ -290,6 +358,7 @@ struct TrackerSnapshot
     // Наименованеи класса модели
     QString className;
 
+    // Список трекируемых объектов
     QList<TrackObject> objects;
 
     DECLARE_B_SERIALIZE_FUNC
