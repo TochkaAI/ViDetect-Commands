@@ -54,6 +54,12 @@ extern const QUuidEx TrackersEventSubscript;
 */
 extern const QUuidEx TrackersSnapshot;
 
+/**
+  Передает информацию о дополнительно необходимых отрисовках на кадре от
+  системы верхнего уровня к VDetect
+*/
+extern const QUuidEx PostprocessingMarkup;
+
 } // namespace command
 
 enum class ModelType : quint32
@@ -374,6 +380,74 @@ struct TrackersSnapshotA : Data<&command::TrackersSnapshot,
                                  Message::Type::Answer>
 {
     QList<TrackerSnapshot> items;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "items", items )
+};
+
+struct MarkupObject
+{
+    typedef container_ptr<MarkupObject> Ptr;
+
+    enum class TypeFigure : quint32
+    {
+        Unknouwn = 0,
+        Point = 1,
+        Line = 2,
+        Rectangle = 3,
+        Circle = 4
+    };
+
+    enum class GroupFigure : quint32
+    {
+        Unknouwn = 0,
+        OrdinaryFigure = 1,
+        ROI = 2,
+        CurrectionFigure = 3
+    };
+
+    struct Text
+    {
+        QString text;
+        QList<int> position;
+        int scale = {0};
+        QList<int> color;
+        int thickness = {0};
+        float offset = {0};
+
+        DECLARE_B_SERIALIZE_FUNC
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "text"      , text      )
+            J_SERIALIZE_MAP_ITEM( "position"  , position  )
+            J_SERIALIZE_MAP_ITEM( "scale"     , scale     )
+            J_SERIALIZE_MAP_ITEM( "color"     , color     )
+            J_SERIALIZE_MAP_ITEM( "thickness" , thickness )
+            J_SERIALIZE_MAP_ITEM( "offset"    , offset    )
+        J_SERIALIZE_END
+    };
+
+    GroupFigure group = {GroupFigure::Unknouwn};
+    TypeFigure type = {TypeFigure::Unknouwn};
+    QList<int> coorditane;
+    float thickness = {0};
+    QList<int> color;
+    Text descriptor;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "group"      , group      )
+        J_SERIALIZE_MAP_ITEM( "type"       , type       )
+        J_SERIALIZE_MAP_ITEM( "coorditane" , coorditane )
+        J_SERIALIZE_MAP_ITEM( "thickness"  , thickness  )
+        J_SERIALIZE_MAP_ITEM( "descriptor" , descriptor )
+    J_SERIALIZE_END
+};
+
+struct PostprocessingMarkup : Data<&command::PostprocessingMarkup,
+                                    Message::Type::Command>
+{
+
+    QList<MarkupObject::Ptr> items;
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "items", items )

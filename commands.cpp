@@ -16,6 +16,7 @@ REGISTRY_COMMAND_SINGLPROC(TrackerEvent,           "50dc6d0c-a0aa-48e6-81be-a10e
 REGISTRY_COMMAND_SINGLPROC(TrackersEventInfo,      "04bd5a2f-c298-4aac-90a9-00b158eae8f6")
 REGISTRY_COMMAND_SINGLPROC(TrackersEventSubscript, "33bac850-3f26-4816-b1a1-055e02921227")
 REGISTRY_COMMAND_SINGLPROC(TrackersSnapshot,       "0d629902-bc81-4ace-a5c0-7cab38ec240d")
+REGISTRY_COMMAND_SINGLPROC(PostprocessingMarkup,   "036f0683-29ee-4fd8-b612-1e103ace9331")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -258,6 +259,68 @@ bserial::RawVector TrackersSnapshotA::toRaw() const
 }
 
 void TrackersSnapshotA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> items;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector MarkupObject::Text::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << text;
+    stream << position;
+    stream << scale;
+    stream << color;
+    stream << thickness;
+    stream << offset;
+    B_SERIALIZE_RETURN
+}
+
+void MarkupObject::Text::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> text;
+    stream >> position;
+    stream >> scale;
+    stream >> color;
+    stream >> thickness;
+    stream >> offset;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector MarkupObject::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << group;
+    stream << type;
+    stream << coorditane;
+    stream << thickness;
+    stream << color;
+    stream << descriptor;
+    B_SERIALIZE_RETURN
+}
+
+void MarkupObject::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> group;
+    stream >> type;
+    stream >> coorditane;
+    stream >> thickness;
+    stream >> color;
+    stream >> descriptor;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector PostprocessingMarkup::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << items;
+    B_SERIALIZE_RETURN
+}
+
+void PostprocessingMarkup::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
     stream >> items;
