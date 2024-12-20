@@ -19,9 +19,24 @@ Product {
     Depends { name: "PProto" }
     Depends { name: "RapidJson"; required: false }
     Depends { name: "SharedLib" }
+    Depends { name: "lib.opencv" /*; required: false*/ }
     Depends { name: "Qt"; submodules: ["core", "network"] }
 
-    cpp.defines: project.cppDefines;
+//    Properties {
+//        condition: lib.opencv.present
+//        lib.opencv.version: project.opencvVersion
+//    }
+
+    lib.opencv.version: project.opencvVersion
+
+//    cpp.defines: {
+//        var def = project.cppDefines;
+//        if (lib.opencv.present)
+//            def.push("OPENCV_IS_PRESENT");
+//        return def;
+//    }
+
+    cpp.defines: project.cppDefines
     cpp.cxxFlags: project.cxxFlags
     cpp.cxxLanguageVersion: project.cxxLanguageVersion
 
@@ -32,6 +47,7 @@ Product {
 
     cpp.systemIncludePaths: QbsUtl.concatPaths(
         Qt.core.cpp.includePaths
+       ,lib.opencv.includePath
     )
 
     files: [

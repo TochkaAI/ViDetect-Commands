@@ -3,6 +3,10 @@
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
 
+#ifdef OPENCV_IS_PRESENT
+#include <opencv2/opencv.hpp>
+#endif
+
 namespace pproto {
 namespace command {
 
@@ -59,6 +63,36 @@ extern const QUuidEx TrackersSnapshot;
   системы верхнего уровня к VDetect
 */
 extern const QUuidEx PostprocessingMarkup;
+
+/**
+  Возвращает информацию о наборе графических примитивов
+*/
+extern const QUuidEx GraphsetInfo;
+
+/**
+  Команда для конфигурирования набора графических примитивов
+  TODO Не реализовано. Команда должна полностью заменять список
+  графических примитивов. Прорабатать вопрос с опциональным полем brush
+*/
+extern const QUuidEx GraphsetConfig;
+
+/**
+  Команда для конфигурирования видимости набора графических примитивов
+  TODO Не реализовано.
+*/
+extern const QUuidEx GraphsetVisible;
+
+/**
+  Команда для добавления новых графических примитивов
+  TODO Не реализовано.
+*/
+extern const QUuidEx GraphsetAdd;
+
+/**
+  Команда для удаления существующих графических примитивов
+  TODO Не реализовано.
+*/
+extern const QUuidEx GraphsetRemove;
 
 } // namespace command
 
@@ -345,14 +379,15 @@ struct TrackersEventSubscript : Data<&command::TrackersEventSubscript,
     // для всех классов
     QList<qint32> classIndexes;
 
-    // Набор событий
+    // Набор событий, на которые будет выполнена подписка. Если набор событий
+    // оставить пустым, то будет выполнена отписка от всех событий
     QSet<pproto::TrackEvent> events;
 
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "class_indexes" , classIndexes )
-        J_SERIALIZE_MAP_ITEM( "events"       , events        )
+        J_SERIALIZE_MAP_ITEM( "events"        , events       )
     J_SERIALIZE_END
 };
 
@@ -416,6 +451,7 @@ struct MarkupObject
         float offset = {0};
 
         DECLARE_B_SERIALIZE_FUNC
+
         J_SERIALIZE_BEGIN
             J_SERIALIZE_MAP_ITEM( "text"      , text      )
             J_SERIALIZE_MAP_ITEM( "position"  , position  )
@@ -434,6 +470,7 @@ struct MarkupObject
     Text descriptor;
 
     DECLARE_B_SERIALIZE_FUNC
+
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "group"      , group      )
         J_SERIALIZE_MAP_ITEM( "type"       , type       )
@@ -451,6 +488,395 @@ struct PostprocessingMarkup : Data<&command::PostprocessingMarkup,
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "items", items )
+};
+
+namespace graph {
+
+struct Identity
+{
+    QUuidEx id;
+    quint32 index = {0};
+    QString name;
+
+    // Определяет поле, по которому нужно выполнять поиск
+    enum class FindField : quint32
+    {
+        Id    = 0,
+        Index = 1,
+        Name  = 2
+    };
+    FindField findField = {FindField::Index};
+
+    template<typename T> struct Find
+    {
+        int operator() (const QUuidEx* id, const T* item2) const
+            {return QUuidEx::compare(*id, item2->identity.id);}
+
+        int operator() (const quint32* index, const T* item2) const
+            {return LIST_COMPARE_ITEM(*index, item2->identity.index);}
+
+        int operator() (const QString* name, const T* item2) const
+            {return name->compare(item2->identity.name);}
+
+        int operator() (const Identity* item1, const T* item2) const
+        {
+            if (item1->findField == FindField::Id)
+                return operator() (&item1->id, item2);
+
+            else if (item1->findField == FindField::Index)
+                return operator() (&item1->index, item2);
+
+            else if (item1->findField == FindField::Name)
+                return operator() (&item1->name, item2);
+
+            return -1;
+        }
+    };
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_OPT( "id"         , id        )
+        J_SERIALIZE_MAP_OPT( "index"      , index     )
+        J_SERIALIZE_MAP_OPT( "name"       , name      )
+        J_SERIALIZE_MAP_OPT( "find_field" , findField )
+    J_SERIALIZE_END
+};
+
+struct Point
+{
+    qint32 x = {0};
+    qint32 y = {0};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "x" , x )
+        J_SERIALIZE_MAP_ITEM( "y" , y )
+    J_SERIALIZE_END
+};
+
+struct Offset
+{
+    qint32 x = {0};
+    qint32 y = {0};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "x" , x )
+        J_SERIALIZE_MAP_ITEM( "y" , y )
+    J_SERIALIZE_END
+};
+
+struct Color
+{
+    quint8 r = {255};
+    quint8 g = {255};
+    quint8 b = {255};
+
+#ifdef OPENCV_IS_PRESENT
+    operator cv::Scalar () const {return CV_RGB(r, g, b);}
+#endif
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "r" , r )
+        J_SERIALIZE_MAP_ITEM( "g" , g )
+        J_SERIALIZE_MAP_ITEM( "b" , b )
+    J_SERIALIZE_END
+};
+
+struct Brush
+{
+    qint32 thickness = {1};
+    Color  color;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_OPT( "thickness" , thickness )
+        J_SERIALIZE_MAP_OPT( "color"     , color )
+    J_SERIALIZE_END
+};
+
+struct Text
+{
+    // Идентификационный признак
+    Identity identity;
+
+    // Признак отображения примитива в кадре
+    bool visible = {true};
+
+    // Кисть
+    Brush brush;
+
+    // Начальная позиция рисования текста
+    Point position;
+
+    // Смещения начальной позиции рисования текста по осям X, Y. Может принимать
+    // отрицательные значения
+    Offset offset;
+
+    // Масштаб текста (в процентах)
+    quint32 scale = {100};
+
+    // Текст
+    QString text;
+
+#ifdef OPENCV_IS_PRESENT
+    cv::Point position_() const;
+    void setPosition(const cv::Point&);
+
+    cv::Point offset_() const;
+    void setOffset(const cv::Point&);
+#endif
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "identity" , identity )
+        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
+        J_SERIALIZE_MAP_ITEM( "position" , position )
+        J_SERIALIZE_MAP_OPT ( "offset"   , offset   )
+        J_SERIALIZE_MAP_OPT ( "scale"    , scale    )
+        J_SERIALIZE_MAP_ITEM( "text"     , text     )
+    J_SERIALIZE_END
+
+    typedef lst::List<Text, Identity::Find<Text>> List;
+};
+
+struct Line
+{
+    // Идентификационный признак
+    Identity identity;
+
+    // Признак отображения примитива в кадре
+    bool visible = {true};
+
+    // Кисть
+    Brush brush;
+
+    Point point1; // Первая точка линии
+    Point point2; // Вторая точка линии
+
+#ifdef OPENCV_IS_PRESENT
+    // Точка с координатами point1
+    cv::Point p1() const;
+    void setP1(const cv::Point&);
+
+    // Точка с координатами point2
+    cv::Point p2() const;
+    void setP2(const cv::Point&);
+#endif
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "identity" , identity )
+        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
+        J_SERIALIZE_MAP_ITEM( "point1"   , point1   )
+        J_SERIALIZE_MAP_ITEM( "point2"   , point2   )
+    J_SERIALIZE_END
+
+    typedef lst::List<Line, Identity::Find<Line>> List;
+};
+
+struct Rectangle
+{
+    // Идентификационный признак
+    Identity identity;
+
+    // Признак отображения примитива в кадре
+    bool visible = {true};
+
+    // Кисть
+    Brush brush;
+
+    Point point1 = {0, 0};     // Верхняя левая точка (синоним top/left)
+    Point point2 = {100, 100}; // Правая нижняя точка (синоним bottom/right)
+
+#ifdef OPENCV_IS_PRESENT
+    // Точка с координатами point1 (синоним top/left)
+    cv::Point p1() const;
+    void setP1(const cv::Point&);
+
+    // Точка с координатами point2 (синоним bottom/right)
+    cv::Point p2() const;
+    void setP2(const cv::Point&);
+
+    // Верхний левый угол прямоугольника (top/left)
+    cv::Point tl() const {return p1();}
+    void setTl(const cv::Point& p) {setP1(p);}
+
+    // Нижний правый угол прямоугольника (bottom/right)
+    cv::Point br() const {return p2();}
+    void setBr(const cv::Point& p) {setP2(p);}
+
+    // Прямоугольник в cv::Rect представлении
+    cv::Rect rect() const;
+    void setRect(const cv::Rect&);
+#endif
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "identity" , identity )
+        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
+        J_SERIALIZE_MAP_ITEM( "point1"   , point1   )
+        J_SERIALIZE_MAP_ITEM( "point2"   , point2   )
+    J_SERIALIZE_END
+
+    typedef lst::List<Rectangle, Identity::Find<Rectangle>> List;
+};
+
+struct Circle
+{
+    // Идентификационный признак
+    Identity identity;
+
+    // Признак отображения примитива в кадре
+    bool visible = {true};
+
+    // Кисть
+    Brush brush;
+
+    Point center;
+    quint32 radius = {0};
+
+#ifdef OPENCV_IS_PRESENT
+    cv::Point center_() const;
+    void setCenter(const cv::Point&);
+#endif
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "identity" , identity )
+        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
+        J_SERIALIZE_MAP_ITEM( "center"   , center   )
+        J_SERIALIZE_MAP_ITEM( "radius"   , radius   )
+    J_SERIALIZE_END
+
+    typedef lst::List<Circle, Identity::Find<Circle>> List;
+};
+
+/**
+  Набор графических примитиров
+*/
+struct Set
+{
+    // Идентификационный признак
+    Identity identity;
+
+    // Признак отображения всего набора графических примитивов
+    bool visible = {true};
+
+    // Общая кисть
+    Brush brush;
+
+    // Граница области набора графических примитивов
+    Rectangle border;
+
+    // Набор текстовых примитивов
+    Text::List texts;
+
+    // Набор линий
+    Line::List lines;
+
+    // Набор прямоугольников
+    Rectangle::List rectangles;
+
+    // Набор окружностей
+    Circle::List circles;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "identity"   , identity   )
+        J_SERIALIZE_MAP_OPT ( "visible"    , visible    )
+        J_SERIALIZE_MAP_OPT ( "border"     , border     )
+        J_SERIALIZE_MAP_OPT ( "texts"      , texts      )
+        J_SERIALIZE_MAP_OPT ( "lines"      , lines      )
+        J_SERIALIZE_MAP_OPT ( "rectangles" , rectangles )
+        J_SERIALIZE_MAP_OPT ( "circles"    , circles    )
+    J_SERIALIZE_END
+
+    typedef lst::List<Set, Identity::Find<Set>> List;
+};
+
+} // namespace graph
+
+struct Graphset
+{
+    // Признак отображения всех наборов графических примитивов
+    bool visible = {true};
+
+    // Список наборов графических примитивов
+    data::graph::Set::List items;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "visible" , visible )
+        J_SERIALIZE_MAP_ITEM( "items"   , items   )
+    J_SERIALIZE_END
+};
+
+struct GraphsetInfoA : Graphset, Data<&command::GraphsetInfo,
+                                       Message::Type::Answer>
+{
+};
+
+struct GraphsetVisible : Data<&command::GraphsetVisible,
+                               Message::Type::Command>
+{
+    // Признак отображения всех наборов графических примитивов
+    bool visible = {true};
+
+    struct Set
+    {
+        struct Item
+        {
+            graph::Identity identity; // Идентификационный признак
+            bool visible = {true};    // Признак отображения примитива в кадре
+
+            DECLARE_B_SERIALIZE_FUNC
+
+            J_SERIALIZE_BEGIN
+                J_SERIALIZE_MAP_ITEM( "identity" , identity )
+                J_SERIALIZE_MAP_ITEM( "visible"  , visible  )
+            J_SERIALIZE_END
+        };
+
+        QList<Item> texts;      // Набор текстовых примитивов
+        QList<Item> lines;      // Набор линий
+        QList<Item> rectangles; // Набор прямоугольников
+        QList<Item> circles;    // Набор окружностей
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "texts"      , texts      )
+            J_SERIALIZE_MAP_ITEM( "lines"      , lines      )
+            J_SERIALIZE_MAP_ITEM( "rectangles" , rectangles )
+            J_SERIALIZE_MAP_ITEM( "circles"    , circles    )
+        J_SERIALIZE_END
+    };
+
+    QList<Set> items;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "visible" , visible )
+        J_SERIALIZE_MAP_ITEM( "items"   , items   )
+    J_SERIALIZE_END
 };
 
 } // namespace data
