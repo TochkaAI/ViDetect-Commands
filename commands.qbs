@@ -4,22 +4,23 @@ import ProbExt
 
 Product {
     name: "ViDetect"
+    targetName: "videtect"
+    condition: true
 
     Properties {
-        condition: project.isViDetectProject === true
         name: "Commands"
+        targetName: "commands"
+        condition: project.isViDetectProject === true
     }
-
-    targetName: "commands"
-    condition: true
 
     type: "staticlibrary"
 
     Depends { name: "cpp" }
+    Depends { name: "Inference"; required: false }
     Depends { name: "PProto" }
     Depends { name: "RapidJson"; required: false }
     Depends { name: "SharedLib" }
-    Depends { name: "lib.opencv" /*; required: false*/ }
+    Depends { name: "lib.opencv" }
     Depends { name: "Qt"; submodules: ["core", "network"] }
 
 //    Properties {
@@ -29,14 +30,12 @@ Product {
 
     lib.opencv.version: project.opencvVersion
 
-//    cpp.defines: {
-//        var def = project.cppDefines;
-//        if (lib.opencv.present)
-//            def.push("OPENCV_IS_PRESENT");
-//        return def;
-//    }
-
-    cpp.defines: project.cppDefines
+    cpp.defines: {
+        var def = project.cppDefines;
+        if (Inference.present)
+            def.push("INFERENCE_IS_PRESENT");
+        return def;
+    }
     cpp.cxxFlags: project.cxxFlags
     cpp.cxxLanguageVersion: project.cxxLanguageVersion
 
