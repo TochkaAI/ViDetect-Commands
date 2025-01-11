@@ -155,7 +155,7 @@ namespace graph {
 struct Identity
 {
     QUuidEx id;
-    quint32 index = {0};
+    qint32  index = {-1};
     QString name;
 
     // Определяет поле, по которому нужно выполнять поиск/идентификацию
@@ -172,7 +172,7 @@ struct Identity
         int operator() (const QUuidEx* id, const T* item2) const
             {return QUuidEx::compare(*id, item2->identity.id);}
 
-        int operator() (const quint32* index, const T* item2) const
+        int operator() (const qint32* index, const T* item2) const
             {return LIST_COMPARE_ITEM(*index, item2->identity.index);}
 
         int operator() (const QString* name, const T* item2) const
@@ -200,32 +200,6 @@ struct Identity
         J_SERIALIZE_MAP_OPT( "index"      , index     )
         J_SERIALIZE_MAP_OPT( "name"       , name      )
         J_SERIALIZE_MAP_OPT( "find_field" , findField )
-    J_SERIALIZE_END
-};
-
-struct Point
-{
-    qint32 x = {0};
-    qint32 y = {0};
-
-    DECLARE_B_SERIALIZE_FUNC
-
-    J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "x" , x )
-        J_SERIALIZE_MAP_ITEM( "y" , y )
-    J_SERIALIZE_END
-};
-
-struct Offset
-{
-    qint32 x = {0};
-    qint32 y = {0};
-
-    DECLARE_B_SERIALIZE_FUNC
-
-    J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "x" , x )
-        J_SERIALIZE_MAP_ITEM( "y" , y )
     J_SERIALIZE_END
 };
 
@@ -258,6 +232,32 @@ struct Brush
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_OPT( "thickness" , thickness )
         J_SERIALIZE_MAP_OPT( "color"     , color )
+    J_SERIALIZE_END
+};
+
+struct Point
+{
+    qint32 x = {0};
+    qint32 y = {0};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "x" , x )
+        J_SERIALIZE_MAP_ITEM( "y" , y )
+    J_SERIALIZE_END
+};
+
+struct Offset
+{
+    qint32 dx = {0};
+    qint32 dy = {0};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "dx" , dx )
+        J_SERIALIZE_MAP_ITEM( "dy" , dy )
     J_SERIALIZE_END
 };
 
@@ -474,9 +474,6 @@ struct Set
     // Признак отображения всего набора графических примитивов
     bool visible = {true};
 
-    // Общая кисть
-    Brush brush;
-
     // Граница области набора графических примитивов
     Rectangle border;
 
@@ -521,24 +518,27 @@ struct ModelClass
     bool skip = {false};
 
     // Индивидуальные пороговые значения для класса модели
+    float cuttingThresh = {0.10};
     float scoreThresh = {0.70};
     float nmsThresh = {0.50};
 
     // TODO возможно здесь надо добавить поля для конфигурирования отрисовки рамок
 
+    typedef lst::List<ModelClass, lst::CompareItemDummy> List;
+
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "index"        , index       )
-        J_SERIALIZE_MAP_ITEM( "name"         , name        )
-        J_SERIALIZE_MAP_ITEM( "skip"         , skip        )
-        J_SERIALIZE_MAP_ITEM( "score_thresh" , scoreThresh )
-        J_SERIALIZE_MAP_ITEM( "nms_thresh"   , nmsThresh   )
+        J_SERIALIZE_MAP_ITEM( "index"          , index         )
+        J_SERIALIZE_MAP_ITEM( "name"           , name          )
+        J_SERIALIZE_MAP_ITEM( "skip"           , skip          )
+        J_SERIALIZE_MAP_ITEM( "cutting_thresh" , cuttingThresh )
+        J_SERIALIZE_MAP_ITEM( "score_thresh"   , scoreThresh   )
+        J_SERIALIZE_MAP_ITEM( "nms_thresh"     , nmsThresh     )
     J_SERIALIZE_END
 };
 
-struct ModelInfoA : Data<&command::ModelInfo,
-                          Message::Type::Answer>
+struct ModelInfo
 {
     // Наименование файла модели
     QString file;
@@ -562,8 +562,12 @@ struct ModelInfoA : Data<&command::ModelInfo,
     // Наименование выходного слоя модели
     QString output;
 
+    // Количество записей в выходном слое модели. Для yolov9 количество столбцов
+    // выходного слоя
+    qint32 recordCount = {-1};
+
     // Список классов модели
-    QList<ModelClass> classes;
+    ModelClass::List classes;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -575,8 +579,14 @@ struct ModelInfoA : Data<&command::ModelInfo,
         J_SERIALIZE_MAP_ITEM( "size"           , inputSize     )
         J_SERIALIZE_MAP_ITEM( "input"          , input         )
         J_SERIALIZE_MAP_ITEM( "output"         , output        )
+        J_SERIALIZE_MAP_ITEM( "record_count"   , recordCount   )
         J_SERIALIZE_MAP_ITEM( "classes"        , classes       )
     J_SERIALIZE_END
+};
+
+struct ModelInfoA : ModelInfo, Data<&command::ModelInfo,
+                                     Message::Type::Answer>
+{
 };
 
 /**

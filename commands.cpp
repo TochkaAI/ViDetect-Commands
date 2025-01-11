@@ -52,38 +52,6 @@ void Identity::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector Point::toRaw() const
-{
-    B_SERIALIZE_V1(stream)
-    stream << x;
-    stream << y;
-    B_SERIALIZE_RETURN
-}
-
-void Point::fromRaw(const bserial::RawVector& vect)
-{
-    B_DESERIALIZE_V1(vect, stream)
-    stream >> x;
-    stream >> y;
-    B_DESERIALIZE_END
-}
-
-bserial::RawVector Offset::toRaw() const
-{
-    B_SERIALIZE_V1(stream)
-    stream << x;
-    stream << y;
-    B_SERIALIZE_RETURN
-}
-
-void Offset::fromRaw(const bserial::RawVector& vect)
-{
-    B_DESERIALIZE_V1(vect, stream)
-    stream >> x;
-    stream >> y;
-    B_DESERIALIZE_END
-}
-
 bserial::RawVector Color::toRaw() const
 {
     B_SERIALIZE_V1(stream)
@@ -118,6 +86,38 @@ void Brush::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+bserial::RawVector Point::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << x;
+    stream << y;
+    B_SERIALIZE_RETURN
+}
+
+void Point::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> x;
+    stream >> y;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector Offset::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << dx;
+    stream << dy;
+    B_SERIALIZE_RETURN
+}
+
+void Offset::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> dx;
+    stream >> dy;
+    B_DESERIALIZE_END
+}
+
 #ifdef OPENCV_IS_PRESENT
 
 cv::Point Caption::position_() const
@@ -133,13 +133,13 @@ void Caption::setPosition(const cv::Point& p)
 
 cv::Point Caption::offset_() const
 {
-    return cv::Point(offset.x, offset.y);
+    return cv::Point(offset.dx, offset.dy);
 }
 
 void Caption::setOffset(const cv::Point& p)
 {
-    offset.x = p.x;
-    offset.y = p.y;
+    offset.dx = p.x;
+    offset.dy = p.y;
 }
 
 #endif // OPENCV_IS_PRESENT
@@ -374,6 +374,7 @@ bserial::RawVector ModelClass::toRaw() const
     stream << index;
     stream << name;
     stream << skip;
+    stream << cuttingThresh;
     stream << scoreThresh;
     stream << nmsThresh;
     B_SERIALIZE_RETURN
@@ -385,12 +386,13 @@ void ModelClass::fromRaw(const bserial::RawVector& vect)
     stream >> index;
     stream >> name;
     stream >> skip;
+    stream >> cuttingThresh;
     stream >> scoreThresh;
     stream >> nmsThresh;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector ModelInfoA::toRaw() const
+bserial::RawVector ModelInfo::toRaw() const
 {
     B_SERIALIZE_V1(stream)
     stream << file;
@@ -400,11 +402,12 @@ bserial::RawVector ModelInfoA::toRaw() const
     stream << inputSize;
     stream << input;
     stream << output;
+    stream << recordCount;
     stream << classes;
     B_SERIALIZE_RETURN
 }
 
-void ModelInfoA::fromRaw(const bserial::RawVector& vect)
+void ModelInfo::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
     stream >> file;
@@ -414,6 +417,7 @@ void ModelInfoA::fromRaw(const bserial::RawVector& vect)
     stream >> inputSize;
     stream >> input;
     stream >> output;
+    stream >> recordCount;
     stream >> classes;
     B_DESERIALIZE_END
 }
