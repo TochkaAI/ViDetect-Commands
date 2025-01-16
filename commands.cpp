@@ -23,6 +23,7 @@ REGISTRY_COMMAND_SINGLPROC(GraphsetVisible,        "dac925e7-8abe-49cb-98d3-1553
 REGISTRY_COMMAND_SINGLPROC(GraphsetAdd,            "197d538b-c9e9-4328-bca3-5f573e76229d")
 REGISTRY_COMMAND_SINGLPROC(GraphsetRemove,         "0581afc9-464e-4978-8ad7-5005bd623331")
 REGISTRY_COMMAND_SINGLPROC(RoisInfo,               "49ee172b-2954-4f90-9965-de3804fe3f14")
+REGISTRY_COMMAND_SINGLPROC(FpFnInfo,               "0db958aa-d392-4157-9ed8-901f258e69d9")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -84,6 +85,11 @@ void Brush::fromRaw(const bserial::RawVector& vect)
     stream >> thickness;
     stream >> color;
     B_DESERIALIZE_END
+}
+
+bool Point::isNull() const
+{
+    return (x == 0) && (y == 0);
 }
 
 bserial::RawVector Point::toRaw() const
@@ -198,6 +204,11 @@ void Line::setP2(const cv::Point& p)
 
 #endif // OPENCV_IS_PRESENT
 
+bool Line::isNull() const
+{
+    return (point1.isNull() && point2.isNull());
+}
+
 bserial::RawVector Line::toRaw() const
 {
     B_SERIALIZE_V1(stream)
@@ -260,6 +271,11 @@ void Rectangle::setRect(const cv::Rect& rect)
 }
 
 #endif // OPENCV_IS_PRESENT
+
+bool pproto::data::graph::Rectangle::isNull() const
+{
+    return (point1.isNull() && point2.isNull());
+}
 
 bserial::RawVector Rectangle::toRaw() const
 {
@@ -772,6 +788,54 @@ void RoisInfo::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
     stream >> globalRois;
+    stream >> classes;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector FpFnInfo::ModelClass::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << index;
+    stream << active;
+    stream << roi;
+    stream << fpTiming;
+    stream << fnTiming;
+    stream << fnTtlDown;
+    B_SERIALIZE_RETURN
+}
+
+void FpFnInfo::ModelClass::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> index;
+    stream >> active;
+    stream >> roi;
+    stream >> fpTiming;
+    stream >> fnTiming;
+    stream >> fnTtlDown;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector FpFnInfo::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << active;
+    stream << path;
+    stream << prefix;
+    stream << visibleRois;
+    stream << markupBrush;
+    stream << classes;
+    B_SERIALIZE_RETURN
+}
+
+void FpFnInfo::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> active;
+    stream >> path;
+    stream >> prefix;
+    stream >> visibleRois;
+    stream >> markupBrush;
     stream >> classes;
     B_DESERIALIZE_END
 }
