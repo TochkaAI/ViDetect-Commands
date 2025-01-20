@@ -16,6 +16,7 @@ REGISTRY_COMMAND_SINGLPROC(TrackerEvent,           "50dc6d0c-a0aa-48e6-81be-a10e
 REGISTRY_COMMAND_SINGLPROC(TrackersEventInfo,      "04bd5a2f-c298-4aac-90a9-00b158eae8f6")
 REGISTRY_COMMAND_SINGLPROC(TrackersEventSubscript, "33bac850-3f26-4816-b1a1-055e02921227")
 REGISTRY_COMMAND_SINGLPROC(TrackersSnapshot,       "0d629902-bc81-4ace-a5c0-7cab38ec240d")
+REGISTRY_COMMAND_SINGLPROC(TrackRectsInfo,         "0bc0246f-ef01-42a5-adb2-c724a8ea9327")
 REGISTRY_COMMAND_SINGLPROC(PostprocessingMarkup,   "036f0683-29ee-4fd8-b612-1e103ace9331")
 REGISTRY_COMMAND_SINGLPROC(GraphsetInfo,           "53aedbb1-ee08-4c01-8f45-499e5c099a68")
 REGISTRY_COMMAND_SINGLPROC(GraphsetConfig,         "d184366a-a48e-43a6-8c7e-8561c9a43184")
@@ -382,6 +383,26 @@ void Set::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+bserial::RawVector TrackRect::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << id;
+    stream << visible;
+    stream << caption;
+    stream << border;
+    B_SERIALIZE_RETURN
+}
+
+void TrackRect::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> id;
+    stream >> visible;
+    stream >> caption;
+    stream >> border;
+    B_DESERIALIZE_END
+}
+
 } // namespace graph
 
 bserial::RawVector ModelClass::toRaw() const
@@ -628,6 +649,38 @@ void TrackersSnapshotA::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+bserial::RawVector TrackRectsInfo::ModelClass::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << index;
+    stream << rect;
+    B_SERIALIZE_RETURN
+}
+
+void TrackRectsInfo::ModelClass::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> index;
+    stream >> rect;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector TrackRectsInfo::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << visible;
+    stream << classes;
+    B_SERIALIZE_RETURN
+}
+
+void TrackRectsInfo::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> visible;
+    stream >> classes;
+    B_DESERIALIZE_END
+}
+
 bserial::RawVector MarkupObject::Text::toRaw() const
 {
     B_SERIALIZE_V1(stream)
@@ -779,6 +832,7 @@ void RoisInfo::ModelClass::fromRaw(const bserial::RawVector& vect)
 bserial::RawVector RoisInfo::toRaw() const
 {
     B_SERIALIZE_V1(stream)
+    stream << visible;
     stream << globalRois;
     stream << classes;
     B_SERIALIZE_RETURN
@@ -787,6 +841,7 @@ bserial::RawVector RoisInfo::toRaw() const
 void RoisInfo::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
+    stream >> visible;
     stream >> globalRois;
     stream >> classes;
     B_DESERIALIZE_END

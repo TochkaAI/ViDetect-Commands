@@ -63,6 +63,11 @@ extern const QUuidEx TrackersEventSubscript;
 extern const QUuidEx TrackersSnapshot;
 
 /**
+  Возвращает информацию о параметрах отрисоки рамок трекирования
+*/
+extern const QUuidEx TrackRectsInfo;
+
+/**
   Передает информацию о дополнительно необходимых отрисовках на кадре от
   системы верхнего уровня к VDetect
 */
@@ -516,6 +521,44 @@ struct Set
     typedef lst::List<Set, Identity::Find<Set>> List;
 };
 
+struct TrackRect
+{
+    // Идентификатор трекируемого объекта, используется для динамической
+    // раскраски объекта
+    QUuidEx id;
+
+    // Глобальный идентификатор трекирования
+    // QUuidEx globalId;
+
+    // Порядковый индекс расположения класса в выходном слое модели
+    // qint32 classIndex = {-1};
+
+    // Признак отображения примитива в кадре
+    bool visible = {true};
+
+    // Надпись для рамки трекирования с привязкой к одному из углов геометри-
+    // ческой области, по умолчанию к верхнему левому углу
+    graph::Caption caption;
+
+    // Геометрическая область рамки трекирования.  Значимыми  являются  только
+    // признак видимости и параметры кисти, геометрия рамки берется от трекера
+    graph::Rectangle border;
+
+    // TODO на проработку
+    // graph::Set graphset;
+
+    typedef lst::List<TrackRect, lst::CompareItemDummy> List;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "id"      , id      )
+        J_SERIALIZE_MAP_OPT ( "visible" , visible )
+        J_SERIALIZE_MAP_OPT ( "caption" , caption )
+        J_SERIALIZE_MAP_ITEM( "border"  , border  )
+    J_SERIALIZE_END
+};
+
 } // namespace graph
 
 struct ModelClass
@@ -650,6 +693,8 @@ struct TrackerInfo
     // по количеству
     qint32 rectsCountLimit = {-1};
 
+    typedef lst::List<TrackerInfo, lst::CompareItemDummy> List;
+
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
@@ -667,7 +712,7 @@ struct TrackerInfo
 struct TrackersInfoA : Data<&command::TrackersInfo,
                              Message::Type::Answer>
 {
-    QList<TrackerInfo> items;
+    TrackerInfo::List items;
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "items", items )
@@ -698,6 +743,8 @@ struct TrackObject
 
     // Усредненная рамка/скор за 1-8 итераций
     DetectRect averageRect;
+
+    typedef lst::List<TrackObject, lst::CompareItemDummy> List;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -751,6 +798,8 @@ struct TrackersEventInfoA : Data<&command::TrackersEventInfo,
         // Набор событий
         QSet<pproto::TrackEvent> events;
 
+        typedef lst::List<Item, lst::CompareItemDummy> List;
+
         DECLARE_B_SERIALIZE_FUNC
 
         J_SERIALIZE_BEGIN
@@ -760,7 +809,7 @@ struct TrackersEventInfoA : Data<&command::TrackersEventInfo,
         J_SERIALIZE_END
     };
 
-    QList<Item> items;
+    Item::List items;
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "items", items )
@@ -795,7 +844,9 @@ struct TrackerSnapshot
     QString className;
 
     // Список трекируемых объектов
-    QList<TrackObject> objects;
+    TrackObject::List objects;
+
+    typedef lst::List<TrackerSnapshot, lst::CompareItemDummy> List;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -809,10 +860,48 @@ struct TrackerSnapshot
 struct TrackersSnapshotA : Data<&command::TrackersSnapshot,
                                  Message::Type::Answer>
 {
-    QList<TrackerSnapshot> items;
+    TrackerSnapshot::List items;
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "items", items )
+};
+
+struct TrackRectsInfo
+{
+    // Признак отображения всех рамок трекирования
+    bool visible = {false};
+
+    struct ModelClass
+    {
+        // Порядковый индекс расположения класса в выходном слое модели
+        qint32 index = {0};
+
+        // Параметры отображения рамок трекирования для класса модели
+        graph::TrackRect rect;
+
+        typedef lst::List<ModelClass, lst::CompareItemDummy> List;
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "index" , index )
+            J_SERIALIZE_MAP_ITEM( "rect"  , rect  )
+        J_SERIALIZE_END
+    };
+
+    ModelClass::List classes;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "visible" , visible )
+        J_SERIALIZE_MAP_ITEM( "classes" , classes )
+    J_SERIALIZE_END
+};
+
+struct TrackRectsInfoA : TrackRectsInfo,  Data<&command::TrackRectsInfo,
+                                                Message::Type::Answer>
+{
 };
 
 struct MarkupObject
@@ -997,6 +1086,7 @@ struct RoisInfo
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "visible"     , visible    )
         J_SERIALIZE_MAP_ITEM( "global_rois" , globalRois )
         J_SERIALIZE_MAP_ITEM( "classes"     , classes    )
     J_SERIALIZE_END
