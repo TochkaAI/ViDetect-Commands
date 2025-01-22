@@ -34,6 +34,11 @@ REGISTRY_COMMAND_SINGLPROC(FpFnInfo,               "0db958aa-d392-4157-9ed8-901f
 namespace data {
 namespace graph {
 
+bool Identity::isNull() const
+{
+    return (id.isNull() && (index < 0) && name.isEmpty());
+}
+
 bserial::RawVector Identity::toRaw() const
 {
     B_SERIALIZE_V1(stream)
@@ -405,6 +410,22 @@ void TrackRect::fromRaw(const bserial::RawVector& vect)
 
 } // namespace graph
 
+bserial::RawVector FrameCrop::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << active;
+    stream << border;
+    B_SERIALIZE_RETURN
+}
+
+void FrameCrop::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> active;
+    stream >> border;
+    B_DESERIALIZE_END
+}
+
 bserial::RawVector ModelClass::toRaw() const
 {
     B_SERIALIZE_V1(stream)
@@ -440,6 +461,7 @@ bserial::RawVector ModelInfo::toRaw() const
     stream << input;
     stream << output;
     stream << recordCount;
+    stream << frameCrop;
     stream << classes;
     B_SERIALIZE_RETURN
 }
@@ -455,6 +477,7 @@ void ModelInfo::fromRaw(const bserial::RawVector& vect)
     stream >> input;
     stream >> output;
     stream >> recordCount;
+    stream >> frameCrop;
     stream >> classes;
     B_DESERIALIZE_END
 }

@@ -204,6 +204,8 @@ struct Identity
         }
     };
 
+    bool isNull() const;
+
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
@@ -561,6 +563,23 @@ struct TrackRect
 
 } // namespace graph
 
+struct FrameCrop
+{
+    //typedef container_ptr<FrameCrop> Ptr;
+
+    // Признак активности механизма frame crop
+    bool active = {true};
+
+    graph::Rectangle border;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "active"  , active  )
+        J_SERIALIZE_MAP_ITEM( "border"  , border  )
+    J_SERIALIZE_END
+};
+
 struct ModelClass
 {
     // Порядковый индекс класса модели
@@ -621,6 +640,8 @@ struct ModelInfo
     // выходного слоя
     qint32 recordCount = {-1};
 
+    FrameCrop frameCrop;
+
     // Список классов модели
     ModelClass::List classes;
 
@@ -635,6 +656,7 @@ struct ModelInfo
         J_SERIALIZE_MAP_ITEM( "input"          , input         )
         J_SERIALIZE_MAP_ITEM( "output"         , output        )
         J_SERIALIZE_MAP_ITEM( "record_count"   , recordCount   )
+        J_SERIALIZE_MAP_ITEM( "frame_crop"     , frameCrop     )
         J_SERIALIZE_MAP_ITEM( "classes"        , classes       )
     J_SERIALIZE_END
 };
