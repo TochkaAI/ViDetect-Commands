@@ -328,6 +328,7 @@ bserial::RawVector Circle::toRaw() const
     stream << brush;
     stream << center;
     stream << radius;
+    stream << filled;
     B_SERIALIZE_RETURN
 }
 
@@ -339,6 +340,7 @@ void Circle::fromRaw(const bserial::RawVector& vect)
     stream >> brush;
     stream >> center;
     stream >> radius;
+    stream >> filled;
     B_DESERIALIZE_END
 }
 
@@ -395,6 +397,7 @@ bserial::RawVector TrackRect::toRaw() const
     stream << visible;
     stream << caption;
     stream << border;
+    stream << center;
     B_SERIALIZE_RETURN
 }
 
@@ -405,6 +408,7 @@ void TrackRect::fromRaw(const bserial::RawVector& vect)
     stream >> visible;
     stream >> caption;
     stream >> border;
+    stream >> center;
     B_DESERIALIZE_END
 }
 

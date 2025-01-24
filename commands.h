@@ -437,6 +437,9 @@ struct Circle
     Point center;
     quint32 radius = {0};
 
+    // Признак заполнения круга сплошным цветом
+    bool filled = {false};
+
 #ifdef OPENCV_IS_PRESENT
     cv::Point center_() const;
     void setCenter(const cv::Point&);
@@ -450,6 +453,7 @@ struct Circle
         J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
         J_SERIALIZE_MAP_ITEM( "center"   , center   )
         J_SERIALIZE_MAP_ITEM( "radius"   , radius   )
+        J_SERIALIZE_MAP_ITEM( "filled"   , filled   )
     J_SERIALIZE_END
 
     typedef lst::List<Circle, Identity::Find<Circle>> List;
@@ -546,6 +550,9 @@ struct TrackRect
     // признак видимости и параметры кисти, геометрия рамки берется от трекера
     graph::Rectangle border;
 
+    // Геометрический центр рамки трекирования
+    graph::Circle center;
+
     // TODO на проработку
     // graph::Set graphset;
 
@@ -558,6 +565,7 @@ struct TrackRect
         J_SERIALIZE_MAP_OPT ( "visible" , visible )
         J_SERIALIZE_MAP_OPT ( "caption" , caption )
         J_SERIALIZE_MAP_ITEM( "border"  , border  )
+        J_SERIALIZE_MAP_ITEM( "center"  , center  )
     J_SERIALIZE_END
 };
 
