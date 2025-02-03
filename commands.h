@@ -263,6 +263,21 @@ struct Point
     J_SERIALIZE_END
 };
 
+struct Size
+{
+    qint32 width = {0};
+    qint32 height = {0};
+
+    bool isNull() const;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "width"  , width  )
+        J_SERIALIZE_MAP_ITEM( "height" , height )
+    J_SERIALIZE_END
+};
+
 struct Offset
 {
     qint32 dx = {0};
@@ -383,8 +398,15 @@ struct Rectangle
     // Кисть
     Brush brush;
 
-    Point point1; // Верхняя левая точка (синоним top/left)
-    Point point2; // Правая нижняя точка (синоним bottom/right)
+    // Верхняя левая точка (синоним top/left)
+    Point point1;
+
+    // Правая нижняя точка (синоним bottom/right)
+    Point point2;
+
+    // Геометрические размеры прямоугольника. Если параметр point2 равен null,
+    // то построение прямоугольника будет происходить на основе size
+    Size size;
 
 #ifdef OPENCV_IS_PRESENT
     // Точка с координатами point1 (синоним top/left)
@@ -418,6 +440,7 @@ struct Rectangle
         J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
         J_SERIALIZE_MAP_ITEM( "point1"   , point1   )
         J_SERIALIZE_MAP_ITEM( "point2"   , point2   )
+        J_SERIALIZE_MAP_ITEM( "size"     , size     )
     J_SERIALIZE_END
 
     typedef lst::List<Rectangle, Identity::Find<Rectangle>> List;

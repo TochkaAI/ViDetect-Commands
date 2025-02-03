@@ -114,6 +114,27 @@ void Point::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+bool Size::isNull() const
+{
+    return (width == 0) && (height == 0);
+}
+
+bserial::RawVector Size::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << width;
+    stream << height;
+    B_SERIALIZE_RETURN
+}
+
+void Size::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> width;
+    stream >> height;
+    B_DESERIALIZE_END
+}
+
 bserial::RawVector Offset::toRaw() const
 {
     B_SERIALIZE_V1(stream)
@@ -252,7 +273,10 @@ void Rectangle::setP1(const cv::Point& p)
 
 cv::Point Rectangle::p2() const
 {
-    return cv::Point(point2.x, point2.y);
+    if (!point2.isNull())
+        return cv::Point(point2.x, point2.y);
+    else
+        return cv::Point(point1.x + size.width, point1.y + size.height);
 }
 
 void Rectangle::setP2(const cv::Point& p)
@@ -263,9 +287,12 @@ void Rectangle::setP2(const cv::Point& p)
 
 cv::Rect Rectangle::rect() const
 {
-    return cv::Rect(point1.x, point1.y,
-                    point2.x - point1.x /*width*/,
-                    point2.y - point1.y /*height*/);
+    if (!point2.isNull())
+        return cv::Rect(point1.x, point1.y,
+                        point2.x - point1.x /*width*/,
+                        point2.y - point1.y /*height*/);
+    else
+        return cv::Rect(point1.x, point1.y, size.width, size.height);
 }
 
 void Rectangle::setRect(const cv::Rect& rect)
@@ -274,13 +301,16 @@ void Rectangle::setRect(const cv::Rect& rect)
     point1.y = rect.y;
     point2.x = rect.x + rect.width;
     point2.y = rect.y + rect.height;
+
+    size.width  = rect.width;
+    size.height = rect.height;
 }
 
 #endif // OPENCV_IS_PRESENT
 
 bool pproto::data::graph::Rectangle::isNull() const
 {
-    return (point1.isNull() && point2.isNull());
+    return (point1.isNull() && point2.isNull() && size.isNull());
 }
 
 bserial::RawVector Rectangle::toRaw() const
@@ -291,6 +321,7 @@ bserial::RawVector Rectangle::toRaw() const
     stream << brush;
     stream << point1;
     stream << point2;
+    stream << size;
     B_SERIALIZE_RETURN
 }
 
@@ -302,6 +333,7 @@ void Rectangle::fromRaw(const bserial::RawVector& vect)
     stream >> brush;
     stream >> point1;
     stream >> point2;
+    stream >> size;
     B_DESERIALIZE_END
 }
 
