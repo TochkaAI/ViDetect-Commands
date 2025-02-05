@@ -20,6 +20,7 @@ Product {
     Depends { name: "PProto" }
     Depends { name: "RapidJson"; required: false }
     Depends { name: "SharedLib" }
+    Depends { name: "Yaml" }
     Depends { name: "lib.opencv" }
     Depends { name: "Qt"; submodules: ["core", "network"] }
 
@@ -50,9 +51,11 @@ Product {
     )
 
     files: [
-        "error.h",
+        "config/load_config.cpp",
+        "config/load_config.h",
         "commands.cpp",
         "commands.h",
+        "error.h",
     ]
 
     Export {

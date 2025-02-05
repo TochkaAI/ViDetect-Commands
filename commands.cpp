@@ -13,18 +13,18 @@ namespace command {
 REGISTRY_COMMAND_SINGLPROC(ModelInfo,              "d8f7f3f5-2965-4b1a-9508-3e18f85d0fcc")
 REGISTRY_COMMAND_SINGLPROC(TrackersInfo,           "d6272e50-b3e7-4d7d-b45e-e22440c78315")
 REGISTRY_COMMAND_SINGLPROC(TrackerEvent,           "50dc6d0c-a0aa-48e6-81be-a10e2998dee3")
-REGISTRY_COMMAND_SINGLPROC(TrackersEventInfo,      "04bd5a2f-c298-4aac-90a9-00b158eae8f6")
-REGISTRY_COMMAND_SINGLPROC(TrackersEventSubscript, "33bac850-3f26-4816-b1a1-055e02921227")
-REGISTRY_COMMAND_SINGLPROC(TrackersSnapshot,       "0d629902-bc81-4ace-a5c0-7cab38ec240d")
-REGISTRY_COMMAND_SINGLPROC(TrackRectsInfo,         "0bc0246f-ef01-42a5-adb2-c724a8ea9327")
-REGISTRY_COMMAND_SINGLPROC(PostprocessingMarkup,   "036f0683-29ee-4fd8-b612-1e103ace9331")
-REGISTRY_COMMAND_SINGLPROC(GraphsetInfo,           "53aedbb1-ee08-4c01-8f45-499e5c099a68")
-REGISTRY_COMMAND_SINGLPROC(GraphsetConfig,         "d184366a-a48e-43a6-8c7e-8561c9a43184")
-REGISTRY_COMMAND_SINGLPROC(GraphsetVisible,        "dac925e7-8abe-49cb-98d3-15535131850a")
-REGISTRY_COMMAND_SINGLPROC(GraphsetAdd,            "197d538b-c9e9-4328-bca3-5f573e76229d")
-REGISTRY_COMMAND_SINGLPROC(GraphsetRemove,         "0581afc9-464e-4978-8ad7-5005bd623331")
-REGISTRY_COMMAND_SINGLPROC(RoisInfo,               "49ee172b-2954-4f90-9965-de3804fe3f14")
-REGISTRY_COMMAND_SINGLPROC(FpFnInfo,               "0db958aa-d392-4157-9ed8-901f258e69d9")
+REGISTRY_COMMAND_SINGLPROC(TrackersEventsInfo,      "04bd5a2f-c298-4aac-90a9-00b158eae8f6")
+REGISTRY_COMMAND_SINGLPROC(TrackersEventsSubscript, "33bac850-3f26-4816-b1a1-055e02921227")
+REGISTRY_COMMAND_SINGLPROC(TrackersSnapshot,        "0d629902-bc81-4ace-a5c0-7cab38ec240d")
+REGISTRY_COMMAND_SINGLPROC(TrackRectsInfo,          "0bc0246f-ef01-42a5-adb2-c724a8ea9327")
+REGISTRY_COMMAND_SINGLPROC(GraphsetInfo,            "53aedbb1-ee08-4c01-8f45-499e5c099a68")
+REGISTRY_COMMAND_SINGLPROC(GraphsetChanged,         "d184366a-a48e-43a6-8c7e-8561c9a43184")
+REGISTRY_COMMAND_SINGLPROC(GraphsetDynamicInfo,     "b4fdbb1c-dfdf-4b25-8479-49b0902fe9e0")
+REGISTRY_COMMAND_SINGLPROC(GraphsetDynamicUpdate,   "056b6217-5919-4578-8b30-7c80bb52e8df")
+REGISTRY_COMMAND_SINGLPROC(GraphsetDynamicChanged,  "85072983-a893-48b4-a916-d7a362aea537")
+REGISTRY_COMMAND_SINGLPROC(GraphsetVisible,         "dac925e7-8abe-49cb-98d3-15535131850a")
+REGISTRY_COMMAND_SINGLPROC(RoisInfo,                "49ee172b-2954-4f90-9965-de3804fe3f14")
+REGISTRY_COMMAND_SINGLPROC(FpFnInfo,                "0db958aa-d392-4157-9ed8-901f258e69d9")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -153,9 +153,9 @@ void Offset::fromRaw(const bserial::RawVector& vect)
 
 #ifdef OPENCV_IS_PRESENT
 
-cv::Point Caption::position_() const
+cv::Point Caption::position_(const cv::Point& offset) const
 {
-    return cv::Point(position.x, position.y);
+    return cv::Point(position.x + offset.x, position.y + offset.y);
 }
 
 void Caption::setPosition(const cv::Point& p)
@@ -207,9 +207,9 @@ void Caption::fromRaw(const bserial::RawVector& vect)
 
 #ifdef OPENCV_IS_PRESENT
 
-cv::Point Line::p1() const
+cv::Point Line::p1(const cv::Point& offset) const
 {
-    return cv::Point(point1.x, point1.y);
+    return cv::Point(point1.x + offset.x, point1.y + offset.y);
 }
 
 void Line::setP1(const cv::Point& p)
@@ -218,9 +218,9 @@ void Line::setP1(const cv::Point& p)
     point1.y = p.y;
 }
 
-cv::Point Line::p2() const
+cv::Point Line::p2(const cv::Point& offset) const
 {
-    return cv::Point(point2.x, point2.y);
+    return cv::Point(point2.x + offset.x, point2.y + offset.y);
 }
 
 void Line::setP2(const cv::Point& p)
@@ -260,9 +260,52 @@ void Line::fromRaw(const bserial::RawVector& vect)
 
 #ifdef OPENCV_IS_PRESENT
 
-cv::Point Rectangle::p1() const
+vector<cv::Point> Polyline::points_(const cv::Point& offset) const
 {
-    return cv::Point(point1.x, point1.y);
+    vector<cv::Point> pnts;
+    pnts.reserve(points.size());
+    for (const Point& p : points)
+        pnts.emplace_back(p.x + offset.x, p.y + offset.y);
+    return pnts;
+}
+
+#endif // OPENCV_IS_PRESENT
+
+bool Polyline::isNull() const
+{
+    for (const Point& p : points)
+        if (!p.isNull())
+            return false;
+    return true;
+}
+
+bserial::RawVector Polyline::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << identity;
+    stream << visible;
+    stream << brush;
+    stream << points;
+    stream << closed;
+    B_SERIALIZE_RETURN
+}
+
+void Polyline::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> identity;
+    stream >> visible;
+    stream >> brush;
+    stream >> points;
+    stream >> closed;
+    B_DESERIALIZE_END
+}
+
+#ifdef OPENCV_IS_PRESENT
+
+cv::Point Rectangle::p1(const cv::Point& offset) const
+{
+    return cv::Point(point1.x + offset.x, point1.y + offset.y);
 }
 
 void Rectangle::setP1(const cv::Point& p)
@@ -271,12 +314,13 @@ void Rectangle::setP1(const cv::Point& p)
     point1.y = p.y;
 }
 
-cv::Point Rectangle::p2() const
+cv::Point Rectangle::p2(const cv::Point& offset) const
 {
     if (!point2.isNull())
-        return cv::Point(point2.x, point2.y);
+        return cv::Point(point2.x + offset.x, point2.y + offset.y);
     else
-        return cv::Point(point1.x + size.width, point1.y + size.height);
+        return cv::Point(point1.x + offset.x + size.width,
+                         point1.y + offset.y + size.height);
 }
 
 void Rectangle::setP2(const cv::Point& p)
@@ -285,25 +329,39 @@ void Rectangle::setP2(const cv::Point& p)
     point2.y = p.y;
 }
 
-cv::Rect Rectangle::rect() const
+cv::Rect Rectangle::rect(const cv::Point& offset) const
 {
     if (!point2.isNull())
-        return cv::Rect(point1.x, point1.y,
-                        point2.x - point1.x /*width*/,
-                        point2.y - point1.y /*height*/);
+    {
+        cv::Rect rect;
+        rect.x = point1.x + offset.x;
+        rect.y = point1.y + offset.y;
+        rect.width  = point2.x - point1.x;
+        rect.height = point2.y - point1.y;
+        return rect;
+    }
     else
-        return cv::Rect(point1.x, point1.y, size.width, size.height);
+        return cv::Rect(point1.x + offset.x, point1.y + offset.y,
+                        size.width, size.height);
 }
 
-void Rectangle::setRect(const cv::Rect& rect)
+void Rectangle::setRect(const cv::Rect& rect, bool bySize)
 {
     point1.x = rect.x;
     point1.y = rect.y;
-    point2.x = rect.x + rect.width;
-    point2.y = rect.y + rect.height;
 
-    size.width  = rect.width;
-    size.height = rect.height;
+    if (bySize)
+    {
+        point2 = Point();
+        size.width  = rect.width;
+        size.height = rect.height;
+    }
+    else
+    {
+        size = Size();
+        point2.x = rect.x + rect.width;
+        point2.y = rect.y + rect.height;
+    }
 }
 
 #endif // OPENCV_IS_PRESENT
@@ -339,9 +397,9 @@ void Rectangle::fromRaw(const bserial::RawVector& vect)
 
 #ifdef OPENCV_IS_PRESENT
 
-cv::Point Circle::center_() const
+cv::Point Circle::center_(const cv::Point& offset) const
 {
-    return cv::Point(center.x, center.y);
+    return cv::Point(center.x + offset.x, center.y + offset.y);
 }
 
 void Circle::setCenter(const cv::Point& p)
@@ -404,6 +462,7 @@ bserial::RawVector Set::toRaw() const
     stream << border;
     stream << captions;
     stream << lines;
+    stream << polylines;
     stream << rectangles;
     stream << circles;
     B_SERIALIZE_RETURN
@@ -417,6 +476,7 @@ void Set::fromRaw(const bserial::RawVector& vect)
     stream >> border;
     stream >> captions;
     stream >> lines;
+    stream >> polylines;
     stream >> rectangles;
     stream >> circles;
     B_DESERIALIZE_END
@@ -628,7 +688,7 @@ void TrackerEvent::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackersEventInfoA::Item::toRaw() const
+bserial::RawVector TrackersEventsInfoA::Item::toRaw() const
 {
     B_SERIALIZE_V1(stream)
     stream << classIndex;
@@ -637,7 +697,7 @@ bserial::RawVector TrackersEventInfoA::Item::toRaw() const
     B_SERIALIZE_RETURN
 }
 
-void TrackersEventInfoA::Item::fromRaw(const bserial::RawVector& vect)
+void TrackersEventsInfoA::Item::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
     stream >> classIndex;
@@ -646,21 +706,21 @@ void TrackersEventInfoA::Item::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackersEventInfoA::toRaw() const
+bserial::RawVector TrackersEventsInfoA::toRaw() const
 {
     B_SERIALIZE_V1(stream)
     stream << items;
     B_SERIALIZE_RETURN
 }
 
-void TrackersEventInfoA::fromRaw(const bserial::RawVector& vect)
+void TrackersEventsInfoA::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackersEventSubscript::toRaw() const
+bserial::RawVector TrackersEventsSubscript::toRaw() const
 {
     B_SERIALIZE_V1(stream)
     stream << classIndexes;
@@ -668,7 +728,7 @@ bserial::RawVector TrackersEventSubscript::toRaw() const
     B_SERIALIZE_RETURN
 }
 
-void TrackersEventSubscript::fromRaw(const bserial::RawVector& vect)
+void TrackersEventsSubscript::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
     stream >> classIndexes;
@@ -740,68 +800,6 @@ void TrackRectsInfo::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector MarkupObject::Text::toRaw() const
-{
-    B_SERIALIZE_V1(stream)
-    stream << text;
-    stream << position;
-    stream << scale;
-    stream << color;
-    stream << thickness;
-    stream << offset;
-    B_SERIALIZE_RETURN
-}
-
-void MarkupObject::Text::fromRaw(const bserial::RawVector& vect)
-{
-    B_DESERIALIZE_V1(vect, stream)
-    stream >> text;
-    stream >> position;
-    stream >> scale;
-    stream >> color;
-    stream >> thickness;
-    stream >> offset;
-    B_DESERIALIZE_END
-}
-
-bserial::RawVector MarkupObject::toRaw() const
-{
-    B_SERIALIZE_V1(stream)
-    stream << group;
-    stream << type;
-    stream << coorditane;
-    stream << thickness;
-    stream << color;
-    stream << descriptor;
-    B_SERIALIZE_RETURN
-}
-
-void MarkupObject::fromRaw(const bserial::RawVector& vect)
-{
-    B_DESERIALIZE_V1(vect, stream)
-    stream >> group;
-    stream >> type;
-    stream >> coorditane;
-    stream >> thickness;
-    stream >> color;
-    stream >> descriptor;
-    B_DESERIALIZE_END
-}
-
-bserial::RawVector PostprocessingMarkup::toRaw() const
-{
-    B_SERIALIZE_V1(stream)
-    stream << items;
-    B_SERIALIZE_RETURN
-}
-
-void PostprocessingMarkup::fromRaw(const bserial::RawVector& vect)
-{
-    B_DESERIALIZE_V1(vect, stream)
-    stream >> items;
-    B_DESERIALIZE_END
-}
-
 bserial::RawVector Graphset::toRaw() const
 {
     B_SERIALIZE_V1(stream)
@@ -815,6 +813,48 @@ void Graphset::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_V1(vect, stream)
     stream >> visible;
     stream >> items;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector GraphsetInfoA::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << value;
+    B_SERIALIZE_RETURN
+}
+
+void GraphsetInfoA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> value;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector GraphsetDynamicInfoA::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << value;
+    B_SERIALIZE_RETURN
+}
+
+void GraphsetDynamicInfoA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> value;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector GraphsetDynamicUpdate::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << value;
+    B_SERIALIZE_RETURN
+}
+
+void GraphsetDynamicUpdate::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> value;
     B_DESERIALIZE_END
 }
 

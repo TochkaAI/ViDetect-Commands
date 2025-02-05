@@ -17,9 +17,7 @@ namespace command {
 //----------------------------- Список команд --------------------------------
 
 /**
-  Возвращает информацию по используемой модели, по классам модели, по настройкам
-  трекера, по настройкам отрисовки рамок детектирования (и возможно по зонам ROI,
-  это еще на разработку)
+  Команда возвращает информацию по используемой модели и классам
 */
 extern const QUuidEx ModelInfo;
 
@@ -31,7 +29,7 @@ extern const QUuidEx ModelInfo;
 extern const QUuidEx ModelConfig;
 
 /**
-  Возвращает информацию по используемым трекерам
+  Команда возвращает информацию по используемым трекерам
 */
 extern const QUuidEx TrackersInfo;
 
@@ -47,15 +45,15 @@ extern const QUuidEx TrackersConfig;
 extern const QUuidEx TrackerEvent;
 
 /**
-  Возвращает информацию об эмитируемых событиях для всех трекеров
+  Команда возвращает информацию об эмитируемых событиях для всех трекеров
 */
-extern const QUuidEx TrackersEventInfo;
+extern const QUuidEx TrackersEventsInfo;
 
 /**
   Команда выполняет подписку на получение событий TrackerEvent от системы
   трекирования
 */
-extern const QUuidEx TrackersEventSubscript;
+extern const QUuidEx TrackersEventsSubscript;
 
 /**
   Возвращает текущее состояние трекируемых объектов во всех трекерах
@@ -68,40 +66,38 @@ extern const QUuidEx TrackersSnapshot;
 extern const QUuidEx TrackRectsInfo;
 
 /**
-  Передает информацию о дополнительно необходимых отрисовках на кадре от
-  системы верхнего уровня к VDetect
-*/
-extern const QUuidEx PostprocessingMarkup;
-
-/**
-  Возвращает информацию о наборе графических примитивов
+  Возвращает информацию о наборе графических примитивов полученном из конфигу-
+  рационного файла (videtect.graph)
 */
 extern const QUuidEx GraphsetInfo;
 
 /**
-  Команда для конфигурирования набора графических примитивов
-  TODO Не реализовано. Команда должна полностью заменять список
-  графических примитивов. Прорабатать вопрос с опциональным полем brush
+  Событие эмитируется при перечитывании набора графических примитивов из конфи-
+  гурационного файла (videtect.graph)
 */
-extern const QUuidEx GraphsetConfig;
+extern const QUuidEx GraphsetChanged;
+
+/**
+  Команда возвращает информацию о наборе графических примитивов созданных дина-
+  мически при помощи команды GraphsetDynamicUpdate
+*/
+extern const QUuidEx GraphsetDynamicInfo;
+
+/**
+  Команда создает/обновляет динамический набор графических примитивов
+*/
+extern const QUuidEx GraphsetDynamicUpdate;
+
+/**
+  Событие эмитируется при обновлении динамического набора графических примитивов
+*/
+extern const QUuidEx GraphsetDynamicChanged;
 
 /**
   Команда для конфигурирования видимости набора графических примитивов
   TODO Не реализовано.
 */
 extern const QUuidEx GraphsetVisible;
-
-/**
-  Команда для добавления новых графических примитивов
-  TODO Не реализовано.
-*/
-extern const QUuidEx GraphsetAdd;
-
-/**
-  Команда для удаления существующих графических примитивов
-  TODO Не реализовано.
-*/
-extern const QUuidEx GraphsetRemove;
 
 /**
   Возвращает информацию о ROIs
@@ -156,7 +152,17 @@ inline QDataStream& operator<< (QDataStream& s, const pproto::TrackEvent te)
 //---------------- Структуры данных используемые в сообщениях ----------------
 
 namespace data {
+
+/**
+  Фиктивная структура, требуется для корректного поиска потоковых операторов
+  используемых для сериализации структуры graph::Point
+*/
+struct Point {};
+
 namespace graph {
+
+using namespace std;
+//DEFINE_B_SERIALIZE_STREAM_OPERATORS
 
 /**
   Структура используется для идентификации графического примитива. Идентификация
@@ -165,6 +171,13 @@ namespace graph {
 */
 struct Identity
 {
+    Identity() = default;
+    Identity(const Identity&) = default;
+
+    Identity(const QUuidEx& id ) : id(id), findField(FindField::Id) {}
+    Identity(const int index   ) : index(index), findField(FindField::Index) {}
+    Identity(const QString name) : name(name), findField(FindField::Name) {}
+
     QUuidEx id;
     qint32  index = {-1};
     QString name;
@@ -248,7 +261,7 @@ struct Brush
     J_SERIALIZE_END
 };
 
-struct Point
+struct Point : data::Point
 {
     qint32 x = {0};
     qint32 y = {0};
@@ -282,6 +295,10 @@ struct Offset
 {
     qint32 dx = {0};
     qint32 dy = {0};
+
+#ifdef OPENCV_IS_PRESENT
+    operator cv::Point () const {return cv::Point(dx, dy);}
+#endif
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -325,7 +342,7 @@ struct Caption
     qint32 cornerBind = {1};
 
 #ifdef OPENCV_IS_PRESENT
-    cv::Point position_() const;
+    cv::Point position_(const cv::Point& offset = {}) const;
     void setPosition(const cv::Point&);
 
     cv::Point offset_() const;
@@ -364,11 +381,11 @@ struct Line
 
 #ifdef OPENCV_IS_PRESENT
     // Точка с координатами point1
-    cv::Point p1() const;
+    cv::Point p1(const cv::Point& offset = {}) const;
     void setP1(const cv::Point&);
 
     // Точка с координатами point2
-    cv::Point p2() const;
+    cv::Point p2(const cv::Point& offset = {}) const;
     void setP2(const cv::Point&);
 #endif
 
@@ -385,6 +402,42 @@ struct Line
     J_SERIALIZE_END
 
     typedef lst::List<Line, Identity::Find<Line>> List;
+};
+
+struct Polyline
+{
+    // Идентификационный признак
+    Identity identity;
+
+    // Признак отображения примитива в кадре
+    bool visible = {true};
+
+    // Кисть
+    Brush brush;
+
+    // Точки полилинии
+    QList<Point> points;
+
+    // Признак замкнутой полилинии
+    bool closed = {true};
+
+#ifdef OPENCV_IS_PRESENT
+    vector<cv::Point> points_(const cv::Point& offset = {}) const;
+#endif
+
+    bool isNull() const;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "identity" , identity )
+        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
+        J_SERIALIZE_MAP_ITEM( "points"   , points   )
+        J_SERIALIZE_MAP_ITEM( "closed"   , closed   )
+    J_SERIALIZE_END
+
+    typedef lst::List<Polyline, Identity::Find<Polyline>> List;
 };
 
 struct Rectangle
@@ -410,24 +463,24 @@ struct Rectangle
 
 #ifdef OPENCV_IS_PRESENT
     // Точка с координатами point1 (синоним top/left)
-    cv::Point p1() const;
+    cv::Point p1(const cv::Point& offset = {}) const;
     void setP1(const cv::Point&);
 
     // Точка с координатами point2 (синоним bottom/right)
-    cv::Point p2() const;
+    cv::Point p2(const cv::Point& offset = {}) const;
     void setP2(const cv::Point&);
 
     // Верхний левый угол прямоугольника (top/left)
-    cv::Point tl() const {return p1();}
+    cv::Point tl(const cv::Point& offset = {}) const {return p1(offset);}
     void setTl(const cv::Point& p) {setP1(p);}
 
     // Нижний правый угол прямоугольника (bottom/right)
-    cv::Point br() const {return p2();}
+    cv::Point br(const cv::Point& offset = {}) const {return p2(offset);}
     void setBr(const cv::Point& p) {setP2(p);}
 
     // Прямоугольник в cv::Rect представлении
-    cv::Rect rect() const;
-    void setRect(const cv::Rect&);
+    cv::Rect rect(const cv::Point& offset = {}) const;
+    void setRect(const cv::Rect&, bool bySize = false);
 #endif
 
     bool isNull() const;
@@ -464,7 +517,7 @@ struct Circle
     bool filled = {false};
 
 #ifdef OPENCV_IS_PRESENT
-    cv::Point center_() const;
+    cv::Point center_(const cv::Point& offset = {}) const;
     void setCenter(const cv::Point&);
 #endif
 
@@ -529,6 +582,9 @@ struct Set
     // Набор линий
     Line::List lines;
 
+    // Набор линий
+    Polyline::List polylines;
+
     // Набор прямоугольников
     Rectangle::List rectangles;
 
@@ -543,6 +599,7 @@ struct Set
         J_SERIALIZE_MAP_OPT ( "border"     , border     )
         J_SERIALIZE_MAP_OPT ( "captions"   , captions   )
         J_SERIALIZE_MAP_OPT ( "lines"      , lines      )
+        J_SERIALIZE_MAP_OPT ( "polylines"  , polylines  )
         J_SERIALIZE_MAP_OPT ( "rectangles" , rectangles )
         J_SERIALIZE_MAP_OPT ( "circles"    , circles    )
     J_SERIALIZE_END
@@ -596,8 +653,6 @@ struct TrackRect
 
 struct FrameCrop
 {
-    //typedef container_ptr<FrameCrop> Ptr;
-
     // Признак активности механизма frame crop
     bool active = {true};
 
@@ -671,6 +726,7 @@ struct ModelInfo
     // выходного слоя
     qint32 recordCount = {-1};
 
+    // Определяет область кадра для отправки в нейросеть
     FrameCrop frameCrop;
 
     // Список классов модели
@@ -837,8 +893,8 @@ struct TrackerEvent : Data<&command::TrackerEvent,
     J_SERIALIZE_END
 };
 
-struct TrackersEventInfoA : Data<&command::TrackersEventInfo,
-                                  Message::Type::Answer>
+struct TrackersEventsInfoA : Data<&command::TrackersEventsInfo,
+                                   Message::Type::Answer>
 {
     struct Item
     {
@@ -868,8 +924,8 @@ struct TrackersEventInfoA : Data<&command::TrackersEventInfo,
     J_SERIALIZE_MAP_ONE( "items", items )
 };
 
-struct TrackersEventSubscript : Data<&command::TrackersEventSubscript,
-                                      Message::Type::Command>
+struct TrackersEventsSubscript : Data<&command::TrackersEventsSubscript,
+                                       Message::Type::Command>
 {
     // Список индексов классов в выходном слое модели, для которых будет выпол-
     // нена подписка на события. Если список пустой - события будут  подписаны
@@ -957,78 +1013,10 @@ struct TrackRectsInfoA : TrackRectsInfo,  Data<&command::TrackRectsInfo,
 {
 };
 
-struct MarkupObject
-{
-    typedef container_ptr<MarkupObject> Ptr;
-
-    enum class TypeFigure : quint32
-    {
-        Unknouwn = 0,
-        Point = 1,
-        Line = 2,
-        Rectangle = 3,
-        Circle = 4
-    };
-
-    enum class GroupFigure : quint32
-    {
-        Unknouwn = 0,
-        OrdinaryFigure = 1,
-        ROI = 2,
-        CurrectionFigure = 3
-    };
-
-    struct Text
-    {
-        QString text;
-        QList<int> position;
-        int scale = {0};
-        QList<int> color;
-        int thickness = {0};
-        float offset = {0};
-
-        DECLARE_B_SERIALIZE_FUNC
-
-        J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "text"      , text      )
-            J_SERIALIZE_MAP_ITEM( "position"  , position  )
-            J_SERIALIZE_MAP_ITEM( "scale"     , scale     )
-            J_SERIALIZE_MAP_ITEM( "color"     , color     )
-            J_SERIALIZE_MAP_ITEM( "thickness" , thickness )
-            J_SERIALIZE_MAP_ITEM( "offset"    , offset    )
-        J_SERIALIZE_END
-    };
-
-    GroupFigure group = {GroupFigure::Unknouwn};
-    TypeFigure type = {TypeFigure::Unknouwn};
-    QList<int> coorditane;
-    float thickness = {0};
-    QList<int> color;
-    Text descriptor;
-
-    DECLARE_B_SERIALIZE_FUNC
-
-    J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "group"      , group      )
-        J_SERIALIZE_MAP_ITEM( "type"       , type       )
-        J_SERIALIZE_MAP_ITEM( "coorditane" , coorditane )
-        J_SERIALIZE_MAP_ITEM( "thickness"  , thickness  )
-        J_SERIALIZE_MAP_ITEM( "descriptor" , descriptor )
-    J_SERIALIZE_END
-};
-
-struct PostprocessingMarkup : Data<&command::PostprocessingMarkup,
-                                    Message::Type::Command>
-{
-
-    QList<MarkupObject::Ptr> items;
-
-    DECLARE_B_SERIALIZE_FUNC
-    J_SERIALIZE_MAP_ONE( "items", items )
-};
-
 struct Graphset
 {
+    typedef container_ptr<Graphset> Ptr;
+
     // Признак отображения всех наборов графических примитивов
     bool visible = {true};
 
@@ -1043,9 +1031,31 @@ struct Graphset
     J_SERIALIZE_END
 };
 
-struct GraphsetInfoA : Graphset, Data<&command::GraphsetInfo,
-                                       Message::Type::Answer>
+struct GraphsetInfoA : Data<&command::GraphsetInfo,
+                             Message::Type::Answer>
 {
+    Graphset::Ptr value;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "value", value )
+};
+
+struct GraphsetDynamicInfoA : Data<&command::GraphsetDynamicInfo,
+                                    Message::Type::Answer>
+{
+    Graphset::Ptr value;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "value", value )
+};
+
+struct GraphsetDynamicUpdate : Data<&command::GraphsetDynamicUpdate,
+                                     Message::Type::Command>
+{
+    Graphset::Ptr value;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "value", value )
 };
 
 struct GraphsetVisible : Data<&command::GraphsetVisible,
