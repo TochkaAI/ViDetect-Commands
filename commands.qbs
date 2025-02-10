@@ -16,10 +16,10 @@ Product {
     type: "staticlibrary"
 
     Depends { name: "cpp" }
-    Depends { name: "Inference"; required: false }
     Depends { name: "PProto" }
     Depends { name: "RapidJson"; required: false }
     Depends { name: "SharedLib" }
+    Depends { name: "Tracking"; required: false }
     Depends { name: "Yaml" }
     Depends { name: "lib.opencv" }
     Depends { name: "Qt"; submodules: ["core", "network"] }
@@ -33,8 +33,8 @@ Product {
 
     cpp.defines: {
         var def = project.cppDefines;
-        if (Inference.present)
-            def.push("INFERENCE_IS_PRESENT");
+        if (Tracking.present)
+            def.push("TRACKING_IS_PRESENT");
         return def;
     }
     cpp.cxxFlags: project.cxxFlags

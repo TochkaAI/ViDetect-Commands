@@ -3,8 +3,8 @@
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
 
-#ifdef INFERENCE_IS_PRESENT
-#include "inference/detect_rect.h"
+#ifdef TRACKING_IS_PRESENT
+#include "tracking/detect_rect.h"
 #endif
 
 #ifdef OPENCV_IS_PRESENT
@@ -56,14 +56,44 @@ extern const QUuidEx TrackersEventsInfo;
 extern const QUuidEx TrackersEventsSubscript;
 
 /**
-  Возвращает текущее состояние трекируемых объектов во всех трекерах
+  Команда возвращает текущее состояние трекируемых объектов во всех трекерах
 */
 extern const QUuidEx TrackersSnapshot;
 
 /**
-  Возвращает информацию о параметрах отрисоки рамок трекирования
+  Команда возвращает информацию о параметрах отображения рамок трекирования
 */
 extern const QUuidEx TrackRectsInfo;
+
+/**
+  Событие эмитируется при перечитывании информации о параметрах отображения
+  рамок трекирования из конфигурационного файла (videtect.rect)
+*/
+extern const QUuidEx TrackRectsChanged;
+
+/**
+  Команда возвращает информацию об индивидуальных параметрах отображения рамок
+  трекирования
+*/
+extern const QUuidEx TrackRectsDynamicInfo;
+
+/**
+  Команда обновляет или добавляет элементы TrackRect в список индивидуальных
+  параметров отображения для рамок трекируемых объектов
+*/
+extern const QUuidEx TrackRectsDynamicUpdate;
+
+/**
+  Команда удаляет элементы TrackRect из списка индивидуальных параметров
+  отображения для рамок трекируемых объектов
+*/
+extern const QUuidEx TrackRectsDynamicRemove;
+
+/**
+  Событие эмитируется при изменении списока индивидуальных параметров отображе-
+  ния для рамок трекируемых объектов
+*/
+extern const QUuidEx TrackRectsDynamicChanged;
 
 /**
   Возвращает информацию о наборе графических примитивов полученном из конфигу-
@@ -87,6 +117,12 @@ extern const QUuidEx GraphsetDynamicInfo;
   Команда создает/обновляет динамический набор графических примитивов
 */
 extern const QUuidEx GraphsetDynamicUpdate;
+
+/**
+  Команда удаляет элементы graph::Set из динамического набора графических
+  примитивов
+*/
+extern const QUuidEx GraphsetDynamicRemove;
 
 /**
   Событие эмитируется при обновлении динамического набора графических примитивов
@@ -154,29 +190,29 @@ inline QDataStream& operator<< (QDataStream& s, const pproto::TrackEvent te)
 namespace data {
 
 /**
-  Фиктивная структура, требуется для корректного поиска потоковых операторов
-  используемых для сериализации структуры graph::Point
+  Фиктивные структуры, требуется для корректного поиска потоковых операторов
+  используемых для сериализации данных
 */
 struct Point {};
+struct Identity {};
 
 namespace graph {
 
 using namespace std;
-//DEFINE_B_SERIALIZE_STREAM_OPERATORS
 
 /**
   Структура используется для идентификации графического примитива. Идентификация
   может осуществляться по одному из трех полей:  id, index, name. За выбор поля
   для идентификации примитива отвечает пользователь API
 */
-struct Identity
+struct Identity : data::Identity
 {
     Identity() = default;
     Identity(const Identity&) = default;
 
-    Identity(const QUuidEx& id ) : id(id), findField(FindField::Id) {}
+    Identity(const QUuidEx& id ) : id(id),       findField(FindField::Id)    {}
     Identity(const int index   ) : index(index), findField(FindField::Index) {}
-    Identity(const QString name) : name(name), findField(FindField::Name) {}
+    Identity(const QString name) : name(name),   findField(FindField::Name)  {}
 
     QUuidEx id;
     qint32  index = {-1};
@@ -204,15 +240,15 @@ struct Identity
 
         int operator() (const Identity* item1, const T* item2) const
         {
-            if (item1->findField == FindField::Id)
+            if (item1->findField == FindField::Id) {
                 return operator() (&item1->id, item2);
-
-            else if (item1->findField == FindField::Index)
+            }
+            else if (item1->findField == FindField::Index) {
                 return operator() (&item1->index, item2);
-
-            else if (item1->findField == FindField::Name)
+            }
+            else if (item1->findField == FindField::Name) {
                 return operator() (&item1->name, item2);
-
+            }
             return -1;
         }
     };
@@ -263,8 +299,19 @@ struct Brush
 
 struct Point : data::Point
 {
+    Point() = default;
+    Point(qint32 x, qint32 y) : x(x), y(y) {}
+
     qint32 x = {0};
     qint32 y = {0};
+
+#ifdef OPENCV_IS_PRESENT
+    Point(const cv::Point&   p) : x(p.x), y(p.y) {}
+    Point(const cv::Point2f& p) : Point((cv::Point)p) {}
+
+    operator cv::Point   () const {return {x, y};}
+    operator cv::Point2f () const {return cv::Point2f(x, y);}
+#endif
 
     bool isNull() const;
 
@@ -457,10 +504,6 @@ struct Rectangle
     // Правая нижняя точка (синоним bottom/right)
     Point point2;
 
-    // Геометрические размеры прямоугольника. Если параметр point2 равен null,
-    // то построение прямоугольника будет происходить на основе size
-    Size size;
-
 #ifdef OPENCV_IS_PRESENT
     // Точка с координатами point1 (синоним top/left)
     cv::Point p1(const cv::Point& offset = {}) const;
@@ -470,20 +513,27 @@ struct Rectangle
     cv::Point p2(const cv::Point& offset = {}) const;
     void setP2(const cv::Point&);
 
-    // Верхний левый угол прямоугольника (top/left)
-    cv::Point tl(const cv::Point& offset = {}) const {return p1(offset);}
-    void setTl(const cv::Point& p) {setP1(p);}
+//    // Верхний левый угол прямоугольника (top/left)
+//    cv::Point tl(const cv::Point& offset = {}) const {return p1(offset);}
+//    void setTl(const cv::Point& p) {setP1(p);}
 
-    // Нижний правый угол прямоугольника (bottom/right)
-    cv::Point br(const cv::Point& offset = {}) const {return p2(offset);}
-    void setBr(const cv::Point& p) {setP2(p);}
+//    // Нижний правый угол прямоугольника (bottom/right)
+//    cv::Point br(const cv::Point& offset = {}) const {return p2(offset);}
+//    void setBr(const cv::Point& p) {setP2(p);}
 
     // Прямоугольник в cv::Rect представлении
     cv::Rect rect(const cv::Point& offset = {}) const;
-    void setRect(const cv::Rect&, bool bySize = false);
+    void setRect(const cv::Rect&);
 #endif
 
     bool isNull() const;
+
+    // Ширина/высота прямоугольника
+    Size size() const;
+    void setSize(const Size&);
+
+    // Центр прямоугольника
+    Point center() const;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -493,7 +543,6 @@ struct Rectangle
         J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
         J_SERIALIZE_MAP_ITEM( "point1"   , point1   )
         J_SERIALIZE_MAP_ITEM( "point2"   , point2   )
-        J_SERIALIZE_MAP_ITEM( "size"     , size     )
     J_SERIALIZE_END
 
     typedef lst::List<Rectangle, Identity::Find<Rectangle>> List;
@@ -567,11 +616,18 @@ struct Roi
 */
 struct Set
 {
+    typedef container_ptr<Set> Ptr;
+
     // Идентификационный признак
     Identity identity;
 
     // Признак отображения всего набора графических примитивов
     bool visible = {true};
+
+    // Вспомогательный параметр, определяет будет ли выводиться в лог информация
+    // по графическому примитиву.  Используется  для  минимизации  лог-сообщений
+    // при частом обновлении динамических наборов примитивов
+    bool printLog = {false};
 
     // Граница области набора графических примитивов
     Rectangle border;
@@ -596,6 +652,7 @@ struct Set
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "identity"   , identity   )
         J_SERIALIZE_MAP_OPT ( "visible"    , visible    )
+        J_SERIALIZE_MAP_OPT ( "print_log"  , printLog   )
         J_SERIALIZE_MAP_OPT ( "border"     , border     )
         J_SERIALIZE_MAP_OPT ( "captions"   , captions   )
         J_SERIALIZE_MAP_OPT ( "lines"      , lines      )
@@ -605,48 +662,6 @@ struct Set
     J_SERIALIZE_END
 
     typedef lst::List<Set, Identity::Find<Set>> List;
-};
-
-struct TrackRect
-{
-    // Идентификатор трекируемого объекта, используется для динамической
-    // раскраски объекта
-    QUuidEx id;
-
-    // Глобальный идентификатор трекирования
-    // QUuidEx globalId;
-
-    // Порядковый индекс расположения класса в выходном слое модели
-    // qint32 classIndex = {-1};
-
-    // Признак отображения примитива в кадре
-    bool visible = {true};
-
-    // Надпись для рамки трекирования с привязкой к одному из углов геометри-
-    // ческой области, по умолчанию к верхнему левому углу
-    graph::Caption caption;
-
-    // Геометрическая область рамки трекирования.  Значимыми  являются  только
-    // признак видимости и параметры кисти, геометрия рамки берется от трекера
-    graph::Rectangle border;
-
-    // Геометрический центр рамки трекирования
-    graph::Circle center;
-
-    // TODO на проработку
-    // graph::Set graphset;
-
-    typedef lst::List<TrackRect, lst::CompareItemDummy> List;
-
-    DECLARE_B_SERIALIZE_FUNC
-
-    J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "id"      , id      )
-        J_SERIALIZE_MAP_OPT ( "visible" , visible )
-        J_SERIALIZE_MAP_OPT ( "caption" , caption )
-        J_SERIALIZE_MAP_ITEM( "border"  , border  )
-        J_SERIALIZE_MAP_ITEM( "center"  , center  )
-    J_SERIALIZE_END
 };
 
 } // namespace graph
@@ -661,8 +676,8 @@ struct FrameCrop
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "active"  , active  )
-        J_SERIALIZE_MAP_ITEM( "border"  , border  )
+        J_SERIALIZE_MAP_ITEM( "active" , active  )
+        J_SERIALIZE_MAP_ITEM( "border" , border  )
     J_SERIALIZE_END
 };
 
@@ -682,9 +697,14 @@ struct ModelClass
     float scoreThresh = {0.70};
     float nmsThresh = {0.50};
 
-    // TODO возможно здесь надо добавить поля для конфигурирования отрисовки рамок
+    template<typename T> struct Find
+    {
+        // Поиск по index
+        int operator() (const qint32* index, const T* item2) const
+            {return LIST_COMPARE_ITEM(*index, item2->index);}
+    };
 
-    typedef lst::List<ModelClass, lst::CompareItemDummy> List;
+    typedef lst::List<ModelClass, Find<ModelClass>> List;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -700,6 +720,8 @@ struct ModelClass
 
 struct ModelInfo
 {
+    typedef container_ptr<ModelInfo> Ptr;
+
     // Наименование файла модели
     QString file;
 
@@ -714,7 +736,7 @@ struct ModelInfo
     qint8 imageChannels = {3};
 
     // Размер входного слоя модели
-    quint32 inputSize = {640};
+    qint32 inputSize = {640};
 
     // Наименование входного слоя модели
     QString input;
@@ -748,9 +770,13 @@ struct ModelInfo
     J_SERIALIZE_END
 };
 
-struct ModelInfoA : ModelInfo, Data<&command::ModelInfo,
-                                     Message::Type::Answer>
+struct ModelInfoA : Data<&command::ModelInfo,
+                          Message::Type::Answer>
 {
+    ModelInfo::Ptr value;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "value", value )
 };
 
 /**
@@ -764,6 +790,8 @@ struct DetectRect
     qint32 y_max = {0}; // Координата Bottom-Right
 
     float score  = {0}; // Оценка детектированной области
+
+    graph::Point center() const; // Центр прямоугольника
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -827,6 +855,17 @@ struct TrackersInfoA : Data<&command::TrackersInfo,
     J_SERIALIZE_MAP_ONE( "items", items )
 };
 
+template<typename T> struct TrackCompare
+{
+    // Сортировка по id
+    int operator() (const T* item1, const T* item2) const
+        {return QUuidEx::compare(item1->id, item2->id);}
+
+    // Поиск по id
+    int operator() (const QUuidEx* id, const T* item2) const
+        {return QUuidEx::compare(*id, item2->id);}
+};
+
 /**
   Описание объекта трекирования для внешней системы
 */
@@ -853,7 +892,7 @@ struct TrackObject
     // Усредненная рамка/скор за 1-8 итераций
     DetectRect averageRect;
 
-    typedef lst::List<TrackObject, lst::CompareItemDummy> List;
+    typedef lst::List<TrackObject, TrackCompare<TrackObject>> List;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -955,7 +994,14 @@ struct TrackerSnapshot
     // Список трекируемых объектов
     TrackObject::List objects;
 
-    typedef lst::List<TrackerSnapshot, lst::CompareItemDummy> List;
+    struct Find
+    {
+        // Поиск по classIndex
+        int operator() (const qint32* classIndex, const TrackerSnapshot* item2) const
+            {return LIST_COMPARE_ITEM(*classIndex, item2->classIndex);}
+    };
+
+    typedef lst::List<TrackerSnapshot, Find> List;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -975,8 +1021,52 @@ struct TrackersSnapshotA : Data<&command::TrackersSnapshot,
     J_SERIALIZE_MAP_ONE( "items", items )
 };
 
-struct TrackRectsInfo
+struct TrackRect
 {
+    // Идентификатор трекируемого объекта, используется для динамической
+    // раскраски объекта
+    QUuidEx id;
+
+    // Глобальный идентификатор трекирования. Вспомогательный параметр
+    // QUuidEx globalId;
+
+    // Признак отображения примитива в кадре
+    bool visible = {true};
+
+    // Надпись для рамки трекирования с привязкой к одному из углов геометри-
+    // ческой области, по умолчанию к верхнему левому углу
+    graph::Caption caption;
+
+    // Геометрическая область рамки трекирования.  Значимыми  являются  только
+    // признак видимости и параметры кисти, геометрия рамки берется от трекера
+    graph::Rectangle border;
+
+    // Геометрический центр рамки трекирования
+    graph::Circle center;
+
+    // Набор графических примитивов, используется для отрисовки дополнительной/
+    // вспомогательной информации по трекируемому объекту
+    graph::Set::Ptr graphset;
+
+    typedef lst::List<TrackRect, TrackCompare<TrackRect>> List;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "id"          , id         )
+      //J_SERIALIZE_MAP_ITEM( "global_id"   , globalId   )
+        J_SERIALIZE_MAP_OPT ( "visible"     , visible    )
+        J_SERIALIZE_MAP_OPT ( "caption"     , caption    )
+        J_SERIALIZE_MAP_ITEM( "border"      , border     )
+        J_SERIALIZE_MAP_ITEM( "center"      , center     )
+        J_SERIALIZE_MAP_ITEM( "graphset"    , graphset   )
+    J_SERIALIZE_END
+};
+
+struct TrackRects
+{
+    typedef container_ptr<TrackRects> Ptr;
+
     // Признак отображения всех рамок трекирования
     bool visible = {false};
 
@@ -986,9 +1076,9 @@ struct TrackRectsInfo
         qint32 index = {0};
 
         // Параметры отображения рамок трекирования для класса модели
-        graph::TrackRect rect;
+        TrackRect rect;
 
-        typedef lst::List<ModelClass, lst::CompareItemDummy> List;
+        typedef lst::List<ModelClass, data::ModelClass::Find<ModelClass>> List;
 
         DECLARE_B_SERIALIZE_FUNC
 
@@ -1008,9 +1098,41 @@ struct TrackRectsInfo
     J_SERIALIZE_END
 };
 
-struct TrackRectsInfoA : TrackRectsInfo,  Data<&command::TrackRectsInfo,
-                                                Message::Type::Answer>
+struct TrackRectsInfoA : Data<&command::TrackRectsInfo,
+                               Message::Type::Answer>
 {
+    TrackRects::Ptr value;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "value", value )
+};
+
+struct TrackRectsDynamicInfoA : Data<&command::TrackRectsDynamicInfo,
+                                      Message::Type::Answer>
+{
+    TrackRect::List items;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "items", items )
+};
+
+struct TrackRectsDynamicUpdate : Data<&command::TrackRectsDynamicUpdate,
+                                       Message::Type::Command>
+{
+    TrackRect::List items;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "items", items )
+};
+
+struct TrackRectsDynamicRemove : Data<&command::TrackRectsDynamicRemove,
+                                       Message::Type::Command>
+{
+    // Список идентификаторов трекируемых объектов
+    QSet<QUuidEx> items;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "items", items )
 };
 
 struct Graphset
@@ -1021,7 +1143,7 @@ struct Graphset
     bool visible = {true};
 
     // Список наборов графических примитивов
-    data::graph::Set::List items;
+    graph::Set::List items;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -1043,19 +1165,28 @@ struct GraphsetInfoA : Data<&command::GraphsetInfo,
 struct GraphsetDynamicInfoA : Data<&command::GraphsetDynamicInfo,
                                     Message::Type::Answer>
 {
-    Graphset::Ptr value;
+    graph::Set::List items;
 
     DECLARE_B_SERIALIZE_FUNC
-    J_SERIALIZE_MAP_ONE( "value", value )
+    J_SERIALIZE_MAP_ONE( "items", items )
 };
 
 struct GraphsetDynamicUpdate : Data<&command::GraphsetDynamicUpdate,
                                      Message::Type::Command>
 {
-    Graphset::Ptr value;
+    graph::Set::List items;
 
     DECLARE_B_SERIALIZE_FUNC
-    J_SERIALIZE_MAP_ONE( "value", value )
+    J_SERIALIZE_MAP_ONE( "items", items )
+};
+
+struct GraphsetDynamicRemove : Data<&command::GraphsetDynamicRemove,
+                                     Message::Type::Command>
+{
+    QList<graph::Identity> items;
+
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "items", items )
 };
 
 struct GraphsetVisible : Data<&command::GraphsetVisible,
@@ -1110,11 +1241,11 @@ struct RoisInfo
     bool visible = {false};
 
     // Глобальные области ROI
-    data::graph::Roi::List globalRois;
+    graph::Roi::List globalRois;
 
-#ifdef INFERENCE_IS_PRESENT
+#ifdef TRACKING_IS_PRESENT
     // Глобальные области ROI, используются для быстрой обработки
-    infer::DetectRect::List globalRoisFast;
+    tochka::DetectRect::List globalRoisFast;
 #endif
 
     struct ModelClass
@@ -1127,11 +1258,11 @@ struct RoisInfo
         bool skipGlobalRois = {false};
 
         // Области ROI для класса
-        data::graph::Roi::List rois;
+        graph::Roi::List rois;
 
-#ifdef INFERENCE_IS_PRESENT
+#ifdef TRACKING_IS_PRESENT
         // Области ROI, используются для быстрой обработки
-        infer::DetectRect::List roisFast;
+        tochka::DetectRect::List roisFast;
 #endif
         typedef lst::List<ModelClass, lst::CompareItemDummy> List;
 
@@ -1195,7 +1326,7 @@ struct FpFnInfo
     bool visibleRois = {false};
 
     // Кисть для отрисовки рамки трекирования в файле с разметкой
-    data::graph::Brush markupBrush;
+    graph::Brush markupBrush;
 
     struct ModelClass
     {
@@ -1206,7 +1337,7 @@ struct FpFnInfo
         bool active = {true};
 
         // Область ROI для класса
-        data::graph::Roi roi;
+        graph::Roi roi;
 
         // Время следующей итерации сохранения FP-изображения (в секундах)
         qint32 fpTiming = {30};

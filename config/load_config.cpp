@@ -202,7 +202,6 @@ bool loadPolyline(const YamlConfig* conf, const YAML::Node& baseNode,
         return true;
     };
     conf->getValue(node, "points", loadPoints, false);
-
     return true;
 }
 
@@ -219,20 +218,17 @@ bool loadRectangle(const YamlConfig* conf, const YAML::Node& baseNode,
         return true;
     }
 
-//    YAML::Node node1 = base["border"];
-//    bool b2 = node1.IsDefined();
-//    bool b1 = node1.IsNull();
-
-//    if (node.IsNull())
-//        return false;
-
     loadIdentity  (conf, node, "identity", rect.identity);
     conf->getValue(      node, "visible" , rect.visible, false);
     loadBrush     (conf, node, "brush"   , rect.brush);
     loadPoint     (conf, node, "point"   , rect.point1);
     loadPoint     (conf, node, "point1"  , rect.point1);
     loadPoint     (conf, node, "point2"  , rect.point2);
-    loadSize      (conf, node, "size"    , rect.size);
+
+    data::graph::Size size;
+    if (loadSize(conf, node, "size", size))
+        rect.setSize(size);
+
     return true;
 }
 
