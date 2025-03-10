@@ -22,6 +22,7 @@ REGISTRY_COMMAND_SINGLPROC(TrackRectsDynamicInfo,    "3303e9c6-2f9e-452f-92ef-ed
 REGISTRY_COMMAND_SINGLPROC(TrackRectsDynamicUpdate,  "a8791397-3e64-453c-9b4f-4c220384e496")
 REGISTRY_COMMAND_SINGLPROC(TrackRectsDynamicRemove,  "c151c1d0-3ce9-4617-8861-2a8c352d1e19")
 REGISTRY_COMMAND_SINGLPROC(TrackRectsDynamicChanged, "b0b6662d-a260-4c7a-8ab4-c0b05bcf49b2")
+REGISTRY_COMMAND_SINGLPROC(TrackGlobalIdUpdate,      "e0e06094-7b7a-4b63-94dd-d4c7f784b622")
 REGISTRY_COMMAND_SINGLPROC(GraphsetInfo,             "53aedbb1-ee08-4c01-8f45-499e5c099a68")
 REGISTRY_COMMAND_SINGLPROC(GraphsetChanged,          "d184366a-a48e-43a6-8c7e-8561c9a43184")
 REGISTRY_COMMAND_SINGLPROC(GraphsetDynamicInfo,      "b4fdbb1c-dfdf-4b25-8479-49b0902fe9e0")
@@ -646,11 +647,17 @@ void TrackersInfoA::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+QUuidEx TrackObject::globalUuid() const
+{
+    return QUuidEx(globalId, globalIdExt);
+}
+
 bserial::RawVector TrackObject::toRaw() const
 {
     B_SERIALIZE_V1(stream)
     stream << id;
     stream << globalId;
+    stream << globalIdExt;
     stream << isValidated;
     stream << timeDetect;
     stream << timeComplete;
@@ -664,6 +671,7 @@ void TrackObject::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_V1(vect, stream)
     stream >> id;
     stream >> globalId;
+    stream >> globalIdExt;
     stream >> isValidated;
     stream >> timeDetect;
     stream >> timeComplete;
@@ -776,7 +784,6 @@ bserial::RawVector TrackRect::toRaw() const
 {
     B_SERIALIZE_V1(stream)
     stream << id;
-  //stream << globalId;
     stream << visible;
     stream << caption;
     stream << border;
@@ -789,7 +796,6 @@ void TrackRect::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
     stream >> id;
-  //stream >> globalId;
     stream >> visible;
     stream >> caption;
     stream >> border;
@@ -883,6 +889,24 @@ void TrackRectsDynamicRemove::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect, stream)
     stream >> items;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector TrackGlobalIdUpdate::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << id;
+    stream << globalId;
+    stream << globalIdExt;
+    B_SERIALIZE_RETURN
+}
+
+void TrackGlobalIdUpdate::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> id;
+    stream >> globalId;
+    stream >> globalIdExt;
     B_DESERIALIZE_END
 }
 

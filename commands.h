@@ -96,6 +96,12 @@ extern const QUuidEx TrackRectsDynamicRemove;
 extern const QUuidEx TrackRectsDynamicChanged;
 
 /**
+  Команда обновляет или устанавливает глобальный идентификатор для трекируемого
+  объекта
+*/
+extern const QUuidEx TrackGlobalIdUpdate;
+
+/**
   Возвращает информацию о наборе графических примитивов полученном из конфигу-
   рационного файла (videtect.graph)
 */
@@ -381,12 +387,11 @@ struct Caption
 
     // Вспомогательный параметр,  используется для привязки надписи к одному из
     // углов прямоугольной рамки ROI или рамки детектирования. Параметр привязки
-    // может принимать значения в диапазоне [1, 4], где 1 соответствует верхнему
-    // левому углу прямоугольника. Обход углов происходит  по  часовой  стрелке.
-    // Функция привязки  имеет  приоритет  над  параметром  position.  Механизм
-    // деактивируется когда cornerBind меньше 1. Значение параметра по умолчанию
-    // равно 1 (привязка к верхнему левому углу)
-    qint32 cornerBind = {1};
+    // может принимать значения [1,2,3,4], где 1 соответствует  верхнему  левому
+    // углу прямоугольника. Обход углов происходит по часовой  стрелке.  Функция
+    // привязки имеет приоритет над параметром position. Механизм деактивируется
+    // когда cornerBind меньше 1
+    qint32 cornerBind = {-1};
 
 #ifdef OPENCV_IS_PRESENT
     cv::Point position_(const cv::Point& offset = {}) const;
@@ -399,14 +404,14 @@ struct Caption
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "identity"    , identity   )
-        J_SERIALIZE_MAP_OPT ( "visible"     , visible    )
-        J_SERIALIZE_MAP_OPT ( "brush"       , brush      )
-        J_SERIALIZE_MAP_ITEM( "position"    , position   )
-        J_SERIALIZE_MAP_OPT ( "offset"      , offset     )
-        J_SERIALIZE_MAP_OPT ( "scale"       , scale      )
-        J_SERIALIZE_MAP_ITEM( "text"        , text       )
-        J_SERIALIZE_MAP_ITEM( "corner_bind" , cornerBind )
+        J_SERIALIZE_MAP_OPT( "identity"    , identity   )
+        J_SERIALIZE_MAP_OPT( "visible"     , visible    )
+        J_SERIALIZE_MAP_OPT( "brush"       , brush      )
+        J_SERIALIZE_MAP_OPT( "position"    , position   )
+        J_SERIALIZE_MAP_OPT( "offset"      , offset     )
+        J_SERIALIZE_MAP_OPT( "scale"       , scale      )
+        J_SERIALIZE_MAP_OPT( "text"        , text       )
+        J_SERIALIZE_MAP_OPT( "corner_bind" , cornerBind )
     J_SERIALIZE_END
 
     typedef lst::List<Caption, Identity::Find<Caption>> List;
@@ -441,11 +446,11 @@ struct Line
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "identity" , identity )
-        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
-        J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
-        J_SERIALIZE_MAP_ITEM( "point1"   , point1   )
-        J_SERIALIZE_MAP_ITEM( "point2"   , point2   )
+        J_SERIALIZE_MAP_OPT( "identity" , identity )
+        J_SERIALIZE_MAP_OPT( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT( "brush"    , brush    )
+        J_SERIALIZE_MAP_OPT( "point1"   , point1   )
+        J_SERIALIZE_MAP_OPT( "point2"   , point2   )
     J_SERIALIZE_END
 
     typedef lst::List<Line, Identity::Find<Line>> List;
@@ -477,11 +482,11 @@ struct Polyline
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "identity" , identity )
-        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
-        J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
-        J_SERIALIZE_MAP_ITEM( "points"   , points   )
-        J_SERIALIZE_MAP_ITEM( "closed"   , closed   )
+        J_SERIALIZE_MAP_OPT( "identity" , identity )
+        J_SERIALIZE_MAP_OPT( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT( "brush"    , brush    )
+        J_SERIALIZE_MAP_OPT( "points"   , points   )
+        J_SERIALIZE_MAP_OPT( "closed"   , closed   )
     J_SERIALIZE_END
 
     typedef lst::List<Polyline, Identity::Find<Polyline>> List;
@@ -513,14 +518,6 @@ struct Rectangle
     cv::Point p2(const cv::Point& offset = {}) const;
     void setP2(const cv::Point&);
 
-//    // Верхний левый угол прямоугольника (top/left)
-//    cv::Point tl(const cv::Point& offset = {}) const {return p1(offset);}
-//    void setTl(const cv::Point& p) {setP1(p);}
-
-//    // Нижний правый угол прямоугольника (bottom/right)
-//    cv::Point br(const cv::Point& offset = {}) const {return p2(offset);}
-//    void setBr(const cv::Point& p) {setP2(p);}
-
     // Прямоугольник в cv::Rect представлении
     cv::Rect rect(const cv::Point& offset = {}) const;
     void setRect(const cv::Rect&);
@@ -538,11 +535,11 @@ struct Rectangle
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "identity" , identity )
-        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
-        J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
-        J_SERIALIZE_MAP_ITEM( "point1"   , point1   )
-        J_SERIALIZE_MAP_ITEM( "point2"   , point2   )
+        J_SERIALIZE_MAP_OPT( "identity" , identity )
+        J_SERIALIZE_MAP_OPT( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT( "brush"    , brush    )
+        J_SERIALIZE_MAP_OPT( "point1"   , point1   )
+        J_SERIALIZE_MAP_OPT( "point2"   , point2   )
     J_SERIALIZE_END
 
     typedef lst::List<Rectangle, Identity::Find<Rectangle>> List;
@@ -573,12 +570,12 @@ struct Circle
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "identity" , identity )
-        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
-        J_SERIALIZE_MAP_OPT ( "brush"    , brush    )
-        J_SERIALIZE_MAP_ITEM( "center"   , center   )
-        J_SERIALIZE_MAP_ITEM( "radius"   , radius   )
-        J_SERIALIZE_MAP_ITEM( "filled"   , filled   )
+        J_SERIALIZE_MAP_OPT( "identity" , identity )
+        J_SERIALIZE_MAP_OPT( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT( "brush"    , brush    )
+        J_SERIALIZE_MAP_OPT( "center"   , center   )
+        J_SERIALIZE_MAP_OPT( "radius"   , radius   )
+        J_SERIALIZE_MAP_OPT( "filled"   , filled   )
     J_SERIALIZE_END
 
     typedef lst::List<Circle, Identity::Find<Circle>> List;
@@ -676,8 +673,8 @@ struct FrameCrop
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "active" , active  )
-        J_SERIALIZE_MAP_ITEM( "border" , border  )
+        J_SERIALIZE_MAP_OPT ( "active" , active )
+        J_SERIALIZE_MAP_ITEM( "border" , border )
     J_SERIALIZE_END
 };
 
@@ -874,8 +871,16 @@ struct TrackObject
     // Идентификатор трекируемого объекта
     QUuidEx id;
 
-    // Глобальный идентификатор трекирования
-    QUuidEx globalId;
+    // Глобальный идентификатор трекирования, используется для прослеживания
+    // объекта между разными зонами/камерами
+    quint64 globalId  = {0};
+
+    // Вспомогательное поле, используется для расширения глобального идентифи-
+    // катора трекирования до UUID представления
+    quint64 globalIdExt = {0};
+
+    // Возвращает глобальный идентификатор трекирования в UUID представлении
+    QUuidEx globalUuid() const;
 
     // Признак вальдации объекта
     bool isValidated = {false};
@@ -899,6 +904,7 @@ struct TrackObject
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "id"            , id           )
         J_SERIALIZE_MAP_ITEM( "global_id"     , globalId     )
+        J_SERIALIZE_MAP_ITEM( "global_id_ext" , globalIdExt  )
         J_SERIALIZE_MAP_ITEM( "is_validated"  , isValidated  )
         J_SERIALIZE_MAP_ITEM( "time_detect"   , timeDetect   )
         J_SERIALIZE_MAP_ITEM( "time_complete" , timeComplete )
@@ -1027,9 +1033,6 @@ struct TrackRect
     // раскраски объекта
     QUuidEx id;
 
-    // Глобальный идентификатор трекирования. Вспомогательный параметр
-    // QUuidEx globalId;
-
     // Признак отображения примитива в кадре
     bool visible = {true};
 
@@ -1041,7 +1044,9 @@ struct TrackRect
     // признак видимости и параметры кисти, геометрия рамки берется от трекера
     graph::Rectangle border;
 
-    // Геометрический центр рамки трекирования
+    // Геометрический центр рамки трекирования. Значимыми  являются  только
+    // признак видимости и параметры кисти, координаты центра рамки берутся
+    // от трекера
     graph::Circle center;
 
     // Набор графических примитивов, используется для отрисовки дополнительной/
@@ -1053,13 +1058,12 @@ struct TrackRect
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "id"          , id         )
-      //J_SERIALIZE_MAP_ITEM( "global_id"   , globalId   )
-        J_SERIALIZE_MAP_OPT ( "visible"     , visible    )
-        J_SERIALIZE_MAP_OPT ( "caption"     , caption    )
-        J_SERIALIZE_MAP_ITEM( "border"      , border     )
-        J_SERIALIZE_MAP_ITEM( "center"      , center     )
-        J_SERIALIZE_MAP_ITEM( "graphset"    , graphset   )
+        J_SERIALIZE_MAP_ITEM( "id"       , id       )
+        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT ( "caption"  , caption  )
+        J_SERIALIZE_MAP_OPT ( "border"   , border   )
+        J_SERIALIZE_MAP_OPT ( "center"   , center   )
+        J_SERIALIZE_MAP_OPT ( "graphset" , graphset )
     J_SERIALIZE_END
 };
 
@@ -1133,6 +1137,29 @@ struct TrackRectsDynamicRemove : Data<&command::TrackRectsDynamicRemove,
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "items", items )
+};
+
+struct TrackGlobalIdUpdate : Data<&command::TrackGlobalIdUpdate,
+                                   Message::Type::Command>
+{
+    // Идентификатор трекируемого объекта
+    QUuidEx id;
+
+    // Глобальный идентификатор трекирования, используется для прослеживания
+    // объекта между разными зонами/камерами
+    quint64 globalId  = {0};
+
+    // Вспомогательное поле, используется для расширения глобального идентифи-
+    // катора трекирования до UUID представления
+    quint64 globalIdExt = {0};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "id"            , id          )
+        J_SERIALIZE_MAP_ITEM( "global_id"     , globalId    )
+        J_SERIALIZE_MAP_OPT ( "global_id_ext" , globalIdExt )
+    J_SERIALIZE_END
 };
 
 struct Graphset
