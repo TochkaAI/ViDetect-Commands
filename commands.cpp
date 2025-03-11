@@ -616,6 +616,7 @@ bserial::RawVector TrackerInfo::toRaw() const
     stream << validateSaturation;
     stream << rectsTimeLimit;
     stream << rectsCountLimit;
+    stream << rectsAverageDepth;
     B_SERIALIZE_RETURN
 }
 
@@ -630,6 +631,7 @@ void TrackerInfo::fromRaw(const bserial::RawVector& vect)
     stream >> validateSaturation;
     stream >> rectsTimeLimit;
     stream >> rectsCountLimit;
+    stream >> rectsAverageDepth;
     B_DESERIALIZE_END
 }
 

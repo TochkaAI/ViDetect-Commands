@@ -827,6 +827,10 @@ struct TrackerInfo
     // по количеству
     qint32 rectsCountLimit = {-1};
 
+    // Глубина усреднения координат и скоров для списка TrackBase::rects.
+    // Используется для минимизации эффекта дрожания при отрисовке рамок
+    qint32 rectsAverageDepth = {10};
+
     typedef lst::List<TrackerInfo, lst::CompareItemDummy> List;
 
     DECLARE_B_SERIALIZE_FUNC
@@ -840,6 +844,7 @@ struct TrackerInfo
         J_SERIALIZE_MAP_ITEM( "validate_saturation" , validateSaturation )
         J_SERIALIZE_MAP_ITEM( "rects_time_limit"    , rectsTimeLimit     )
         J_SERIALIZE_MAP_ITEM( "rects_count_limit"   , rectsCountLimit    )
+        J_SERIALIZE_MAP_ITEM( "rects_average_depth" , rectsAverageDepth  )
     J_SERIALIZE_END
 };
 
@@ -894,7 +899,8 @@ struct TrackObject
     // История трекирования
     QList<DetectRect> rects;
 
-    // Усредненная рамка/скор за 1-8 итераций
+    // Усредненная рамка/скор. Глубина усреднения определяется параметром
+    // average_depth в файле конфигурирования трекеров (videtect.track)
     DetectRect averageRect;
 
     typedef lst::List<TrackObject, TrackCompare<TrackObject>> List;
