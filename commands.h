@@ -3,8 +3,8 @@
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
 
-#ifdef TRACKING_IS_PRESENT
-#include "tracking/detect_rect.h"
+#ifdef DETECTION_IS_PRESENT
+#include "detection/detect_rect.h"
 #endif
 
 #ifdef OPENCV_IS_PRESENT
@@ -165,7 +165,7 @@ enum class ModelType : quint32
 };
 
 /**
-  Коды событий трекера. Коды соотносятся с полями структуры infer::TrackEvents
+  Коды событий трекера. Коды соотносятся с полями структуры tochka::TrackEvents
 */
 enum class TrackEvent : quint32
 {
@@ -1276,7 +1276,7 @@ struct RoisInfo
     // Глобальные области ROI
     graph::Roi::List globalRois;
 
-#ifdef TRACKING_IS_PRESENT
+#ifdef DETECTION_IS_PRESENT
     // Глобальные области ROI, используются для быстрой обработки
     tochka::DetectRect::List globalRoisFast;
 #endif
@@ -1293,7 +1293,7 @@ struct RoisInfo
         // Области ROI для класса
         graph::Roi::List rois;
 
-#ifdef TRACKING_IS_PRESENT
+#ifdef DETECTION_IS_PRESENT
         // Области ROI, используются для быстрой обработки
         tochka::DetectRect::List roisFast;
 #endif
