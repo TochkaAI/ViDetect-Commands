@@ -32,6 +32,11 @@ REGISTRY_COMMAND_SINGLPROC(GraphsetDynamicChanged,   "85072983-a893-48b4-a916-d7
 REGISTRY_COMMAND_SINGLPROC(GraphsetVisible,          "dac925e7-8abe-49cb-98d3-15535131850a")
 REGISTRY_COMMAND_SINGLPROC(RoisInfo,                 "49ee172b-2954-4f90-9965-de3804fe3f14")
 REGISTRY_COMMAND_SINGLPROC(FpFnInfo,                 "0db958aa-d392-4157-9ed8-901f258e69d9")
+REGISTRY_COMMAND_SINGLPROC(SaverInfo,                "774271e3-e3c5-40ff-b9e4-b9ec822eef18")
+REGISTRY_COMMAND_SINGLPROC(SaverBufferInfo,          "8e7012ea-c237-426c-a6b0-8c8b1acfd7c1")
+REGISTRY_COMMAND_SINGLPROC(SaverStart,               "b0340619-0513-4ca1-9149-99b3704c6d51")
+REGISTRY_COMMAND_SINGLPROC(SaverStop,                "bd5b7bdf-4fa2-4a9b-8e2c-f3df59490303")
+REGISTRY_COMMAND_SINGLPROC(SetSaverBuffer,           "5a01508d-16ae-468a-a872-59729a50f3cb")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -1117,6 +1122,90 @@ void FpFnInfo::fromRaw(const bserial::RawVector& vect)
     stream >> visibleRois;
     stream >> markupBrush;
     stream >> classes;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector SaverInfoA::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << fileName;
+    stream << maxSaveTime;
+    stream << isMarkup;
+    B_SERIALIZE_RETURN
+}
+
+void SaverInfoA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> fileName;
+    stream >> maxSaveTime;
+    stream >> isMarkup;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector SaverBufferInfoA::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << bufferSizeClear;
+    stream << bufferSizeMarkup;
+    B_SERIALIZE_RETURN
+}
+
+void SaverBufferInfoA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> bufferSizeClear;
+    stream >> bufferSizeMarkup;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector SetSaverBuffer::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << bufferSizeClear;
+    stream << bufferSizeMarkup;
+    B_SERIALIZE_RETURN
+}
+
+void SetSaverBuffer::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> bufferSizeClear;
+    stream >> bufferSizeMarkup;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector SaverStart::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << isMarkup;
+    stream << maxSaveTime;
+    stream << autoStop;
+    stream << fileName;
+    B_SERIALIZE_RETURN
+}
+
+void SaverStart::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> isMarkup;
+    stream >> maxSaveTime;
+    stream >> autoStop;
+    stream >> fileName;
+    B_DESERIALIZE_END
+}
+
+bserial::RawVector SaverStopA::toRaw() const
+{
+    B_SERIALIZE_V1(stream)
+    stream << fileName;
+    B_SERIALIZE_RETURN
+}
+
+void SaverStopA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect, stream)
+    stream >> fileName;
     B_DESERIALIZE_END
 }
 
