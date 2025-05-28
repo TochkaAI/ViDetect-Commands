@@ -755,6 +755,13 @@ struct ModelInfo
 {
     typedef container_ptr<ModelInfo> Ptr;
 
+    // Корневая директория для субдиректорий models и cache. Если параметр path
+    // не определен явно,  то  директории  расположения  модели  и  кеша  будут
+    // следующие:
+    //   /var/opt/tochkacv/models/videtect
+    //   /var/opt/tochkacv/cache/videtect
+    QString path;
+
     // Наименование файла модели
     QString file;
 
@@ -790,6 +797,7 @@ struct ModelInfo
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "path"           , path          )
         J_SERIALIZE_MAP_ITEM( "file"           , file          )
         J_SERIALIZE_MAP_ITEM( "type"           , type          )
         J_SERIALIZE_MAP_ITEM( "type_str"       , typeStr       )
