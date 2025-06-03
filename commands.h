@@ -248,6 +248,7 @@ struct Identity : data::Identity
     Identity(const QUuidEx& id ) : id(id),       findField(FindField::Id)    {}
     Identity(const int index   ) : index(index), findField(FindField::Index) {}
     Identity(const QString name) : name(name),   findField(FindField::Name)  {}
+    Identity(const char*   name) : name(name),   findField(FindField::Name)  {}
 
     QUuidEx id;
     qint32  index = {-1};
@@ -831,6 +832,20 @@ struct DetectRect
     qint32 y_max = {0}; // Координата Bottom-Right
 
     float score  = {0}; // Оценка детектированной области
+
+#ifdef OPENCV_IS_PRESENT
+    // Точка с координатами point1 (синоним top/left)
+    cv::Point p1(const cv::Point& offset = {}) const;
+    void setP1(const cv::Point&);
+
+    // Точка с координатами point2 (синоним bottom/right)
+    cv::Point p2(const cv::Point& offset = {}) const;
+    void setP2(const cv::Point&);
+
+    // Прямоугольник в cv::Rect представлении
+    cv::Rect rect(const cv::Point& offset = {}) const;
+    void setRect(const cv::Rect&);
+#endif
 
     graph::Point center() const; // Центр прямоугольника
 

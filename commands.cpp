@@ -582,6 +582,50 @@ void ModelInfoA::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+#ifdef OPENCV_IS_PRESENT
+
+cv::Point DetectRect::p1(const cv::Point& offset) const
+{
+    return cv::Point(x_min + offset.x, y_min + offset.y);
+}
+
+void DetectRect::setP1(const cv::Point& p)
+{
+    x_min = p.x;
+    y_min = p.y;
+}
+
+cv::Point DetectRect::p2(const cv::Point& offset) const
+{
+    return cv::Point(x_max + offset.x, y_max + offset.y);
+}
+
+void DetectRect::setP2(const cv::Point& p)
+{
+    x_max = p.x;
+    y_max = p.y;
+}
+
+cv::Rect DetectRect::rect(const cv::Point& offset) const
+{
+    cv::Rect rect;
+    rect.x = x_min + offset.x;
+    rect.y = y_min + offset.y;
+    rect.width  = x_max - x_min;
+    rect.height = y_max - y_min;
+    return rect;
+}
+
+void DetectRect::setRect(const cv::Rect& rect)
+{
+    x_min = rect.x;
+    y_min = rect.y;
+    x_max = rect.x + rect.width;
+    y_max = rect.y + rect.height;
+}
+
+#endif // OPENCV_IS_PRESENT
+
 graph::Point DetectRect::center() const
 {
     graph::Point p;
