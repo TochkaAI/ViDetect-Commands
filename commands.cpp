@@ -51,9 +51,9 @@ bool Identity::isNull() const
     return (id.isNull() && (index < 0) && name.isEmpty());
 }
 
-bserial::RawVector Identity::toRaw() const
+void Identity::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << id;
     stream << index;
     stream << name;
@@ -63,7 +63,7 @@ bserial::RawVector Identity::toRaw() const
 
 void Identity::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> id;
     stream >> index;
     stream >> name;
@@ -71,9 +71,9 @@ void Identity::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector Color::toRaw() const
+void Color::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << r;
     stream << g;
     stream << b;
@@ -82,16 +82,16 @@ bserial::RawVector Color::toRaw() const
 
 void Color::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> r;
     stream >> g;
     stream >> b;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector Brush::toRaw() const
+void Brush::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << thickness;
     stream << color;
     B_SERIALIZE_RETURN
@@ -99,7 +99,7 @@ bserial::RawVector Brush::toRaw() const
 
 void Brush::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> thickness;
     stream >> color;
     B_DESERIALIZE_END
@@ -110,9 +110,9 @@ bool Point::isNull() const
     return (x == 0) && (y == 0);
 }
 
-bserial::RawVector Point::toRaw() const
+void Point::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << x;
     stream << y;
     B_SERIALIZE_RETURN
@@ -120,7 +120,7 @@ bserial::RawVector Point::toRaw() const
 
 void Point::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> x;
     stream >> y;
     B_DESERIALIZE_END
@@ -131,9 +131,9 @@ bool Size::isNull() const
     return (width == 0) && (height == 0);
 }
 
-bserial::RawVector Size::toRaw() const
+void Size::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << width;
     stream << height;
     B_SERIALIZE_RETURN
@@ -141,15 +141,15 @@ bserial::RawVector Size::toRaw() const
 
 void Size::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> width;
     stream >> height;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector Offset::toRaw() const
+void Offset::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << dx;
     stream << dy;
     B_SERIALIZE_RETURN
@@ -157,7 +157,7 @@ bserial::RawVector Offset::toRaw() const
 
 void Offset::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> dx;
     stream >> dy;
     B_DESERIALIZE_END
@@ -189,9 +189,9 @@ void Caption::setOffset(const cv::Point& p)
 
 #endif // OPENCV_IS_PRESENT
 
-bserial::RawVector Caption::toRaw() const
+void Caption::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << identity;
     stream << visible;
     stream << brush;
@@ -205,7 +205,7 @@ bserial::RawVector Caption::toRaw() const
 
 void Caption::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> identity;
     stream >> visible;
     stream >> brush;
@@ -248,9 +248,9 @@ bool Line::isNull() const
     return (point1.isNull() && point2.isNull());
 }
 
-bserial::RawVector Line::toRaw() const
+void Line::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << identity;
     stream << visible;
     stream << brush;
@@ -261,7 +261,7 @@ bserial::RawVector Line::toRaw() const
 
 void Line::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> identity;
     stream >> visible;
     stream >> brush;
@@ -291,9 +291,9 @@ bool Polyline::isNull() const
     return true;
 }
 
-bserial::RawVector Polyline::toRaw() const
+void Polyline::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << identity;
     stream << visible;
     stream << brush;
@@ -304,7 +304,7 @@ bserial::RawVector Polyline::toRaw() const
 
 void Polyline::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> identity;
     stream >> visible;
     stream >> brush;
@@ -381,9 +381,9 @@ Point Rectangle::center() const
     return p;
 }
 
-bserial::RawVector Rectangle::toRaw() const
+void Rectangle::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << identity;
     stream << visible;
     stream << brush;
@@ -394,7 +394,7 @@ bserial::RawVector Rectangle::toRaw() const
 
 void Rectangle::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> identity;
     stream >> visible;
     stream >> brush;
@@ -418,9 +418,9 @@ void Circle::setCenter(const cv::Point& p)
 
 #endif // OPENCV_IS_PRESENT
 
-bserial::RawVector Circle::toRaw() const
+void Circle::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << identity;
     stream << visible;
     stream << brush;
@@ -432,7 +432,7 @@ bserial::RawVector Circle::toRaw() const
 
 void Circle::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> identity;
     stream >> visible;
     stream >> brush;
@@ -442,9 +442,9 @@ void Circle::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector Roi::toRaw() const
+void Roi::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << identity;
     stream << visible;
     stream << caption;
@@ -454,7 +454,7 @@ bserial::RawVector Roi::toRaw() const
 
 void Roi::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> identity;
     stream >> visible;
     stream >> caption;
@@ -462,9 +462,9 @@ void Roi::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector Set::toRaw() const
+void Set::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << identity;
     stream << visible;
     stream << printLog;
@@ -479,7 +479,7 @@ bserial::RawVector Set::toRaw() const
 
 void Set::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> identity;
     stream >> visible;
     stream >> printLog;
@@ -494,9 +494,9 @@ void Set::fromRaw(const bserial::RawVector& vect)
 
 } // namespace graph
 
-bserial::RawVector FrameCrop::toRaw() const
+void FrameCrop::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << active;
     stream << border;
     B_SERIALIZE_RETURN
@@ -504,15 +504,15 @@ bserial::RawVector FrameCrop::toRaw() const
 
 void FrameCrop::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> active;
     stream >> border;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector ModelClass::toRaw() const
+void ModelClass::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << index;
     stream << name;
     stream << skip;
@@ -524,7 +524,7 @@ bserial::RawVector ModelClass::toRaw() const
 
 void ModelClass::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> index;
     stream >> name;
     stream >> skip;
@@ -534,9 +534,9 @@ void ModelClass::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector ModelInfo::toRaw() const
+void ModelInfo::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << file;
     stream << type;
     stream << typeStr;
@@ -553,7 +553,7 @@ bserial::RawVector ModelInfo::toRaw() const
 
 void ModelInfo::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> file;
     stream >> type;
     stream >> typeStr;
@@ -568,16 +568,16 @@ void ModelInfo::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector ModelInfoA::toRaw() const
+void ModelInfoA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << value;
     B_SERIALIZE_RETURN
 }
 
 void ModelInfoA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> value;
     B_DESERIALIZE_END
 }
@@ -634,9 +634,9 @@ graph::Point DetectRect::center() const
     return p;
 }
 
-bserial::RawVector DetectRect::toRaw() const
+void DetectRect::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << x_min;
     stream << y_min;
     stream << x_max;
@@ -647,7 +647,7 @@ bserial::RawVector DetectRect::toRaw() const
 
 void DetectRect::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> x_min;
     stream >> y_min;
     stream >> x_max;
@@ -656,9 +656,9 @@ void DetectRect::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackerInfo::toRaw() const
+void TrackerInfo::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << classIndex;
     stream << className;
     stream << iouThresh;
@@ -673,7 +673,7 @@ bserial::RawVector TrackerInfo::toRaw() const
 
 void TrackerInfo::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> classIndex;
     stream >> className;
     stream >> iouThresh;
@@ -686,16 +686,16 @@ void TrackerInfo::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackersInfoA::toRaw() const
+void TrackersInfoA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << items;
     B_SERIALIZE_RETURN
 }
 
 void TrackersInfoA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> items;
     B_DESERIALIZE_END
 }
@@ -705,9 +705,9 @@ QUuidEx TrackObject::globalUuid() const
     return QUuidEx(globalId, globalIdExt);
 }
 
-bserial::RawVector TrackObject::toRaw() const
+void TrackObject::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << id;
     stream << globalId;
     stream << globalIdExt;
@@ -721,7 +721,7 @@ bserial::RawVector TrackObject::toRaw() const
 
 void TrackObject::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> id;
     stream >> globalId;
     stream >> globalIdExt;
@@ -733,9 +733,9 @@ void TrackObject::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackerEvent::toRaw() const
+void TrackerEvent::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << classIndex;
     stream << className;
     stream << event;
@@ -745,7 +745,7 @@ bserial::RawVector TrackerEvent::toRaw() const
 
 void TrackerEvent::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> classIndex;
     stream >> className;
     stream >> event;
@@ -753,9 +753,9 @@ void TrackerEvent::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackersEventsInfoA::Item::toRaw() const
+void TrackersEventsInfoA::Item::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << classIndex;
     stream << className;
     stream << events;
@@ -764,30 +764,30 @@ bserial::RawVector TrackersEventsInfoA::Item::toRaw() const
 
 void TrackersEventsInfoA::Item::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> classIndex;
     stream >> className;
     stream >> events;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackersEventsInfoA::toRaw() const
+void TrackersEventsInfoA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << items;
     B_SERIALIZE_RETURN
 }
 
 void TrackersEventsInfoA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackersEventsSubscript::toRaw() const
+void TrackersEventsSubscript::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << classIndexes;
     stream << events;
     B_SERIALIZE_RETURN
@@ -795,15 +795,15 @@ bserial::RawVector TrackersEventsSubscript::toRaw() const
 
 void TrackersEventsSubscript::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> classIndexes;
     stream >> events;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackerSnapshot::toRaw() const
+void TrackerSnapshot::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << classIndex;
     stream << className;
     stream << objects;
@@ -812,30 +812,30 @@ bserial::RawVector TrackerSnapshot::toRaw() const
 
 void TrackerSnapshot::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> classIndex;
     stream >> className;
     stream >> objects;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackersSnapshotA::toRaw() const
+void TrackersSnapshotA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << items;
     B_SERIALIZE_RETURN
 }
 
 void TrackersSnapshotA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackRect::toRaw() const
+void TrackRect::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << id;
     stream << visible;
     stream << caption;
@@ -847,7 +847,7 @@ bserial::RawVector TrackRect::toRaw() const
 
 void TrackRect::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> id;
     stream >> visible;
     stream >> caption;
@@ -857,9 +857,9 @@ void TrackRect::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackRects::ModelClass::toRaw() const
+void TrackRects::ModelClass::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << index;
     stream << rect;
     B_SERIALIZE_RETURN
@@ -867,15 +867,15 @@ bserial::RawVector TrackRects::ModelClass::toRaw() const
 
 void TrackRects::ModelClass::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> index;
     stream >> rect;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackRects::toRaw() const
+void TrackRects::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << visible;
     stream << classes;
     B_SERIALIZE_RETURN
@@ -883,71 +883,71 @@ bserial::RawVector TrackRects::toRaw() const
 
 void TrackRects::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> visible;
     stream >> classes;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackRectsInfoA::toRaw() const
+void TrackRectsInfoA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << value;
     B_SERIALIZE_RETURN
 }
 
 void TrackRectsInfoA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> value;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackRectsDynamicInfoA::toRaw() const
+void TrackRectsDynamicInfoA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << items;
     B_SERIALIZE_RETURN
 }
 
 void TrackRectsDynamicInfoA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackRectsDynamicUpdate::toRaw() const
+void TrackRectsDynamicUpdate::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << items;
     B_SERIALIZE_RETURN
 }
 
 void TrackRectsDynamicUpdate::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackRectsDynamicRemove::toRaw() const
+void TrackRectsDynamicRemove::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << items;
     B_SERIALIZE_RETURN
 }
 
 void TrackRectsDynamicRemove::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector TrackGlobalIdUpdate::toRaw() const
+void TrackGlobalIdUpdate::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << id;
     stream << globalId;
     stream << globalIdExt;
@@ -956,16 +956,16 @@ bserial::RawVector TrackGlobalIdUpdate::toRaw() const
 
 void TrackGlobalIdUpdate::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> id;
     stream >> globalId;
     stream >> globalIdExt;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector Graphset::toRaw() const
+void Graphset::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << visible;
     stream << items;
     B_SERIALIZE_RETURN
@@ -973,71 +973,71 @@ bserial::RawVector Graphset::toRaw() const
 
 void Graphset::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> visible;
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector GraphsetInfoA::toRaw() const
+void GraphsetInfoA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << value;
     B_SERIALIZE_RETURN
 }
 
 void GraphsetInfoA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> value;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector GraphsetDynamicInfoA::toRaw() const
+void GraphsetDynamicInfoA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << items;
     B_SERIALIZE_RETURN
 }
 
 void GraphsetDynamicInfoA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector GraphsetDynamicUpdate::toRaw() const
+void GraphsetDynamicUpdate::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << items;
     B_SERIALIZE_RETURN
 }
 
 void GraphsetDynamicUpdate::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector GraphsetDynamicRemove::toRaw() const
+void GraphsetDynamicRemove::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << items;
     B_SERIALIZE_RETURN
 }
 
 void GraphsetDynamicRemove::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector GraphsetVisible::Set::Item::toRaw() const
+void GraphsetVisible::Set::Item::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << identity;
     stream << visible;
     B_SERIALIZE_RETURN
@@ -1045,15 +1045,15 @@ bserial::RawVector GraphsetVisible::Set::Item::toRaw() const
 
 void GraphsetVisible::Set::Item::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> identity;
     stream >> visible;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector GraphsetVisible::Set::toRaw() const
+void GraphsetVisible::Set::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << texts;
     stream << lines;
     stream << rectangles;
@@ -1063,7 +1063,7 @@ bserial::RawVector GraphsetVisible::Set::toRaw() const
 
 void GraphsetVisible::Set::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> texts;
     stream >> lines;
     stream >> rectangles;
@@ -1071,9 +1071,9 @@ void GraphsetVisible::Set::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector GraphsetVisible::toRaw() const
+void GraphsetVisible::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << visible;
     stream << items;
     B_SERIALIZE_RETURN
@@ -1081,15 +1081,15 @@ bserial::RawVector GraphsetVisible::toRaw() const
 
 void GraphsetVisible::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> visible;
     stream >> items;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector RoisInfo::ModelClass::toRaw() const
+void RoisInfo::ModelClass::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << index;
     stream << skipGlobalRois;
     stream << rois;
@@ -1098,16 +1098,16 @@ bserial::RawVector RoisInfo::ModelClass::toRaw() const
 
 void RoisInfo::ModelClass::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> index;
     stream >> skipGlobalRois;
     stream >> rois;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector RoisInfo::toRaw() const
+void RoisInfo::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << visible;
     stream << globalRois;
     stream << classes;
@@ -1116,16 +1116,16 @@ bserial::RawVector RoisInfo::toRaw() const
 
 void RoisInfo::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> visible;
     stream >> globalRois;
     stream >> classes;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector FpFnInfo::ModelClass::toRaw() const
+void FpFnInfo::ModelClass::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << index;
     stream << active;
     stream << roi;
@@ -1137,7 +1137,7 @@ bserial::RawVector FpFnInfo::ModelClass::toRaw() const
 
 void FpFnInfo::ModelClass::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> index;
     stream >> active;
     stream >> roi;
@@ -1147,9 +1147,9 @@ void FpFnInfo::ModelClass::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector FpFnInfo::toRaw() const
+void FpFnInfo::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << active;
     stream << path;
     stream << prefix;
@@ -1161,7 +1161,7 @@ bserial::RawVector FpFnInfo::toRaw() const
 
 void FpFnInfo::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> active;
     stream >> path;
     stream >> prefix;
@@ -1171,9 +1171,9 @@ void FpFnInfo::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector SaverInfoA::toRaw() const
+void SaverInfoA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << fileName;
     stream << maxSaveTime;
     stream << isMarkup;
@@ -1182,16 +1182,16 @@ bserial::RawVector SaverInfoA::toRaw() const
 
 void SaverInfoA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> fileName;
     stream >> maxSaveTime;
     stream >> isMarkup;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector SaverBufferInfoA::toRaw() const
+void SaverBufferInfoA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << bufferSizeClear;
     stream << bufferSizeMarkup;
     B_SERIALIZE_RETURN
@@ -1199,15 +1199,15 @@ bserial::RawVector SaverBufferInfoA::toRaw() const
 
 void SaverBufferInfoA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> bufferSizeClear;
     stream >> bufferSizeMarkup;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector SetSaverBuffer::toRaw() const
+void SetSaverBuffer::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << bufferSizeClear;
     stream << bufferSizeMarkup;
     B_SERIALIZE_RETURN
@@ -1215,15 +1215,15 @@ bserial::RawVector SetSaverBuffer::toRaw() const
 
 void SetSaverBuffer::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> bufferSizeClear;
     stream >> bufferSizeMarkup;
     B_DESERIALIZE_END
 }
 
-bserial::RawVector SaverStart::toRaw() const
+void SaverStart::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << isMarkup;
     stream << maxSaveTime;
     stream << autoStop;
@@ -1233,7 +1233,7 @@ bserial::RawVector SaverStart::toRaw() const
 
 void SaverStart::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> isMarkup;
     stream >> maxSaveTime;
     stream >> autoStop;
@@ -1241,16 +1241,16 @@ void SaverStart::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-bserial::RawVector SaverStopA::toRaw() const
+void SaverStopA::toRaw(bserial::DataStream& stream) const
 {
-    B_SERIALIZE_V1(stream)
+    B_SERIALIZE_V1
     stream << fileName;
     B_SERIALIZE_RETURN
 }
 
 void SaverStopA::fromRaw(const bserial::RawVector& vect)
 {
-    B_DESERIALIZE_V1(vect, stream)
+    B_DESERIALIZE_V1(vect)
     stream >> fileName;
     B_DESERIALIZE_END
 }
