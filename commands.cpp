@@ -541,7 +541,8 @@ void ModelInfo::toRaw(bserial::DataStream& stream) const
     stream << type;
     stream << typeStr;
     stream << imageChannels;
-    stream << inputSize;
+    stream << inputSizeW;
+    stream << inputSizeH;
     stream << input;
     stream << output;
     stream << recordCount;
@@ -558,7 +559,8 @@ void ModelInfo::fromRaw(const bserial::RawVector& vect)
     stream >> type;
     stream >> typeStr;
     stream >> imageChannels;
-    stream >> inputSize;
+    stream >> inputSizeW;
+    stream >> inputSizeH;
     stream >> input;
     stream >> output;
     stream >> recordCount;

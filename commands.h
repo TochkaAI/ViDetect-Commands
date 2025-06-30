@@ -776,8 +776,11 @@ struct ModelInfo
     // чернобелого изображения, и '3' - для цветного изображения
     qint8 imageChannels = {3};
 
-    // Размер входного слоя модели
-    qint32 inputSize = {640};
+    // Размер A входного слоя модели
+    qint32 inputSizeW = {640};
+
+    // Размер B входного слоя модели
+    qint32 inputSizeH = {640};
 
     // Наименование входного слоя модели
     QString input;
@@ -803,7 +806,8 @@ struct ModelInfo
         J_SERIALIZE_MAP_ITEM( "type"           , type          )
         J_SERIALIZE_MAP_ITEM( "type_str"       , typeStr       )
         J_SERIALIZE_MAP_ITEM( "image_channels" , imageChannels )
-        J_SERIALIZE_MAP_ITEM( "size"           , inputSize     )
+        J_SERIALIZE_MAP_ITEM( "size_w"         , inputSizeW    )
+        J_SERIALIZE_MAP_ITEM( "size_h"         , inputSizeH    )
         J_SERIALIZE_MAP_ITEM( "input"          , input         )
         J_SERIALIZE_MAP_ITEM( "output"         , output        )
         J_SERIALIZE_MAP_ITEM( "record_count"   , recordCount   )
