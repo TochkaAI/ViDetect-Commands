@@ -10,6 +10,7 @@ namespace command {
 #define REGISTRY_COMMAND_MULTIPROC(COMMAND, UUID) \
     const QUuidEx COMMAND = command::Pool::Registry{UUID, #COMMAND, true};
 
+REGISTRY_COMMAND_SINGLPROC(ConfigChanged,            "aaa0324a-aca7-4ec5-b94e-ada1716df083")
 REGISTRY_COMMAND_SINGLPROC(ModelInfo,                "d8f7f3f5-2965-4b1a-9508-3e18f85d0fcc")
 REGISTRY_COMMAND_SINGLPROC(TrackersInfo,             "d6272e50-b3e7-4d7d-b45e-e22440c78315")
 REGISTRY_COMMAND_SINGLPROC(TrackerEvent,             "50dc6d0c-a0aa-48e6-81be-a10e2998dee3")
@@ -493,6 +494,22 @@ void Set::fromRaw(const bserial::RawVector& vect)
 }
 
 } // namespace graph
+
+void ConfigChanged::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << file;
+    stream << phase;
+    B_SERIALIZE_RETURN
+}
+
+void ConfigChanged::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> file;
+    stream >> phase;
+    B_DESERIALIZE_END
+}
 
 void FrameCrop::toRaw(bserial::DataStream& stream) const
 {
