@@ -1618,6 +1618,8 @@ struct SaverStart : Data<&command::SaverStart,
                           Message::Type::Command,
                           Message::Type::Answer>
 {
+    int saverIndex = {-1};
+
     // Флаг обозначающий тип записи - с разметкой или без
     bool isMarkup = {true};
 
@@ -1635,10 +1637,11 @@ struct SaverStart : Data<&command::SaverStart,
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "is_markup"    , isMarkup    )
+        J_SERIALIZE_MAP_ITEM( "saver_index"   , saverIndex  )
+        J_SERIALIZE_MAP_ITEM( "is_markup"     , isMarkup    )
         J_SERIALIZE_MAP_ITEM( "max_save_time" , maxSaveTime )
-        J_SERIALIZE_MAP_ITEM( "auto_stop"    , autoStop    )
-        J_SERIALIZE_MAP_ITEM( "file_name"    , fileName    )
+        J_SERIALIZE_MAP_ITEM( "auto_stop"     , autoStop    )
+        J_SERIALIZE_MAP_ITEM( "file_name"     , fileName    )
     J_SERIALIZE_END
 };
 
@@ -1656,9 +1659,12 @@ struct SaverStart : Data<&command::SaverStart,
 //    J_SERIALIZE_END
 //};
 
-struct SaverStopA : Data<&command::SaverStop,
-                          Message::Type::Answer>
+struct SaverStop : Data<&command::SaverStop,
+                         Message::Type::Command,
+                         Message::Type::Answer>
 {
+    int saverIndex = {-1};
+
     // Название видеозаписи которая будет остановлена.
     // Это поле для информирования клиентской стороны
     QString fileName;
@@ -1666,7 +1672,8 @@ struct SaverStopA : Data<&command::SaverStop,
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "file_name" , fileName )
+        J_SERIALIZE_MAP_ITEM( "saver_index" , saverIndex )
+        J_SERIALIZE_MAP_ITEM( "file_name"   , fileName   )
     J_SERIALIZE_END
 };
 

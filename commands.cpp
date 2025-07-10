@@ -1241,6 +1241,7 @@ void SetSaverBuffer::fromRaw(const bserial::RawVector& vect)
 void SaverStart::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
+    stream << saverIndex;
     stream << isMarkup;
     stream << maxSaveTime;
     stream << autoStop;
@@ -1251,6 +1252,7 @@ void SaverStart::toRaw(bserial::DataStream& stream) const
 void SaverStart::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
+    stream >> saverIndex;
     stream >> isMarkup;
     stream >> maxSaveTime;
     stream >> autoStop;
@@ -1258,16 +1260,18 @@ void SaverStart::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-void SaverStopA::toRaw(bserial::DataStream& stream) const
+void SaverStop::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
+    stream << saverIndex;
     stream << fileName;
     B_SERIALIZE_RETURN
 }
 
-void SaverStopA::fromRaw(const bserial::RawVector& vect)
+void SaverStop::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
+    stream >> saverIndex;
     stream >> fileName;
     B_DESERIALIZE_END
 }
