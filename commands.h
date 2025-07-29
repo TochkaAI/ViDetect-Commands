@@ -1142,8 +1142,11 @@ struct TrackRect
     // раскраски объекта
     QUuidEx id;
 
-    // Признак отображения примитива в кадре
+    // Признак отображения рамки трекирования в кадре
     bool visible = {true};
+
+    // Отображать рамки трекирования только для валидированных объектов
+    bool onlyValidated = {false};
 
     // Надпись для рамки трекирования с привязкой к одному из углов геометри-
     // ческой области, по умолчанию к верхнему левому углу
@@ -1167,12 +1170,13 @@ struct TrackRect
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "id"       , id       )
-        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
-        J_SERIALIZE_MAP_OPT ( "caption"  , caption  )
-        J_SERIALIZE_MAP_OPT ( "border"   , border   )
-        J_SERIALIZE_MAP_OPT ( "center"   , center   )
-        J_SERIALIZE_MAP_OPT ( "graphset" , graphset )
+        J_SERIALIZE_MAP_ITEM( "id"             , id            )
+        J_SERIALIZE_MAP_OPT ( "visible"        , visible       )
+        J_SERIALIZE_MAP_OPT ( "only_validated" , onlyValidated )
+        J_SERIALIZE_MAP_OPT ( "caption"        , caption       )
+        J_SERIALIZE_MAP_OPT ( "border"         , border        )
+        J_SERIALIZE_MAP_OPT ( "center"         , center        )
+        J_SERIALIZE_MAP_OPT ( "graphset"       , graphset      )
     J_SERIALIZE_END
 };
 

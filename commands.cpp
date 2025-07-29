@@ -859,6 +859,7 @@ void TrackRect::toRaw(bserial::DataStream& stream) const
     stream << border;
     stream << center;
     stream << graphset;
+    stream << onlyValidated;
     B_SERIALIZE_RETURN
 }
 
@@ -871,6 +872,7 @@ void TrackRect::fromRaw(const bserial::RawVector& vect)
     stream >> border;
     stream >> center;
     stream >> graphset;
+    stream >> onlyValidated;
     B_DESERIALIZE_END
 }
 
