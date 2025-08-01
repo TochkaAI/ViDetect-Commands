@@ -656,6 +656,9 @@ struct Roi
     // Признак отображения примитива в кадре
     bool visible = {true};
 
+    // Инвертирует принадлежность объекта детектирования к области ROI
+    bool inverse = {false};
+
     // Надпись ROI с привязкой к одному из углов геометрической области,
     // по умолчанию к верхнему левому углу
     Caption caption;
@@ -668,6 +671,7 @@ struct Roi
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "identity" , identity )
         J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
+        J_SERIALIZE_MAP_OPT ( "inverse"  , inverse  )
         J_SERIALIZE_MAP_OPT ( "caption"  , caption  )
         J_SERIALIZE_MAP_ITEM( "border"   , border   )
     J_SERIALIZE_END

@@ -450,6 +450,7 @@ void Roi::toRaw(bserial::DataStream& stream) const
     stream << visible;
     stream << caption;
     stream << border;
+    stream << inverse;
     B_SERIALIZE_RETURN
 }
 
@@ -460,6 +461,7 @@ void Roi::fromRaw(const bserial::RawVector& vect)
     stream >> visible;
     stream >> caption;
     stream >> border;
+    stream >> inverse;
     B_DESERIALIZE_END
 }
 

@@ -272,6 +272,7 @@ bool loadRoi(const YamlConfig* conf, const YAML::Node& baseNode,
 
     loadIdentity  (conf, node, "identity", roi.identity);
     conf->getValue(      node, "visible" , roi.visible, false);
+    conf->getValue(      node, "inverse" , roi.inverse, false);
     loadCaption   (conf, node, "caption" , roi.caption);
     loadRectangle (conf, node, "border"  , roi.border);
     return true;
