@@ -908,16 +908,79 @@ struct DetectRect
     J_SERIALIZE_END
 };
 
+struct TrackMatching
+{
+    enum class Type : quint32
+    {
+        Unknown = 0,
+        Iou = 1, // Intersection over Union
+        Atd = 2, // Asymmetric Triangle distance
+    };
+
+    Type type = {Type::Iou};
+
+    struct Atd
+    {
+        typedef container_ptr<Atd> Ptr;
+
+        // f(x) ^
+        //    1 |          *
+        //      |         *| *
+        //      |        * |   *
+        //      |       *  |     *
+        //      |      *   |       *
+        //      |     *    |         *
+        //    0 |* * *     |           * * * *
+        //      +--------------------------> x
+        //           |     |           |
+        //           x1    x2          x3
+
+        QString axis; // Допустимые значения: 'XY', 'X', 'Y'
+
+        float x1 = {0}; // x left
+        float x2 = {0}; // x center
+        float x3 = {0}; // x right
+
+        float y1 = {0}; // y top
+        float y2 = {0}; // y center
+        float y3 = {0}; // y bottom
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "axis", axis )
+            J_SERIALIZE_MAP_ITEM( "x1"  , x1   )
+            J_SERIALIZE_MAP_ITEM( "x2"  , x2   )
+            J_SERIALIZE_MAP_ITEM( "x3"  , x3   )
+            J_SERIALIZE_MAP_ITEM( "y1"  , y1   )
+            J_SERIALIZE_MAP_ITEM( "y2"  , y2   )
+            J_SERIALIZE_MAP_ITEM( "y3"  , y3   )
+        J_SERIALIZE_END
+    };
+
+    Atd::Ptr atd;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "type", type )
+        J_SERIALIZE_MAP_ITEM( "atd" , atd  )
+    J_SERIALIZE_END
+};
+
 struct TrackerInfo
 {
     // Порядковый индекс расположения класса в выходном слое модели
     qint32 classIndex = {-1};
 
-    // Наименованеи класса модели
+    // Наименование класса модели
     QString className;
 
-    // Пороговые значения iou, ttl
-    float  iouThresh = {0.3};
+    // Matching-функция
+    TrackMatching matching;
+
+    // Пороговые значения match, ttl
+    float  matchThresh = {0.3};
     qint32 ttlThresh = {12};
 
     // Порог валидации по времени (в миллисекундах)
@@ -945,7 +1008,8 @@ struct TrackerInfo
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "class_index"         , classIndex         )
         J_SERIALIZE_MAP_ITEM( "class_name"          , className          )
-        J_SERIALIZE_MAP_ITEM( "iou_thresh"          , iouThresh          )
+        J_SERIALIZE_MAP_ITEM( "matching"            , matching           )
+        J_SERIALIZE_MAP_ITEM( "match_thresh"        , matchThresh        )
         J_SERIALIZE_MAP_ITEM( "ttl_thresh"          , ttlThresh          )
         J_SERIALIZE_MAP_ITEM( "validate_time"       , validateTime       )
         J_SERIALIZE_MAP_ITEM( "validate_saturation" , validateSaturation )
@@ -1032,7 +1096,7 @@ struct TrackerEvent : Data<&command::TrackerEvent,
     // Порядковый индекс расположения класса в выходном слое модели
     qint32 classIndex = {-1};
 
-    // Наименованеи класса модели
+    // Наименование класса модели
     QString className;
 
     // Эмитируемое событие
@@ -1059,7 +1123,7 @@ struct TrackersEventsInfoA : Data<&command::TrackersEventsInfo,
         // Порядковый индекс расположения класса в выходном слое модели
         qint32 classIndex = {-1};
 
-        // Наименованеи класса модели
+        // Наименование класса модели
         QString className;
 
         // Набор событий
@@ -1107,7 +1171,7 @@ struct TrackerSnapshot
     // Порядковый индекс расположения класса в выходном слое модели
     qint32 classIndex = {-1};
 
-    // Наименованеи класса модели
+    // Наименование класса модели
     QString className;
 
     // Список трекируемых объектов

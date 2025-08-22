@@ -675,18 +675,61 @@ void DetectRect::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void TrackMatching::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << type;
+    stream << atd;
+    B_SERIALIZE_RETURN
+}
+
+void TrackMatching::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> type;
+    stream >> atd;
+    B_DESERIALIZE_END
+}
+
+void TrackMatching::Atd::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << axis;
+    stream << x1;
+    stream << x2;
+    stream << x3;
+    stream << y1;
+    stream << y2;
+    stream << y3;
+    B_SERIALIZE_RETURN
+}
+
+void TrackMatching::Atd::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> axis;
+    stream >> x1;
+    stream >> x2;
+    stream >> x3;
+    stream >> y1;
+    stream >> y2;
+    stream >> y3;
+    B_DESERIALIZE_END
+}
+
 void TrackerInfo::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
     stream << classIndex;
     stream << className;
-    stream << iouThresh;
+    stream << matchThresh;
     stream << ttlThresh;
     stream << validateTime;
     stream << validateSaturation;
     stream << rectsTimeLimit;
     stream << rectsCountLimit;
     stream << rectsAverageDepth;
+    stream << matching;
     B_SERIALIZE_RETURN
 }
 
@@ -695,13 +738,14 @@ void TrackerInfo::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_V1(vect)
     stream >> classIndex;
     stream >> className;
-    stream >> iouThresh;
+    stream >> matchThresh;
     stream >> ttlThresh;
     stream >> validateTime;
     stream >> validateSaturation;
     stream >> rectsTimeLimit;
     stream >> rectsCountLimit;
     stream >> rectsAverageDepth;
+    stream >> matching;
     B_DESERIALIZE_END
 }
 
