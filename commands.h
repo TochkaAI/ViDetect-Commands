@@ -216,11 +216,12 @@ struct ConfChange
 
 enum class ModelType : quint32
 {
-    Unknown = 0,
-    YoloX   = 1,
-    Yolov5  = 5,
-    Yolov7  = 7,
-    Yolov9  = 9,
+    Unknown   = 0,
+    YoloX     = 1,
+    Yolov5    = 5,
+    Yolov7    = 7,
+    Yolov9    = 9,
+    Emulation = 100,
 };
 
 /**
