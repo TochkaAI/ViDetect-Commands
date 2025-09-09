@@ -679,6 +679,7 @@ void TrackMatching::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
     stream << type;
+    stream << iou;
     stream << atd;
     B_SERIALIZE_RETURN
 }
@@ -687,7 +688,22 @@ void TrackMatching::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
     stream >> type;
+    stream >> iou;
     stream >> atd;
+    B_DESERIALIZE_END
+}
+
+void TrackMatching::Iou::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << threshold;
+    B_SERIALIZE_RETURN
+}
+
+void TrackMatching::Iou::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> threshold;
     B_DESERIALIZE_END
 }
 
@@ -701,6 +717,8 @@ void TrackMatching::Atd::toRaw(bserial::DataStream& stream) const
     stream << y1;
     stream << y2;
     stream << y3;
+    stream << thresholdX;
+    stream << thresholdY;
     B_SERIALIZE_RETURN
 }
 
@@ -714,6 +732,8 @@ void TrackMatching::Atd::fromRaw(const bserial::RawVector& vect)
     stream >> y1;
     stream >> y2;
     stream >> y3;
+    stream >> thresholdX;
+    stream >> thresholdY;
     B_DESERIALIZE_END
 }
 
@@ -722,14 +742,13 @@ void TrackerInfo::toRaw(bserial::DataStream& stream) const
     B_SERIALIZE_V1
     stream << classIndex;
     stream << className;
-    stream << matchThresh;
-    stream << ttlThresh;
+    stream << matching;
+    stream << ttl;
     stream << validateTime;
     stream << validateSaturation;
     stream << rectsTimeLimit;
     stream << rectsCountLimit;
     stream << rectsAverageDepth;
-    stream << matching;
     B_SERIALIZE_RETURN
 }
 
@@ -738,14 +757,13 @@ void TrackerInfo::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_V1(vect)
     stream >> classIndex;
     stream >> className;
-    stream >> matchThresh;
-    stream >> ttlThresh;
+    stream >> matching;
+    stream >> ttl;
     stream >> validateTime;
     stream >> validateSaturation;
     stream >> rectsTimeLimit;
     stream >> rectsCountLimit;
     stream >> rectsAverageDepth;
-    stream >> matching;
     B_DESERIALIZE_END
 }
 

@@ -918,7 +918,16 @@ struct TrackMatching
         Atd = 2, // Asymmetric Triangle distance
     };
 
-    Type type = {Type::Iou};
+    struct Iou
+    {
+        typedef container_ptr<Iou> Ptr;
+
+        // Пороговое значение iou
+        float threshold = {0.3};
+
+        DECLARE_B_SERIALIZE_FUNC
+        J_SERIALIZE_MAP_ONE( "threshold", threshold )
+    };
 
     struct Atd
     {
@@ -946,26 +955,36 @@ struct TrackMatching
         float y2 = {0}; // y center
         float y3 = {0}; // y bottom
 
+        // Пороговые значения по осям X, Y
+        float thresholdX = {0.3};
+        float thresholdY = {0.3};
+
         DECLARE_B_SERIALIZE_FUNC
 
         J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "axis", axis )
-            J_SERIALIZE_MAP_ITEM( "x1"  , x1   )
-            J_SERIALIZE_MAP_ITEM( "x2"  , x2   )
-            J_SERIALIZE_MAP_ITEM( "x3"  , x3   )
-            J_SERIALIZE_MAP_ITEM( "y1"  , y1   )
-            J_SERIALIZE_MAP_ITEM( "y2"  , y2   )
-            J_SERIALIZE_MAP_ITEM( "y3"  , y3   )
+            J_SERIALIZE_MAP_ITEM( "axis" , axis )
+            J_SERIALIZE_MAP_ITEM( "x1"   , x1   )
+            J_SERIALIZE_MAP_ITEM( "x2"   , x2   )
+            J_SERIALIZE_MAP_ITEM( "x3"   , x3   )
+            J_SERIALIZE_MAP_ITEM( "y1"   , y1   )
+            J_SERIALIZE_MAP_ITEM( "y2"   , y2   )
+            J_SERIALIZE_MAP_ITEM( "y3"   , y3   )
+            J_SERIALIZE_MAP_ITEM( "threshold_x" , thresholdX )
+            J_SERIALIZE_MAP_ITEM( "threshold_y" , thresholdY )
         J_SERIALIZE_END
     };
 
+    Type type = {Type::Iou};
+
+    Iou::Ptr iou;
     Atd::Ptr atd;
 
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "type", type )
-        J_SERIALIZE_MAP_ITEM( "atd" , atd  )
+        J_SERIALIZE_MAP_OPT ( "iou" , iou  )
+        J_SERIALIZE_MAP_OPT ( "atd" , atd  )
     J_SERIALIZE_END
 };
 
@@ -980,9 +999,8 @@ struct TrackerInfo
     // Matching-функция
     TrackMatching matching;
 
-    // Пороговые значения match, ttl
-    float  matchThresh = {0.3};
-    qint32 ttlThresh = {12};
+    // Пороговое значениея ttl
+    qint32 ttl = {12};
 
     // Порог валидации по времени (в миллисекундах)
     qint32 validateTime = {500};
@@ -1010,8 +1028,7 @@ struct TrackerInfo
         J_SERIALIZE_MAP_ITEM( "class_index"         , classIndex         )
         J_SERIALIZE_MAP_ITEM( "class_name"          , className          )
         J_SERIALIZE_MAP_ITEM( "matching"            , matching           )
-        J_SERIALIZE_MAP_ITEM( "match_thresh"        , matchThresh        )
-        J_SERIALIZE_MAP_ITEM( "ttl_thresh"          , ttlThresh          )
+        J_SERIALIZE_MAP_ITEM( "ttl"                 , ttl                )
         J_SERIALIZE_MAP_ITEM( "validate_time"       , validateTime       )
         J_SERIALIZE_MAP_ITEM( "validate_saturation" , validateSaturation )
         J_SERIALIZE_MAP_ITEM( "rects_time_limit"    , rectsTimeLimit     )
