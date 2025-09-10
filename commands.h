@@ -909,6 +909,9 @@ struct DetectRect
     J_SERIALIZE_END
 };
 
+/**
+  Механизмы сопоставления/матчинга объектов
+*/
 struct TrackMatching
 {
     enum class Type : quint32
@@ -988,6 +991,30 @@ struct TrackMatching
     J_SERIALIZE_END
 };
 
+/**
+  Механизм группировки трекируемых объектов
+*/
+struct TrackGroup
+{
+    typedef container_ptr<TrackGroup> Ptr;
+
+    // Индекс группы
+    qint32 index = {-1};
+
+    // Смещение трекируемых объектов принадлежащих группе по осям X, Y.
+    // Размерность смещения: пиксель/кадр.
+    float moveX = {0};
+    float moveY = {0};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "index"  , index )
+        J_SERIALIZE_MAP_OPT ( "move_x" , moveX )
+        J_SERIALIZE_MAP_OPT ( "move_y" , moveY )
+    J_SERIALIZE_END
+};
+
 struct TrackerInfo
 {
     // Порядковый индекс расположения класса в выходном слое модели
@@ -1020,6 +1047,9 @@ struct TrackerInfo
     // Используется для минимизации эффекта дрожания при отрисовке рамок
     qint32 rectsAverageDepth = {10};
 
+    // Группировка трекируемых объектов
+    TrackGroup::Ptr group;
+
     typedef lst::List<TrackerInfo, lst::CompareItemDummy> List;
 
     DECLARE_B_SERIALIZE_FUNC
@@ -1034,6 +1064,7 @@ struct TrackerInfo
         J_SERIALIZE_MAP_ITEM( "rects_time_limit"    , rectsTimeLimit     )
         J_SERIALIZE_MAP_ITEM( "rects_count_limit"   , rectsCountLimit    )
         J_SERIALIZE_MAP_ITEM( "rects_average_depth" , rectsAverageDepth  )
+        J_SERIALIZE_MAP_ITEM( "group"               , group              )
     J_SERIALIZE_END
 };
 

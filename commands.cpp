@@ -737,6 +737,24 @@ void TrackMatching::Atd::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void TrackGroup::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << index;
+    stream << moveX;
+    stream << moveY;
+    B_SERIALIZE_RETURN
+}
+
+void TrackGroup::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> index;
+    stream >> moveX;
+    stream >> moveY;
+    B_DESERIALIZE_END
+}
+
 void TrackerInfo::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -749,6 +767,7 @@ void TrackerInfo::toRaw(bserial::DataStream& stream) const
     stream << rectsTimeLimit;
     stream << rectsCountLimit;
     stream << rectsAverageDepth;
+    stream << group;
     B_SERIALIZE_RETURN
 }
 
@@ -764,6 +783,7 @@ void TrackerInfo::fromRaw(const bserial::RawVector& vect)
     stream >> rectsTimeLimit;
     stream >> rectsCountLimit;
     stream >> rectsAverageDepth;
+    stream >> group;
     B_DESERIALIZE_END
 }
 
