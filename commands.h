@@ -1579,6 +1579,9 @@ struct FpFnInfo
     QString path;
     QString prefix;
 
+    // Формат сохранения файла. Допустимые значения: jpg, png
+    QString fileFormat = {"jpg"};
+
     // Признак отображения всех ROI для механизма FP/FN
     bool visibleRois = {false};
 
@@ -1627,6 +1630,7 @@ struct FpFnInfo
         J_SERIALIZE_MAP_ITEM( "active"       , active      )
         J_SERIALIZE_MAP_ITEM( "path"         , path        )
         J_SERIALIZE_MAP_ITEM( "prefix"       , prefix      )
+        J_SERIALIZE_MAP_ITEM( "file_format"  , fileFormat  )
         J_SERIALIZE_MAP_ITEM( "visible_rois" , visibleRois )
         J_SERIALIZE_MAP_ITEM( "markup_brush" , markupBrush )
         J_SERIALIZE_MAP_ITEM( "classes"      , classes     )

@@ -1259,6 +1259,7 @@ void FpFnInfo::toRaw(bserial::DataStream& stream) const
     stream << visibleRois;
     stream << markupBrush;
     stream << classes;
+    stream << fileFormat;
     B_SERIALIZE_RETURN
 }
 
@@ -1271,6 +1272,7 @@ void FpFnInfo::fromRaw(const bserial::RawVector& vect)
     stream >> visibleRois;
     stream >> markupBrush;
     stream >> classes;
+    stream >> fileFormat;
     B_DESERIALIZE_END
 }
 
