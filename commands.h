@@ -1585,6 +1585,10 @@ struct FpFnInfo
     // Признак отображения всех ROI для механизма FP/FN
     bool visibleRois = {false};
 
+    // Сохранять файл с отрисованной разметкой. Файл используется как подсказка
+    // для разметчика
+    bool markupSave = {true};
+
     // Кисть для отрисовки рамки трекирования в файле с разметкой
     graph::Brush markupBrush;
 
@@ -1632,6 +1636,7 @@ struct FpFnInfo
         J_SERIALIZE_MAP_ITEM( "prefix"       , prefix      )
         J_SERIALIZE_MAP_ITEM( "file_format"  , fileFormat  )
         J_SERIALIZE_MAP_ITEM( "visible_rois" , visibleRois )
+        J_SERIALIZE_MAP_ITEM( "markup_save"  , markupSave  )
         J_SERIALIZE_MAP_ITEM( "markup_brush" , markupBrush )
         J_SERIALIZE_MAP_ITEM( "classes"      , classes     )
     J_SERIALIZE_END
