@@ -1244,13 +1244,69 @@ struct TrackerSnapshot
     J_SERIALIZE_END
 };
 
+struct TrackersSnapshot : Data<&command::TrackersSnapshot,
+                                Message::Type::Command>
+{
+    struct VideoFrame
+    {
+        // Запрос видео-фрейма при получении snapshot-а трекеров
+        bool request = {false};
+
+        // Передача видео-фрейма через shared memory
+        // TODO зарезервировано для будущего использования
+        bool sharedMem = {false};
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_OPT( "request"    , request   )
+            J_SERIALIZE_MAP_OPT( "shared_mem" , sharedMem )
+        J_SERIALIZE_END
+    };
+
+    VideoFrame videoFrame;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_OPT( "video_frame" , videoFrame )
+    J_SERIALIZE_END
+};
+
 struct TrackersSnapshotA : Data<&command::TrackersSnapshot,
                                  Message::Type::Answer>
 {
+    struct VideoFrame
+    {
+        typedef container_ptr<VideoFrame> Ptr;
+
+        quint64 number = quint64(-1); // Номер кадра
+        qint32  cvType = {0}; // Тип матрицы изображения в представлении OpenCV
+        qint32  width  = {0}; // Ширина кадра
+        qint32  height = {0}; // Высота кадра
+
+        SByteArray data; // Кадр
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "number"  , number )
+            J_SERIALIZE_MAP_ITEM( "cv_type" , cvType )
+            J_SERIALIZE_MAP_ITEM( "width"   , width  )
+            J_SERIALIZE_MAP_ITEM( "height"  , height )
+            J_SERIALIZE_MAP_ITEM( "data"    , data   )
+        J_SERIALIZE_END
+    };
+
     TrackerSnapshot::List items;
+    VideoFrame::Ptr videoFrame;
 
     DECLARE_B_SERIALIZE_FUNC
-    J_SERIALIZE_MAP_ONE( "items", items )
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "items"       , items      )
+        J_SERIALIZE_MAP_OPT ( "video_frame" , videoFrame )
+    J_SERIALIZE_END
 };
 
 struct TrackRect

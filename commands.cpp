@@ -920,10 +920,63 @@ void TrackerSnapshot::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void TrackersSnapshot::VideoFrame::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << request;
+    stream << sharedMem;
+    B_SERIALIZE_RETURN
+}
+
+void TrackersSnapshot::VideoFrame::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> request;
+    stream >> sharedMem;
+    B_DESERIALIZE_END
+}
+
+void TrackersSnapshot::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << videoFrame;
+    B_SERIALIZE_RETURN
+}
+
+void TrackersSnapshot::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> videoFrame;
+    B_DESERIALIZE_END
+}
+
+void TrackersSnapshotA::VideoFrame::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << number;
+    stream << cvType;
+    stream << width;
+    stream << height;
+    stream << data;
+    B_SERIALIZE_RETURN
+}
+
+void TrackersSnapshotA::VideoFrame::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> number;
+    stream >> cvType;
+    stream >> width;
+    stream >> height;
+    stream >> data;
+    B_DESERIALIZE_END
+}
+
 void TrackersSnapshotA::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
     stream << items;
+    stream << videoFrame;
     B_SERIALIZE_RETURN
 }
 
@@ -931,6 +984,7 @@ void TrackersSnapshotA::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
     stream >> items;
+    stream >> videoFrame;
     B_DESERIALIZE_END
 }
 
