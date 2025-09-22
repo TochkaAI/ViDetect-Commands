@@ -828,6 +828,9 @@ struct ModelInfo
     // Размер входного слоя модели
     qint32 inputSize = {640};
 
+    // Второй размер входного слоя модели. Соответствует ширине (width)
+    qint32 inputSize2 = {640};
+
     // Наименование входного слоя модели
     QString input;
 
@@ -852,7 +855,8 @@ struct ModelInfo
         J_SERIALIZE_MAP_ITEM( "type"           , type          )
         J_SERIALIZE_MAP_ITEM( "type_str"       , typeStr       )
         J_SERIALIZE_MAP_ITEM( "image_channels" , imageChannels )
-        J_SERIALIZE_MAP_ITEM( "size"           , inputSize     )
+        J_SERIALIZE_MAP_ITEM( "input_size"     , inputSize     )
+        J_SERIALIZE_MAP_ITEM( "input_size2"    , inputSize2    )
         J_SERIALIZE_MAP_ITEM( "input"          , input         )
         J_SERIALIZE_MAP_ITEM( "output"         , output        )
         J_SERIALIZE_MAP_ITEM( "record_count"   , recordCount   )

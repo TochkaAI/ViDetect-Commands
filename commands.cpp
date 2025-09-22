@@ -567,6 +567,7 @@ void ModelInfo::toRaw(bserial::DataStream& stream) const
     stream << frameCrop;
     stream << classes;
     stream << path;
+    stream << inputSize2;
     B_SERIALIZE_RETURN
 }
 
@@ -584,6 +585,7 @@ void ModelInfo::fromRaw(const bserial::RawVector& vect)
     stream >> frameCrop;
     stream >> classes;
     stream >> path;
+    stream >> inputSize2;
     B_DESERIALIZE_END
 }
 
