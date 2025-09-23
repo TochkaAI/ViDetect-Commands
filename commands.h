@@ -190,6 +190,26 @@ extern const QUuidEx SaverStart;
 */
 extern const QUuidEx SaverStop;
 
+/**
+  Команда сохранения эталонного кадра для сверки ракурса
+*/
+extern const QUuidEx SaveReferenceFrame;
+
+/**
+  Команда выбора эталонного кадра для сверки ракурса из сохраненных на сервере
+*/
+extern const QUuidEx SetReferenceFrame;
+
+/**
+  Команда для трансляции эталонного кадра вместо видеопотока
+*/
+extern const QUuidEx ShowReferenceFrame;
+
+/**
+  Команда для переключения наложения эталонного кадра (разметки) на видеопоток
+*/
+extern const QUuidEx ToggleCamRecovery;
+
 
 } // namespace command
 
@@ -1945,6 +1965,70 @@ struct SaverStop : Data<&command::SaverStop,
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "saver_index" , saverIndex )
         J_SERIALIZE_MAP_ITEM( "file_name"   , fileName   )
+    J_SERIALIZE_END
+};
+
+struct SaveReferenceFrame : Data<&command::SaveReferenceFrame,
+                                  Message::Type::Command,
+                                  Message::Type::Answer>
+{
+    bool sendReference = {false};
+    QString frameName;
+    SByteArray frameData;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "send_reference" , sendReference )
+        J_SERIALIZE_MAP_ITEM( "frame_name"     , frameName     )
+        J_SERIALIZE_MAP_ITEM( "frame_data"     , frameData     )
+    J_SERIALIZE_END
+};
+
+struct SetReferenceFrame : Data<&command::SetReferenceFrame,
+                                 Message::Type::Command,
+                                 Message::Type::Answer>
+{
+    bool sendReference = {false};
+    QString frameName;
+    SByteArray frameData;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "send_reference" , sendReference )
+        J_SERIALIZE_MAP_ITEM( "frame_name"     , frameName     )
+        J_SERIALIZE_MAP_ITEM( "frame_data"     , frameData     )
+    J_SERIALIZE_END
+};
+
+struct ShowReferenceFrame : Data<&command::ShowReferenceFrame,
+                                  Message::Type::Command,
+                                  Message::Type::Answer>
+{
+    bool active  = {true};
+    bool graphsetActive = {true};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "active"          , active         )
+        J_SERIALIZE_MAP_ITEM( "graphset_active" , graphsetActive )
+    J_SERIALIZE_END
+};
+
+struct ToggleCamRecovery : Data<&command::ToggleCamRecovery,
+                                 Message::Type::Command,
+                                 Message::Type::Answer>
+{
+    bool overlayActive  = {true};
+    bool graphsetActive = {true};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "overlay_active"  , overlayActive  )
+        J_SERIALIZE_MAP_ITEM( "graphset_active" , graphsetActive )
     J_SERIALIZE_END
 };
 
