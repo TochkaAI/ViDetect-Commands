@@ -1253,18 +1253,19 @@ struct TrackersSnapshot : Data<&command::TrackersSnapshot,
 {
     struct VideoFrame
     {
-        // Запрос видео-фрейма при получении snapshot-а трекеров
-        bool request = {false};
+        // Запрос матрицы видео-фрейма (поле VideoFrame::data в структуре TrackersSnapshotA)
+        // при получении snapshot-а трекеров
+        bool requestData = {false};
 
-        // Передача видео-фрейма через shared memory
+        // Передача матрицы видео-фрейма через shared memory
         // TODO зарезервировано для будущего использования
         bool sharedMem = {false};
 
         DECLARE_B_SERIALIZE_FUNC
 
         J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_OPT( "request"    , request   )
-            J_SERIALIZE_MAP_OPT( "shared_mem" , sharedMem )
+            J_SERIALIZE_MAP_OPT( "request_data" , requestData )
+            J_SERIALIZE_MAP_OPT( "shared_mem"   , sharedMem   )
         J_SERIALIZE_END
     };
 
@@ -1289,7 +1290,7 @@ struct TrackersSnapshotA : Data<&command::TrackersSnapshot,
         qint32  width  = {0}; // Ширина кадра
         qint32  height = {0}; // Высота кадра
 
-        SByteArray data; // Кадр
+        SByteArray data; // Матрица кадра
 
         DECLARE_B_SERIALIZE_FUNC
 

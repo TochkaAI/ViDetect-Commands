@@ -925,7 +925,7 @@ void TrackerSnapshot::fromRaw(const bserial::RawVector& vect)
 void TrackersSnapshot::VideoFrame::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
-    stream << request;
+    stream << requestData;
     stream << sharedMem;
     B_SERIALIZE_RETURN
 }
@@ -933,7 +933,7 @@ void TrackersSnapshot::VideoFrame::toRaw(bserial::DataStream& stream) const
 void TrackersSnapshot::VideoFrame::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
-    stream >> request;
+    stream >> requestData;
     stream >> sharedMem;
     B_DESERIALIZE_END
 }
