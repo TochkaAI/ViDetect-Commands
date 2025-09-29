@@ -38,10 +38,9 @@ REGISTRY_COMMAND_SINGLPROC(SaverBufferInfo,          "8e7012ea-c237-426c-a6b0-8c
 REGISTRY_COMMAND_SINGLPROC(SaverStart,               "b0340619-0513-4ca1-9149-99b3704c6d51")
 REGISTRY_COMMAND_SINGLPROC(SaverStop,                "bd5b7bdf-4fa2-4a9b-8e2c-f3df59490303")
 REGISTRY_COMMAND_SINGLPROC(SetSaverBuffer,           "5a01508d-16ae-468a-a872-59729a50f3cb")
-REGISTRY_COMMAND_SINGLPROC(SaveReferenceFrame,       "c7941e39-c00c-4545-b3d6-024411f00851")
-REGISTRY_COMMAND_SINGLPROC(SetReferenceFrame,        "6205c40e-5338-4abd-b7b1-a9b088742d00")
-REGISTRY_COMMAND_SINGLPROC(ShowReferenceFrame,       "a37bad03-fb10-46b5-804f-80d2436dc8e0")
-REGISTRY_COMMAND_SINGLPROC(ToggleCamRecovery,        "f0904d07-263b-4896-b387-740b2188cf71")
+REGISTRY_COMMAND_SINGLPROC(CreateRecoveryFrame,      "c7941e39-c00c-4545-b3d6-024411f00851")
+REGISTRY_COMMAND_SINGLPROC(DisplayRecoveryFrame,     "6205c40e-5338-4abd-b7b1-a9b088742d00")
+REGISTRY_COMMAND_SINGLPROC(ToggleRecoveryMode,       "a37bad03-fb10-46b5-804f-80d2436dc8e0")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -1489,6 +1488,34 @@ void SaverStop::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_V1(vect)
     stream >> saverIndex;
     stream >> fileName;
+    B_DESERIALIZE_END
+}
+
+void DisplayRecoveryFrame::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << active;
+    B_SERIALIZE_RETURN
+}
+
+void DisplayRecoveryFrame::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> active;
+    B_DESERIALIZE_END
+}
+
+void ToggleRecoveryMode::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << active;
+    B_SERIALIZE_RETURN
+}
+
+void ToggleRecoveryMode::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> active;
     B_DESERIALIZE_END
 }
 
