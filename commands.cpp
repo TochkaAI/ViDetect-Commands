@@ -529,6 +529,24 @@ void FrameCrop::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void ModelSegment::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << active;
+    stream << outputSize;
+    stream << output;
+    B_SERIALIZE_RETURN
+}
+
+void ModelSegment::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> active;
+    stream >> outputSize;
+    stream >> output;
+    B_DESERIALIZE_END
+}
+
 void ModelClass::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -538,6 +556,7 @@ void ModelClass::toRaw(bserial::DataStream& stream) const
     stream << cuttingThresh;
     stream << scoreThresh;
     stream << nmsThresh;
+    stream << segmentThresh;
     B_SERIALIZE_RETURN
 }
 
@@ -550,6 +569,7 @@ void ModelClass::fromRaw(const bserial::RawVector& vect)
     stream >> cuttingThresh;
     stream >> scoreThresh;
     stream >> nmsThresh;
+    stream >> segmentThresh;
     B_DESERIALIZE_END
 }
 
@@ -568,6 +588,7 @@ void ModelInfo::toRaw(bserial::DataStream& stream) const
     stream << classes;
     stream << path;
     stream << inputSize2;
+    stream << segmentation;
     B_SERIALIZE_RETURN
 }
 
@@ -586,6 +607,7 @@ void ModelInfo::fromRaw(const bserial::RawVector& vect)
     stream >> classes;
     stream >> path;
     stream >> inputSize2;
+    stream >> segmentation;
     B_DESERIALIZE_END
 }
 
@@ -655,6 +677,44 @@ graph::Point DetectRect::center() const
     return p;
 }
 
+void DetectRect::Segment::toRaw(bserial::DataStream& stream) const
+{
+    SByteArray buff;
+    buff.resize(contour.count() * sizeof(quint16) * 2);
+    quint16* b = (quint16*)buff.constData();
+    for (int i = 0; i < contour.count(); ++i)
+    {
+        *b++ = quint16(qMax(contour[i].x, 0));
+        *b++ = quint16(qMax(contour[i].y, 0));
+    }
+
+    B_SERIALIZE_V1
+    stream << buff;
+    B_SERIALIZE_RETURN
+}
+
+void DetectRect::Segment::fromRaw(const bserial::RawVector& vect)
+{
+    contour.clear();
+    SByteArray buff;
+
+    B_DESERIALIZE_V1(vect)
+    stream >> buff;
+    B_DESERIALIZE_END
+
+    if (buff.length())
+    {
+        int count = buff.length() / (sizeof(quint16) * 2);
+        quint16* b = (quint16*)buff.constData();
+        for (int i = 0; i < count; ++i)
+        {
+            qint32 x = *b++;
+            qint32 y = *b++;
+            contour.append({x, y});
+        }
+    }
+}
+
 void DetectRect::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -663,6 +723,9 @@ void DetectRect::toRaw(bserial::DataStream& stream) const
     stream << x_max;
     stream << y_max;
     stream << score;
+    stream << time;
+    stream << number;
+    stream << segment;
     B_SERIALIZE_RETURN
 }
 
@@ -674,6 +737,9 @@ void DetectRect::fromRaw(const bserial::RawVector& vect)
     stream >> x_max;
     stream >> y_max;
     stream >> score;
+    stream >> time;
+    stream >> number;
+    stream >> segment;
     B_DESERIALIZE_END
 }
 

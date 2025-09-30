@@ -2,6 +2,7 @@
 
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
+#include "pproto/commands/time_spec.h"
 
 #ifdef DETECTION_IS_PRESENT
 #include "detection/detect_rect.h"
@@ -764,6 +765,27 @@ struct FrameCrop
     J_SERIALIZE_END
 };
 
+struct ModelSegment
+{
+    // Признак наличия матрицы сегментации в составе нейросети
+    bool active = {false};
+
+    // Размерность выходного слоя сегментации. Сейчас поддерживается только
+    // одна размерность [160, 160, 32]
+    QVector<qint32> outputSize {160, 160, 32};
+
+    // Наименование выходного слоя с кубом коэффициентов сегментации
+    QString output;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_OPT ( "active"      , active     )
+        J_SERIALIZE_MAP_ITEM( "output_size" , outputSize )
+        J_SERIALIZE_MAP_ITEM( "output"      , output     )
+    J_SERIALIZE_END
+};
+
 struct ModelClass
 {
     // Порядковый индекс класса модели
@@ -779,6 +801,7 @@ struct ModelClass
     float cuttingThresh = {0.10};
     float scoreThresh = {0.70};
     float nmsThresh = {0.50};
+    float segmentThresh = {0.75};
 
     template<typename T> struct Find
     {
@@ -798,6 +821,7 @@ struct ModelClass
         J_SERIALIZE_MAP_ITEM( "cutting_thresh" , cuttingThresh )
         J_SERIALIZE_MAP_ITEM( "score_thresh"   , scoreThresh   )
         J_SERIALIZE_MAP_ITEM( "nms_thresh"     , nmsThresh     )
+        J_SERIALIZE_MAP_ITEM( "segment_thresh" , segmentThresh )
     J_SERIALIZE_END
 };
 
@@ -841,6 +865,10 @@ struct ModelInfo
     // выходного слоя
     qint32 recordCount = {-1};
 
+    // Механизм поддержки сегментации в нейросети. Сейчас эту возможность имеют
+    // только сети yolov9
+    ModelSegment segmentation;
+
     // Определяет область кадра для отправки в нейросеть
     FrameCrop frameCrop;
 
@@ -860,6 +888,7 @@ struct ModelInfo
         J_SERIALIZE_MAP_ITEM( "input"          , input         )
         J_SERIALIZE_MAP_ITEM( "output"         , output        )
         J_SERIALIZE_MAP_ITEM( "record_count"   , recordCount   )
+        J_SERIALIZE_MAP_ITEM( "segmentation"   , segmentation  )
         J_SERIALIZE_MAP_ITEM( "frame_crop"     , frameCrop     )
         J_SERIALIZE_MAP_ITEM( "classes"        , classes       )
     J_SERIALIZE_END
@@ -884,7 +913,20 @@ struct DetectRect
     qint32 x_max = {0}; // Координата Bottom-Right
     qint32 y_max = {0}; // Координата Bottom-Right
 
-    float score  = {0}; // Оценка детектированной области
+    float    score  = {0}; // Оценка детектированной области
+    TimeSpec time;         // Время получения кадра (UTC)
+    quint64  number = quint64(-1); // Номер кадра
+
+    struct Segment
+    {
+        typedef container_ptr<Segment> Ptr;
+        QVector<graph::Point> contour;
+
+        DECLARE_B_SERIALIZE_FUNC
+        DECLARE_J_SERIALIZE_FUNC
+    };
+    Segment::Ptr segment;
+
 
 #ifdef OPENCV_IS_PRESENT
     // Точка с координатами point1 (синоним top/left)
@@ -905,13 +947,51 @@ struct DetectRect
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "x_min" , x_min )
-        J_SERIALIZE_MAP_ITEM( "y_min" , y_min )
-        J_SERIALIZE_MAP_ITEM( "x_max" , x_max )
-        J_SERIALIZE_MAP_ITEM( "y_max" , y_max )
-        J_SERIALIZE_MAP_ITEM( "score" , score )
+        J_SERIALIZE_MAP_ITEM( "x_min"   , x_min   )
+        J_SERIALIZE_MAP_ITEM( "y_min"   , y_min   )
+        J_SERIALIZE_MAP_ITEM( "x_max"   , x_max   )
+        J_SERIALIZE_MAP_ITEM( "y_max"   , y_max   )
+        J_SERIALIZE_MAP_ITEM( "score"   , score   )
+        J_SERIALIZE_MAP_ITEM( "time"    , time    )
+        J_SERIALIZE_MAP_ITEM( "number"  , number  )
+        J_SERIALIZE_MAP_ITEM( "segment" , segment )
     J_SERIALIZE_END
 };
+
+template<typename This, typename Packer>
+Packer& DetectRect::Segment::jserialize(const This* ct, Packer& p)
+{
+    This* t = const_cast<This*>(ct);
+
+    p.startObject();
+
+    if (p.isWriter())
+    {
+        QVector<int> vect;
+        for (int i = 0; i < t->contour.count(); ++i)
+        {
+            vect.append(t->contour[i].x);
+            vect.append(t->contour[i].y);
+        }
+        p.member("contour") & vect;
+    }
+    else if (p.isReader())
+    {
+        QVector<int> vect;
+        p.member("contour") & vect;
+
+        t->contour.clear();
+        for (int i = 0; i < vect.count(); i += 2)
+        {
+            if ((i + 1) >= vect.count())
+                break;
+            qint32 x = vect[i];
+            qint32 y = vect[i + 1];
+            t->contour.append({x, y});
+        }
+    }
+    return p.endObject();
+}
 
 /**
   Механизмы сопоставления/матчинга объектов
