@@ -1495,6 +1495,8 @@ void DisplayRecoveryFrame::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
     stream << active;
+    stream << highlight;
+    stream << opacity;
     B_SERIALIZE_RETURN
 }
 
@@ -1502,6 +1504,8 @@ void DisplayRecoveryFrame::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
     stream >> active;
+    stream >> highlight;
+    stream >> opacity;
     B_DESERIALIZE_END
 }
 

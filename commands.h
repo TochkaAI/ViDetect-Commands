@@ -2009,11 +2009,15 @@ struct DisplayRecoveryFrame : Data<&command::DisplayRecoveryFrame,
                                     Message::Type::Answer>
 {
     bool active = {true};
+    bool highlight = {false};
+    int opacity = {100};
 
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "active" , active )
+        J_SERIALIZE_MAP_ITEM( "active"    , active    )
+        J_SERIALIZE_MAP_ITEM( "highlight" , highlight )
+        J_SERIALIZE_MAP_ITEM( "opacity"   , opacity   )
     J_SERIALIZE_END
 };
 
