@@ -6,7 +6,8 @@ namespace pproto {
 namespace error {
 
 //--- 10 Ошибки общего плана ---
-//DECL_ERROR_CODE(product_license,         10, "1f46e8e0-0fdf-464c-b311-264c85977b96", u8"Лицензия на продукт ViDetect не обнаружена")
+DECL_ERROR_CODE(product_license,           10, "acf70ccf-569c-43eb-903f-43da08139338", u8"Лицензия для сервиса ViDetect не обнаружена")
+DECL_ERROR_CODE(protect_key,               10, "5d43ca8c-1e7a-4fa9-947a-4624150baa59", u8"Ключ аппаратной защиты для сервиса ViDetect не обнаружен")
 //DECL_ERROR_CODE(image_empty,             10, "3ca5827e-62ff-46ff-8228-7936a386d0f9", u8"Нет изображений в пакете")
 //DECL_ERROR_CODE(image_unknown,           10, "b6b3afbd-63e4-482a-a80b-647a423642d1", u8"Неизвестная ошибка обработки изображения %1")
 //DECL_ERROR_CODE(image_format,            10, "cc599a01-abba-4880-af16-08527d43a975", u8"Неизвестный формат изображения")
