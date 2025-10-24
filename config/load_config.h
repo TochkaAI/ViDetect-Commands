@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../commands.h"
 #include "shared/config/yaml_config.h"
+#include "../graphics.h"
 
 namespace pproto {
 namespace graph {

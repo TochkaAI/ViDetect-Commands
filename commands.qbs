@@ -56,6 +56,20 @@ Product {
         "commands.cpp",
         "commands.h",
         "error.h",
+        "fpfn.cpp",
+        "fpfn.h",
+        "graphics.cpp",
+        "graphics.h",
+        "graphset.cpp",
+        "graphset.h",
+        "model.cpp",
+        "model.h",
+        "roi.cpp",
+        "roi.h",
+        "saver.cpp",
+        "saver.h",
+        "tracker.cpp",
+        "tracker.h",
     ]
 
     Export {
