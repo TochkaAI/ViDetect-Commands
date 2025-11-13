@@ -118,10 +118,10 @@ struct ModelInfo
 {
     typedef container_ptr<ModelInfo> Ptr;
 
-    // Корневая директория для субдиректорий models и cache. Если параметр path
-    // не определен явно,  то  директории  расположения  модели  и  кеша  будут
+    // Корневая директория для субдиректорий model и cache. Если параметр path
+    // не определен явно, то  директории  расположения  модели  и  кеша  будут
     // следующие:
-    //   /var/opt/tochkacv/models/videtect
+    //   /var/opt/tochkacv/model/videtect
     //   /var/opt/tochkacv/cache/videtect
     QString path;
 
