@@ -1,6 +1,6 @@
 import qbs
+import qbs.FileInfo
 import QbsUtl
-import ProbExt
 
 Product {
     name: "ViDetect"
@@ -40,13 +40,10 @@ Product {
     cpp.cxxFlags: project.cxxFlags
     cpp.cxxLanguageVersion: project.cxxLanguageVersion
 
-    property var includePaths: [
-        "..",
-    ]
-    cpp.includePaths: includePaths;
+    cpp.includePaths: [".."]
 
     cpp.systemIncludePaths: QbsUtl.concatPaths(
-        Qt.core.cpp.includePaths
+        Qt.core.cpp.includePaths // Декларация для подавления Qt warning-ов
        ,lib.opencv.includePath
     )
 
@@ -74,7 +71,9 @@ Product {
 
     Export {
         Depends { name: "cpp" }
-        cpp.includePaths: exportingProduct.includePaths
+        cpp.includePaths: [
+            FileInfo.joinPaths(exportingProduct.sourceDirectory, ".."),
+        ]
     }
 
 } // Product
