@@ -43,8 +43,7 @@ Product {
     cpp.includePaths: [".."]
 
     cpp.systemIncludePaths: QbsUtl.concatPaths(
-        Qt.core.cpp.includePaths // Декларация для подавления Qt warning-ов
-       ,lib.opencv.includePath
+        lib.opencv.includePath
     )
 
     files: [
