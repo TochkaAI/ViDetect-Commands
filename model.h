@@ -1,5 +1,6 @@
 #pragma once
 
+#include "shared/defmac.h"
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
 #include "pproto/commands/time_spec.h"
@@ -33,6 +34,22 @@ enum class ModelType : quint32
     Yolov7    = 7,
     Yolov9    = 9,
     Emulation = 100,
+};
+
+/**
+  Признак используемой модели
+*/
+enum class UsingModel : quint32
+{
+    RealModel = 0, // Реальная модель
+    MetaModel = 1, // Мета-модель
+};
+
+template<typename T> struct ModelClassFind
+{
+    // Поиск по index
+    int operator() (const qint32* index, const T* item2) const
+        {return LIST_COMPARE_ITEM(*index, item2->index);}
 };
 
 //---------------- Структуры данных используемые в сообщениях ----------------
@@ -75,7 +92,7 @@ struct ModelSegment
     J_SERIALIZE_END
 };
 
-struct ModelClass
+struct ModelClassBase
 {
     // Порядковый индекс класса модели
     qint32 index = {-1};
@@ -86,27 +103,31 @@ struct ModelClass
     // Не обрабатывать выход нейросети для данного класса
     bool skip = {false};
 
+    typedef lst::List<ModelClassBase, ModelClassFind<ModelClassBase>> List;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BASE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "index" , index )
+        J_SERIALIZE_MAP_ITEM( "name"  , name  )
+        J_SERIALIZE_MAP_ITEM( "skip"  , skip  )
+    J_SERIALIZE_BASE_END
+};
+
+struct RealModelClass : ModelClassBase
+{
     // Индивидуальные пороговые значения для класса модели
     float cuttingThresh = {0.10};
     float scoreThresh   = {0.70};
     float nmsThresh     = {0.50};
     float segmentThresh = {0.75};
 
-    template<typename T> struct Find
-    {
-        // Поиск по index
-        int operator() (const qint32* index, const T* item2) const
-            {return LIST_COMPARE_ITEM(*index, item2->index);}
-    };
-
-    typedef lst::List<ModelClass, Find<ModelClass>> List;
+    typedef lst::List<RealModelClass, ModelClassFind<ModelClassBase>> List;
 
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "index"          , index         )
-        J_SERIALIZE_MAP_ITEM( "name"           , name          )
-        J_SERIALIZE_MAP_ITEM( "skip"           , skip          )
+        J_SERIALIZE_BASE( ModelClassBase )
         J_SERIALIZE_MAP_ITEM( "cutting_thresh" , cuttingThresh )
         J_SERIALIZE_MAP_ITEM( "score_thresh"   , scoreThresh   )
         J_SERIALIZE_MAP_ITEM( "nms_thresh"     , nmsThresh     )
@@ -114,9 +135,29 @@ struct ModelClass
     J_SERIALIZE_END
 };
 
-struct ModelInfo
+struct MetaModelClass : ModelClassBase
 {
-    typedef container_ptr<ModelInfo> Ptr;
+    // Список индексов реальных классов модели из которых собирается метакласс
+    QSet<int> realModelClasses;
+
+    // Пороговое значение IoU для агрегирования детектированных рамок реальных
+    // классов в рамку метакласса
+    float iouThresh = {0.70};
+
+    typedef lst::List<MetaModelClass, ModelClassFind<ModelClassBase>> List;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_BASE( ModelClassBase )
+        J_SERIALIZE_MAP_ITEM( "real_model_classes" , realModelClasses )
+        J_SERIALIZE_MAP_ITEM( "iou_thresh"         , iouThresh        )
+    J_SERIALIZE_END
+};
+
+struct RealModel
+{
+    typedef container_ptr<RealModel> Ptr;
 
     // Корневая директория для субдиректорий model и cache. Если параметр path
     // не определен явно, то  директории  расположения  модели  и  кеша  будут
@@ -162,7 +203,7 @@ struct ModelInfo
     FrameCrop frameCrop;
 
     // Список классов модели
-    ModelClass::List classes;
+    RealModelClass::List classes;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -183,14 +224,48 @@ struct ModelInfo
     J_SERIALIZE_END
 };
 
+struct MetaModel
+{
+    typedef container_ptr<MetaModel> Ptr;
+
+    // Список метаклассов
+    MetaModelClass::List classes;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "classes" , classes )
+    J_SERIALIZE_END
+};
+
 struct ModelInfoA : Data<&command::ModelInfo,
                           Message::Type::Answer>
 {
-    ModelInfo::Ptr value;
+    UsingModel usingModel = {UsingModel::RealModel};
+
+    RealModel::Ptr realModel;
+    MetaModel::Ptr metaModel;
 
     DECLARE_B_SERIALIZE_FUNC
-    J_SERIALIZE_MAP_ONE( "value", value )
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "using_model" , usingModel )
+        J_SERIALIZE_MAP_ITEM( "real_model"  , realModel  )
+        J_SERIALIZE_MAP_ITEM( "meta_model"  , metaModel  )
+    J_SERIALIZE_END
 };
 
 } // namespace data
+
+// Вспомогательная функция, используется для получения списка классов модели
+// в виде списка data::ModelClassBase::List
+template<typename ModelT>
+data::ModelClassBase::List modelClassesBase(const ModelT& model)
+{
+    data::ModelClassBase::List list {lst::Container::No};
+    for (auto* modelCls : model.classes)
+        list.add(modelCls);
+    return list;
+}
+
 } // namespace pproto

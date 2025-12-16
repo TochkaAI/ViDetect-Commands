@@ -667,7 +667,7 @@ struct TrackRects
         // Параметры отображения рамок трекирования для класса модели
         TrackRect rect;
 
-        typedef lst::List<ModelClass, data::ModelClass::Find<ModelClass>> List;
+        typedef lst::List<ModelClass, ModelClassFind<ModelClass>> List;
 
         DECLARE_B_SERIALIZE_FUNC
 

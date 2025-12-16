@@ -53,12 +53,28 @@ void ModelSegment::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-void ModelClass::toRaw(bserial::DataStream& stream) const
+void ModelClassBase::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
     stream << index;
     stream << name;
     stream << skip;
+    B_SERIALIZE_RETURN
+}
+
+void ModelClassBase::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> index;
+    stream >> name;
+    stream >> skip;
+    B_DESERIALIZE_END
+}
+
+void RealModelClass::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << B_BASE_CLASS(ModelClassBase);
     stream << cuttingThresh;
     stream << scoreThresh;
     stream << nmsThresh;
@@ -66,12 +82,10 @@ void ModelClass::toRaw(bserial::DataStream& stream) const
     B_SERIALIZE_RETURN
 }
 
-void ModelClass::fromRaw(const bserial::RawVector& vect)
+void RealModelClass::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
-    stream >> index;
-    stream >> name;
-    stream >> skip;
+    stream >> B_BASE_CLASS(ModelClassBase);
     stream >> cuttingThresh;
     stream >> scoreThresh;
     stream >> nmsThresh;
@@ -79,7 +93,25 @@ void ModelClass::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-void ModelInfo::toRaw(bserial::DataStream& stream) const
+void MetaModelClass::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << B_BASE_CLASS(ModelClassBase);
+    stream << realModelClasses;
+    stream << iouThresh;
+    B_SERIALIZE_RETURN
+}
+
+void MetaModelClass::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> B_BASE_CLASS(ModelClassBase);
+    stream >> realModelClasses;
+    stream >> iouThresh;
+    B_DESERIALIZE_END
+}
+
+void RealModel::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
     stream << file;
@@ -98,7 +130,7 @@ void ModelInfo::toRaw(bserial::DataStream& stream) const
     B_SERIALIZE_RETURN
 }
 
-void ModelInfo::fromRaw(const bserial::RawVector& vect)
+void RealModel::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
     stream >> file;
@@ -117,17 +149,35 @@ void ModelInfo::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void MetaModel::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << classes;
+    B_SERIALIZE_RETURN
+}
+
+void MetaModel::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> classes;
+    B_DESERIALIZE_END
+}
+
 void ModelInfoA::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
-    stream << value;
+    stream << usingModel;
+    stream << realModel;
+    stream << metaModel;
     B_SERIALIZE_RETURN
 }
 
 void ModelInfoA::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
-    stream >> value;
+    stream >> usingModel;
+    stream >> realModel;
+    stream >> metaModel;
     B_DESERIALIZE_END
 }
 
