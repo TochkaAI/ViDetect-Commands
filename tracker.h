@@ -127,9 +127,22 @@ struct DetectRect
     qint32 x_max = {0}; // Координата Bottom-Right
     qint32 y_max = {0}; // Координата Bottom-Right
 
-    float    score  = {0}; // Оценка детектированной области
-    TimeSpec time;         // Время получения кадра (UTC)
-    quint64  number = quint64(-1); // Номер кадра
+    // Скор прямоугольника. Если прямоугольнику соответствуют несколько классов
+    // рельной модели, то значение берется из класса с максимальным скором
+    float score = {0};
+
+    // Индекс класса реальной модели с максимальным скором, для которого опре-
+    // делены координаты прямоугольника
+    qint32 classIndex = {-1};
+
+    // Список индексов и скоров классов соответствующих координатам прямоугольника
+    QMap<qint32 /*real-class index*/, float /*real-class score*/> classes;
+
+    // Время получения кадра (UTC)
+    TimeSpec time;
+
+    // Номер кадра
+    quint64 number = quint64(-1);
 
     struct Segment
     {
@@ -139,8 +152,9 @@ struct DetectRect
         DECLARE_B_SERIALIZE_FUNC
         DECLARE_J_SERIALIZE_FUNC
     };
-    Segment::Ptr segment;
 
+    // Координаты контура сегментации
+    Segment::Ptr segment;
 
 #ifdef OPENCV_IS_PRESENT
     // Точка с координатами point1 (синоним top/left)
@@ -161,14 +175,16 @@ struct DetectRect
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "x_min"   , x_min   )
-        J_SERIALIZE_MAP_ITEM( "y_min"   , y_min   )
-        J_SERIALIZE_MAP_ITEM( "x_max"   , x_max   )
-        J_SERIALIZE_MAP_ITEM( "y_max"   , y_max   )
-        J_SERIALIZE_MAP_ITEM( "score"   , score   )
-        J_SERIALIZE_MAP_ITEM( "time"    , time    )
-        J_SERIALIZE_MAP_ITEM( "number"  , number  )
-        J_SERIALIZE_MAP_ITEM( "segment" , segment )
+        J_SERIALIZE_MAP_ITEM( "x_min"       , x_min      )
+        J_SERIALIZE_MAP_ITEM( "y_min"       , y_min      )
+        J_SERIALIZE_MAP_ITEM( "x_max"       , x_max      )
+        J_SERIALIZE_MAP_ITEM( "y_max"       , y_max      )
+        J_SERIALIZE_MAP_ITEM( "score"       , score      )
+        J_SERIALIZE_MAP_ITEM( "class_index" , classIndex )
+        J_SERIALIZE_MAP_ITEM( "classes"     , classes    )
+        J_SERIALIZE_MAP_ITEM( "time"        , time       )
+        J_SERIALIZE_MAP_ITEM( "number"      , number     )
+        J_SERIALIZE_MAP_ITEM( "segment"     , segment    )
     J_SERIALIZE_END
 };
 
