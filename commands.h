@@ -38,6 +38,7 @@ struct ConfChange
         Graph   = 5, // Конфиг-файл с наборами графических примитивов
         Roi     = 6, // Конфиг-файл ROI
         FpFn    = 7, // Конфиг-файл FpFn
+        Logic   = 8, // Конфиг-файл Logic
     };
 
     enum class Phase : quint32

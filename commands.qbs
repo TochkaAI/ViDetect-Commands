@@ -51,6 +51,8 @@ Product {
         "config/load_config.h",
         "commands.cpp",
         "commands.h",
+        "detect_rect.cpp",
+        "detect_rect.h",
         "error.h",
         "fpfn.cpp",
         "fpfn.h",
@@ -58,6 +60,8 @@ Product {
         "graphics.h",
         "graphset.cpp",
         "graphset.h",
+        "logicset.cpp",
+        "logicset.h",
         "model.cpp",
         "model.h",
         "roi.cpp",
@@ -66,8 +70,8 @@ Product {
         "rois_info.h",
         "saver.cpp",
         "saver.h",
-        "tracker.cpp",
-        "tracker.h",
+        "tracking.cpp",
+        "tracking.h",
     ]
 
     Export {
