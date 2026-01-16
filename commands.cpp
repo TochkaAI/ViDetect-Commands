@@ -36,26 +36,6 @@ void ConfigChanged::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
-void FrameSnapshot::toRaw(bserial::DataStream& stream) const
-{
-    B_SERIALIZE_V1
-    stream << number;
-    stream << time;
-    stream << videoFrame;
-    stream << error;
-    B_SERIALIZE_RETURN
-}
-
-void FrameSnapshot::fromRaw(const bserial::RawVector& vect)
-{
-    B_DESERIALIZE_V1(vect)
-    stream >> number;
-    stream >> time;
-    stream >> videoFrame;
-    stream >> error;
-    B_DESERIALIZE_END
-}
-
 void FrameSnapshot::VideoFrame::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -75,6 +55,51 @@ void FrameSnapshot::VideoFrame::fromRaw(const bserial::RawVector& vect)
     stream >> data;
     B_DESERIALIZE_END
 }
+
+void FrameSnapshot::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << number;
+    stream << time;
+    stream << videoFrame;
+    B_SERIALIZE_RETURN
+}
+
+void FrameSnapshot::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> number;
+    stream >> time;
+    stream >> videoFrame;
+    B_DESERIALIZE_END
+}
+
+// --- Оставлено для примера ---
+// void FrameSnapshotError::toRaw(bserial::DataStream& stream) const
+// {
+//     B_SERIALIZE_V1
+
+//     // Структуры унаследованные от MessageError сериализуются в особом порядке,
+//     // поэтому для них сериализация/десериализация базового класса не обязательна
+//     // stream << B_BASE_CLASS(MessageError);
+
+//     stream << number;
+//     stream << time;
+//     B_SERIALIZE_RETURN
+// }
+
+// void FrameSnapshotError::fromRaw(const bserial::RawVector& vect)
+// {
+//     B_DESERIALIZE_V1(vect)
+
+//     // Структуры унаследованные от MessageError сериализуются в особом порядке,
+//     // поэтому для них сериализация/десериализация базового класса не обязательна
+//     // stream << B_BASE_CLASS(MessageError);
+
+//     stream >> number;
+//     stream >> time;
+//     B_DESERIALIZE_END
+// }
 
 } // namespace data
 } // namespace pproto

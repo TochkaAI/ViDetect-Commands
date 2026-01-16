@@ -19,7 +19,8 @@ extern const QUuidEx ConfigChanged;
 
 
 /**
-  Структура запроса/передачи кадра из буффера
+  Команда для получения кадра по номеру или времени создания из временного
+  буфера кадров
 */
 extern const QUuidEx FrameSnapshot;
 
@@ -69,11 +70,12 @@ struct FrameSnapshot : Data<&command::FrameSnapshot,
                              Message::Type::Command,
                              Message::Type::Answer>
 {
-    // Номер интересующего кадра. Если номер строки равен -1, то параметр будет
-    // проигнорирован и поиск будет вполнен по параметру time
+    // Номер запрашиваемого кадра. Если номер кадра равен -1, то параметр будет
+    // проигнорирован и поиск будет выполнен по полю time
     quint64 number = quint64(-1);
 
-    // Время интересующего кадра (UTC)
+    // Время запрашиваемого кадра (UTC). Поиск по этому параметру выполняется,
+    // когда значение поля number равно -1
     TimeSpec time;
 
     struct VideoFrame
@@ -98,17 +100,33 @@ struct FrameSnapshot : Data<&command::FrameSnapshot,
 
     VideoFrame::Ptr videoFrame;
 
-    ErrorInfo::Ptr error;
-
     DECLARE_B_SERIALIZE_FUNC
 
-    J_SERIALIZE_BASE_BEGIN
+    J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_OPT( "number"      , number     )
         J_SERIALIZE_MAP_OPT( "time"        , time       )
         J_SERIALIZE_MAP_OPT( "video_frame" , videoFrame )
-        J_SERIALIZE_MAP_OPT( "error"       , error      )
     J_SERIALIZE_END
 };
+
+// --- Оставлено для примера ---
+// struct FrameSnapshotError : MessageError, Data<&command::FrameSnapshot,
+//                                                 Message::Type::Answer>
+// {
+//     // Номер запрашиваемого кадра
+//     quint64 number = quint64(-1);
+
+//     // Время запрашиваемого кадра (UTC)
+//     TimeSpec time;
+
+//     DECLARE_B_SERIALIZE_FUNC
+
+//     J_SERIALIZE_BEGIN
+//         J_SERIALIZE_BASE   ( MessageError      )
+//         J_SERIALIZE_MAP_OPT( "number" , number )
+//         J_SERIALIZE_MAP_OPT( "time"   , time   )
+//     J_SERIALIZE_END
+// };
 
 } // namespace data
 } // namespace pproto
