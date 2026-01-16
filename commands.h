@@ -2,6 +2,7 @@
 
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
+#include "pproto/commands/time_spec.h"
 
 namespace pproto {
 namespace command {
@@ -15,6 +16,12 @@ namespace command {
   смотри в структуре ConfChange
 */
 extern const QUuidEx ConfigChanged;
+
+
+/**
+  Структура запроса/передачи кадра из буффера
+*/
+extern const QUuidEx FrameSnapshot;
 
 } // namespace command
 
@@ -58,5 +65,51 @@ struct ConfigChanged : Data<&command::ConfigChanged,
     J_SERIALIZE_END
 };
 
+struct FrameSnapshot : Data<&command::FrameSnapshot,
+                             Message::Type::Command,
+                             Message::Type::Answer>
+{
+    // Номер интересующего кадра. Если номер строки равен -1, то параметр будет
+    // проигнорирован и поиск будет вполнен по параметру time
+    quint64 number = quint64(-1);
+
+    // Время интересующего кадра (UTC)
+    TimeSpec time;
+
+    struct VideoFrame
+    {
+        typedef container_ptr<VideoFrame> Ptr;
+
+        qint32  cvType = {0}; // Тип матрицы изображения в представлении OpenCV
+        qint32  width  = {0}; // Ширина кадра
+        qint32  height = {0}; // Высота кадра
+
+        SByteArray data; // Матрица кадра
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "cv_type" , cvType )
+            J_SERIALIZE_MAP_ITEM( "width"   , width  )
+            J_SERIALIZE_MAP_ITEM( "height"  , height )
+            J_SERIALIZE_MAP_ITEM( "data"    , data   )
+        J_SERIALIZE_END
+    };
+
+    VideoFrame::Ptr videoFrame;
+
+    ErrorInfo::Ptr error;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BASE_BEGIN
+        J_SERIALIZE_MAP_OPT( "number"      , number     )
+        J_SERIALIZE_MAP_OPT( "time"        , time       )
+        J_SERIALIZE_MAP_OPT( "video_frame" , videoFrame )
+        J_SERIALIZE_MAP_OPT( "error"       , error      )
+    J_SERIALIZE_END
+};
+
 } // namespace data
 } // namespace pproto
+

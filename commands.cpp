@@ -11,6 +11,7 @@ namespace command {
     const QUuidEx COMMAND = command::Pool::Registry{UUID, #COMMAND, true};
 
 REGISTRY_COMMAND_SINGLPROC(ConfigChanged, "aaa0324a-aca7-4ec5-b94e-ada1716df083")
+REGISTRY_COMMAND_SINGLPROC(FrameSnapshot, "e45f4c80-f142-11f0-9a81-171f19f91f1f")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -35,5 +36,46 @@ void ConfigChanged::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void FrameSnapshot::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << number;
+    stream << time;
+    stream << videoFrame;
+    stream << error;
+    B_SERIALIZE_RETURN
+}
+
+void FrameSnapshot::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> number;
+    stream >> time;
+    stream >> videoFrame;
+    stream >> error;
+    B_DESERIALIZE_END
+}
+
+void FrameSnapshot::VideoFrame::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << cvType;
+    stream << width;
+    stream << height;
+    stream << data;
+    B_SERIALIZE_RETURN
+}
+
+void FrameSnapshot::VideoFrame::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> cvType;
+    stream >> width;
+    stream >> height;
+    stream >> data;
+    B_DESERIALIZE_END
+}
+
 } // namespace data
 } // namespace pproto
+
