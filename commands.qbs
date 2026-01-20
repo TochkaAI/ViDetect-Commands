@@ -62,6 +62,8 @@ Product {
         "model.h",
         "roi.cpp",
         "roi.h",
+        "rois_info.cpp",
+        "rois_info.h",
         "saver.cpp",
         "saver.h",
         "tracker.cpp",

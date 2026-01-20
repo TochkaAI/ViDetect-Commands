@@ -254,8 +254,10 @@ bool loadCircle(const YamlConfig* conf, const YAML::Node& baseNode,
     return true;
 }
 
+} // namespace graph
+
 bool loadRoi(const YamlConfig* conf, const YAML::Node& baseNode,
-             const string& nodeName, data::graph::Roi& roi)
+             const string& nodeName, data::Roi& roi)
 {
     YAML::Node node = conf->node(baseNode, nodeName);
     if (!node)
@@ -263,9 +265,11 @@ bool loadRoi(const YamlConfig* conf, const YAML::Node& baseNode,
 
     if (node.IsNull())
     {
-        roi = data::graph::Roi();
+        roi = data::Roi();
         return true;
     }
+
+    using namespace graph;
 
     loadBrush(conf, node, "brush", roi.caption.brush);
     loadBrush(conf, node, "brush", roi.border.brush);
@@ -278,5 +282,4 @@ bool loadRoi(const YamlConfig* conf, const YAML::Node& baseNode,
     return true;
 }
 
-} // namespace graph
 } // namespace pproto

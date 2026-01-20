@@ -4,6 +4,7 @@
 #include "pproto/commands/base.h"
 
 #include "graphics.h"
+#include "roi.h"
 
 namespace pproto {
 namespace command {
@@ -75,7 +76,7 @@ struct FpFnInfo
         bool active = {true};
 
         // Область ROI для класса
-        graph::Roi roi;
+        Roi roi;
 
         // Время следующей итерации сохранения FP-изображения (в секундах)
         qint32 fpTiming = {30};

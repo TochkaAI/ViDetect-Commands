@@ -2,11 +2,13 @@
 
 #include "shared/config/yaml_config.h"
 #include "../graphics.h"
+#include "../roi.h"
 
 namespace pproto {
-namespace graph {
 
 using namespace std;
+
+namespace graph {
 
 bool loadIdentity(const YamlConfig* conf, const YAML::Node& baseNode,
                   const string& nodeName, data::graph::Identity& identity);
@@ -41,8 +43,9 @@ bool loadRectangle(const YamlConfig* conf, const YAML::Node& baseNode,
 bool loadCircle(const YamlConfig* conf, const YAML::Node& baseNode,
                 const string& nodeName, data::graph::Circle& circle);
 
-bool loadRoi(const YamlConfig* conf, const YAML::Node& baseNode,
-             const string& nodeName, data::graph::Roi& roi);
-
 } // namespace graph
+
+bool loadRoi(const YamlConfig* conf, const YAML::Node& baseNode,
+             const string& nodeName, data::Roi& roi);
+
 } // namespace pproto

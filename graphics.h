@@ -407,36 +407,6 @@ struct Circle
     typedef lst::List<Circle, Identity::Find<Circle>> List;
 };
 
-struct Roi
-{
-    // Идентификационный признак
-    Identity identity;
-
-    // Признак отображения примитива в кадре
-    bool visible = {true};
-
-    // Инвертирует принадлежность объекта детектирования к области ROI
-    bool inverse = {false};
-
-    // Надпись ROI с привязкой к одному из углов геометрической области,
-    // по умолчанию к верхнему левому углу
-    Caption caption;
-
-    // Геометрическая область ROI
-    Rectangle border;
-
-    DECLARE_B_SERIALIZE_FUNC
-
-    J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "identity" , identity )
-        J_SERIALIZE_MAP_OPT ( "visible"  , visible  )
-        J_SERIALIZE_MAP_OPT ( "inverse"  , inverse  )
-        J_SERIALIZE_MAP_OPT ( "caption"  , caption  )
-        J_SERIALIZE_MAP_ITEM( "border"   , border   )
-    J_SERIALIZE_END
-
-    typedef lst::List<Roi, Identity::Find<Roi>> List;
-};
 
 /**
   Набор графических примитиров
