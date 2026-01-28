@@ -186,6 +186,32 @@ struct LogicSetSnapshot
     J_SERIALIZE_END
 };
 
+struct LogicSetsSnapshot : Data<&command::LogicSetsSnapshot,
+                                 Message::Type::Command>
+{
+    // Режим получения Snapshot-а логических объектов
+    enum class Mode : quint32
+    {
+        Normal  = 0, // Нормальный режим. В этом режиме команда  делает  копию
+                     // логических объектов. Логические  объекты  для  которых
+                     // завершено трекирование (объект трекера завершил сущест-
+                     // вование) будут удалены из пула объектов ViDetect после
+                     // выполнения этого запроса.
+        Extract = 1  // Режим извлечения. После выполнения команды все логичес-
+                     // кие объекты будут удалены  из пула  объектов  ViDetect.
+                     // Новые логические объекты на основе существующих объек-
+                     // тов трекирования создаваться не будут
+    };
+
+    Mode mode = {Mode::Normal};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_OPT( "mode" , mode )
+    J_SERIALIZE_END
+};
+
 struct LogicSetsSnapshotA : Data<&command::LogicSetsSnapshot,
                                   Message::Type::Answer>
 {

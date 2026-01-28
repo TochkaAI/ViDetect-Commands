@@ -102,6 +102,20 @@ void LogicSetSnapshot::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void LogicSetsSnapshot::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << mode;
+    B_SERIALIZE_RETURN
+}
+
+void LogicSetsSnapshot::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> mode;
+    B_DESERIALIZE_END
+}
+
 void LogicSetsSnapshotA::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
