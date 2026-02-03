@@ -72,6 +72,8 @@ Product {
         "saver.h",
         "tracking.cpp",
         "tracking.h",
+        "video.cpp",
+        "video.h",
     ]
 
     Export {
