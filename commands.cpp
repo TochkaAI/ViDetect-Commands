@@ -10,8 +10,10 @@ namespace command {
 #define REGISTRY_COMMAND_MULTIPROC(COMMAND, UUID) \
     const QUuidEx COMMAND = command::Pool::Registry{UUID, #COMMAND, true};
 
-REGISTRY_COMMAND_SINGLPROC(ConfigChanged, "aaa0324a-aca7-4ec5-b94e-ada1716df083")
-REGISTRY_COMMAND_SINGLPROC(FrameSnapshot, "e45f4c80-f142-11f0-9a81-171f19f91f1f")
+REGISTRY_COMMAND_SINGLPROC(ConfigChanged,   "aaa0324a-aca7-4ec5-b94e-ada1716df083")
+REGISTRY_COMMAND_SINGLPROC(FrameSnapshot,   "e45f4c80-f142-11f0-9a81-171f19f91f1f")
+REGISTRY_COMMAND_SINGLPROC(ProcessingPause, "1395b089-9e7a-4f99-afc7-43cc2813cb5b")
+REGISTRY_COMMAND_SINGLPROC(ProcessingInfo,  "b206217f-da09-4d94-a845-389ef002f494")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -100,6 +102,20 @@ void FrameSnapshot::fromRaw(const bserial::RawVector& vect)
 //     stream >> time;
 //     B_DESERIALIZE_END
 // }
+
+void ProcessingInfoA::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << paused;
+    B_SERIALIZE_RETURN
+}
+
+void ProcessingInfoA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> paused;
+    B_DESERIALIZE_END
+}
 
 } // namespace data
 } // namespace pproto

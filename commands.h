@@ -17,12 +17,23 @@ namespace command {
 */
 extern const QUuidEx ConfigChanged;
 
-
 /**
-  Команда для получения кадра по номеру или времени создания из временного
+  Команда для получения кадра по номеру  или времени  создания  из  временного
   буфера кадров
 */
 extern const QUuidEx FrameSnapshot;
+
+/**
+  Команда останавливает/возобновляет обработку  кадров  нейросетью.  Остановка
+  осуществляется через передачу в поле tag(0)  значения 1.  Для  возобновления
+  обработки кадров надо передать в tag(0) значения 0
+*/
+extern const QUuidEx ProcessingPause;
+
+/**
+  Команда возвращает информацию о процессе обработки
+*/
+extern const QUuidEx ProcessingInfo;
 
 } // namespace command
 
@@ -129,6 +140,18 @@ struct FrameSnapshot : Data<&command::FrameSnapshot,
 //     J_SERIALIZE_END
 // };
 
+struct ProcessingInfoA : Data<&command::ProcessingInfo,
+                               Message::Type::Answer>
+{
+    // Признак приостановки обработки какдров
+    bool paused = {false};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "paused" , paused )
+    J_SERIALIZE_END
+};
+
 } // namespace data
 } // namespace pproto
-
