@@ -189,6 +189,15 @@ extern const QUuidEx SaverStart;
 */
 extern const QUuidEx SaverStop;
 
+/**
+  Команда для запуска и остановки обработки кадров
+*/
+extern const QUuidEx ProcessingPause;
+
+/**
+  Команда получения состояния процесса обработки кадров
+*/
+extern const QUuidEx ProcessingInfo;
 
 } // namespace command
 
@@ -1860,6 +1869,31 @@ struct SaverStop : Data<&command::SaverStop,
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "saver_index" , saverIndex )
         J_SERIALIZE_MAP_ITEM( "file_name"   , fileName   )
+    J_SERIALIZE_END
+};
+
+struct ProcessingPause : Data<&command::ProcessingPause,
+                         Message::Type::Command>
+{
+    // флаг остановки.
+    bool pause {false};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "pause" , pause )
+    J_SERIALIZE_END
+};
+
+struct ProcessingInfoA : Data<&command::ProcessingInfo,
+                         Message::Type::Answer>
+{
+    bool pause {false};
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "pause" , pause )
     J_SERIALIZE_END
 };
 

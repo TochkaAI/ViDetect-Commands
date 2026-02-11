@@ -38,6 +38,8 @@ REGISTRY_COMMAND_SINGLPROC(SaverBufferInfo,          "8e7012ea-c237-426c-a6b0-8c
 REGISTRY_COMMAND_SINGLPROC(SaverStart,               "b0340619-0513-4ca1-9149-99b3704c6d51")
 REGISTRY_COMMAND_SINGLPROC(SaverStop,                "bd5b7bdf-4fa2-4a9b-8e2c-f3df59490303")
 REGISTRY_COMMAND_SINGLPROC(SetSaverBuffer,           "5a01508d-16ae-468a-a872-59729a50f3cb")
+REGISTRY_COMMAND_SINGLPROC(ProcessingPause,          "1395b089-9e7a-4f99-afc7-43cc2813cb5b")
+REGISTRY_COMMAND_SINGLPROC(ProcessingInfo,           "b206217f-da09-4d94-a845-389ef002f494")
 
 #undef REGISTRY_COMMAND_SINGLPROC
 #undef REGISTRY_COMMAND_MULTIPROC
@@ -1417,6 +1419,34 @@ void SaverStop::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_V1(vect)
     stream >> saverIndex;
     stream >> fileName;
+    B_DESERIALIZE_END
+}
+
+void ProcessingPause::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << pause;
+    B_SERIALIZE_RETURN
+}
+
+void ProcessingPause::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> pause;
+    B_DESERIALIZE_END
+}
+
+void ProcessingInfoA::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << pause;
+    B_SERIALIZE_RETURN
+}
+
+void ProcessingInfoA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> pause;
     B_DESERIALIZE_END
 }
 
