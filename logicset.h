@@ -47,6 +47,11 @@ extern const QUuidEx LogicSetsInfo;
 */
 extern const QUuidEx LogicSetsSnapshot;
 
+/**
+  Возвращает информацию о дистанциях между логическими объектами
+*/
+extern const QUuidEx LogicDistances;
+
 } // namespace command
 
 
@@ -221,6 +226,65 @@ struct LogicSetsSnapshotA : Data<&command::LogicSetsSnapshot,
 
     J_SERIALIZE_BEGIN
         J_SERIALIZE_MAP_ITEM( "items" , items )
+    J_SERIALIZE_END
+};
+
+struct LogicDistances : Data<&command::LogicDistances,
+                              Message::Type::Command,
+                              Message::Type::Answer>
+{
+    // Параметры запроса
+    struct Request
+    {
+        typedef container_ptr<Request> Ptr;
+
+        // Идентификатор логического объекта
+        QUuidEx logicId;
+
+        // Список индексов классов модели (реальной или мета-модели) для которых
+        // возвращается дистанции до объекта с идентификатором logicId
+        QSet<int> calcDistanceBetween;
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "logic_id"              , logicId             )
+            J_SERIALIZE_MAP_ITEM( "calc_distance_between" , calcDistanceBetween )
+        J_SERIALIZE_END
+    };
+
+    // Информация о дистанции между двумя логическими объектами
+    struct Item
+    {
+        QUuidEx logicId1; // Идентификатор первого логического объекта
+        QUuidEx logicId2; // Идентификатор второго логического объекта
+
+        float dx = {0};   // Дистанция между объектами по оси X
+        float dy = {0};   // Дистанция между объектами по оси Y
+
+        typedef lst::List<Item, lst::CompareItemDummy> List;
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "logic_id1" , logicId1 )
+            J_SERIALIZE_MAP_ITEM( "logic_id2" , logicId2 )
+            J_SERIALIZE_MAP_ITEM( "dx"        , dx       )
+            J_SERIALIZE_MAP_ITEM( "dy"        , dy       )
+        J_SERIALIZE_END
+    };
+
+    // Параметры запроса
+    Request::Ptr request;
+
+    // Результаты запроса
+    Item::List items;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_OPT( "request" , request )
+        J_SERIALIZE_MAP_OPT( "items"   , items   )
     J_SERIALIZE_END
 };
 
