@@ -25,7 +25,7 @@ struct DetectRect
 
     // Индекс класса реальной модели с максимальным скором, для которого опре-
     // делены координаты прямоугольника
-    qint32 classIndex = {-1};
+    qint32 realClassIndex = {-1};
 
     // Список индексов и скоров классов соответствующих координатам прямоугольника
     QMap<qint32 /*real-class index*/, float /*real-class score*/> classes;
@@ -67,16 +67,16 @@ struct DetectRect
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "x_min"       , x_min      )
-        J_SERIALIZE_MAP_ITEM( "y_min"       , y_min      )
-        J_SERIALIZE_MAP_ITEM( "x_max"       , x_max      )
-        J_SERIALIZE_MAP_ITEM( "y_max"       , y_max      )
-        J_SERIALIZE_MAP_ITEM( "score"       , score      )
-        J_SERIALIZE_MAP_ITEM( "class_index" , classIndex )
-        J_SERIALIZE_MAP_ITEM( "classes"     , classes    )
-        J_SERIALIZE_MAP_ITEM( "time"        , time       )
-        J_SERIALIZE_MAP_ITEM( "number"      , number     )
-        J_SERIALIZE_MAP_ITEM( "segment"     , segment    )
+        J_SERIALIZE_MAP_ITEM( "x_min"            , x_min          )
+        J_SERIALIZE_MAP_ITEM( "y_min"            , y_min          )
+        J_SERIALIZE_MAP_ITEM( "x_max"            , x_max          )
+        J_SERIALIZE_MAP_ITEM( "y_max"            , y_max          )
+        J_SERIALIZE_MAP_ITEM( "score"            , score          )
+        J_SERIALIZE_MAP_ITEM( "real_class_index" , realClassIndex )
+        J_SERIALIZE_MAP_ITEM( "classes"          , classes        )
+        J_SERIALIZE_MAP_ITEM( "time"             , time           )
+        J_SERIALIZE_MAP_ITEM( "number"           , number         )
+        J_SERIALIZE_MAP_ITEM( "segment"          , segment        )
     J_SERIALIZE_END
 };
 

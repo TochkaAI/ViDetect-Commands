@@ -130,8 +130,8 @@ struct LogicObject
     // Идентификатор трекера, на основе которого был создан логический объект
     QUuidEx trackId;
 
-    // Индекс класса реальной модели соответствующий параметру score
-    int classIndex = {-1};
+    // Индекс класса реальной модели
+    int realClassIndex = {-1};
 
     // Порог насыщения (количество рамок) от параметра frames_depth
     int saturate = {0};
@@ -152,19 +152,20 @@ struct LogicObject
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "id"          , id         )
-        J_SERIALIZE_MAP_ITEM( "track_id"    , trackId    )
-        J_SERIALIZE_MAP_ITEM( "class_index" , classIndex )
-        J_SERIALIZE_MAP_ITEM( "saturate"    , saturate   )
-        J_SERIALIZE_MAP_ITEM( "time_create" , timeCreate )
-        J_SERIALIZE_MAP_ITEM( "rects"       , rects      )
+        J_SERIALIZE_MAP_ITEM( "id"               , id             )
+        J_SERIALIZE_MAP_ITEM( "track_id"         , trackId        )
+        J_SERIALIZE_MAP_ITEM( "real_class_index" , realClassIndex )
+        J_SERIALIZE_MAP_ITEM( "saturate"         , saturate       )
+        J_SERIALIZE_MAP_ITEM( "time_create"      , timeCreate     )
+        J_SERIALIZE_MAP_ITEM( "rects"            , rects          )
         //J_SERIALIZE_MAP_ITEM( "average_rect"  , averageRect  )
     J_SERIALIZE_END
 };
 
 struct LogicSetSnapshot
 {
-    // Порядковый индекс расположения класса в выходном слое модели
+    // Порядковый индекс расположения класса в выходном слое модели (в реальном
+    // слое или в слое мета-модели)
     qint32 classIndex = {-1};
 
     // Наименование класса модели
