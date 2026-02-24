@@ -74,6 +74,8 @@ Product {
         "tracking.h",
         "video.cpp",
         "video.h",
+        "coordinates.cpp",
+        "coordinates.h",
     ]
 
     Export {

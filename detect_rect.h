@@ -4,7 +4,8 @@
 #include "pproto/commands/base.h"
 #include "pproto/commands/time_spec.h"
 
-#include "model.h"
+#include "coordinates.h"
+#include "graphics.h"
 
 namespace pproto {
 namespace data {
@@ -48,6 +49,9 @@ struct DetectRect
     // Координаты контура сегментации
     Segment::Ptr segment;
 
+    // Координаты камеры
+    Coordinates::Ptr coordinates;
+
 #ifdef OPENCV_IS_PRESENT
     // Точка с координатами point1 (синоним top/left)
     cv::Point p1(const cv::Point& offset = {}) const;
@@ -77,6 +81,7 @@ struct DetectRect
         J_SERIALIZE_MAP_ITEM( "time"             , time           )
         J_SERIALIZE_MAP_ITEM( "number"           , number         )
         J_SERIALIZE_MAP_ITEM( "segment"          , segment        )
+        J_SERIALIZE_MAP_ITEM( "coordinates"      , coordinates    )
     J_SERIALIZE_END
 };
 

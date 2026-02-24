@@ -106,6 +106,7 @@ void DetectRect::toRaw(bserial::DataStream& stream) const
     stream << segment;
     stream << realClassIndex;
     stream << classes;
+    stream << coordinates;
     B_SERIALIZE_RETURN
 }
 
@@ -122,6 +123,7 @@ void DetectRect::fromRaw(const bserial::RawVector& vect)
     stream >> segment;
     stream >> realClassIndex;
     stream >> classes;
+    stream >> coordinates;
     B_DESERIALIZE_END
 }
 
