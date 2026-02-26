@@ -74,7 +74,7 @@ extern const QUuidEx TrackRectsDynamicUpdate;
 extern const QUuidEx TrackRectsDynamicRemove;
 
 /**
-  Событие эмитируется при изменении списока индивидуальных параметров отображе-
+  Событие эмитируется при изменении списка индивидуальных параметров отображе-
   ния для рамок трекируемых объектов
 */
 extern const QUuidEx TrackRectsDynamicChanged;
