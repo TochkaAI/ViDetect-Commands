@@ -52,6 +52,13 @@ extern const QUuidEx LogicSetsSnapshot;
 */
 extern const QUuidEx LogicDistances;
 
+/**
+  Команда выполняет сброс всех логических объектов и дистанций между ними.
+  После выполнения команды логические объекты начнут нарождаться заново
+  на основе существующих объектов трекирования
+*/
+extern const QUuidEx LogicObjectsReset;
+
 } // namespace command
 
 
