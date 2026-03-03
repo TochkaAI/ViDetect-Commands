@@ -50,6 +50,7 @@ struct ConfChange
         Roi     = 6, // Конфиг-файл ROI
         FpFn    = 7, // Конфиг-файл FpFn
         Logic   = 8, // Конфиг-файл Logic
+        Clsf    = 9, // Конфиг-файл классификаторов
     };
 
     enum class Phase : quint32
@@ -143,7 +144,7 @@ struct FrameSnapshot : Data<&command::FrameSnapshot,
 struct ProcessingInfoA : Data<&command::ProcessingInfo,
                                Message::Type::Answer>
 {
-    // Признак приостановки обработки какдров
+    // Признак приостановки обработки кадров
     bool paused = {false};
 
     DECLARE_B_SERIALIZE_FUNC

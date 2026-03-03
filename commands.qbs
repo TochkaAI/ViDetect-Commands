@@ -49,6 +49,8 @@ Product {
     files: [
         "config/load_config.cpp",
         "config/load_config.h",
+        "classifier.cpp",
+        "classifier.h",
         "commands.cpp",
         "commands.h",
         "detect_rect.cpp",
