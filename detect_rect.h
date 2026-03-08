@@ -49,6 +49,34 @@ struct DetectRect
     // Координаты контура сегментации
     Segment::Ptr segment;
 
+    struct Classifier
+    {
+        typedef container_ptr<Classifier> Ptr;
+
+        // Индекс модели классификатора
+        qint32 modelIndex = {-1};
+
+        // Индекс класса модели классификатора с максимальным скором
+        qint32 classIndex = {-1};
+
+        // Наименование класса модели классификатора с максимальным скором
+        QString className;
+
+        float score = {0};
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "model_iIndex" , modelIndex )
+            J_SERIALIZE_MAP_ITEM( "сlass_index"  , classIndex )
+            J_SERIALIZE_MAP_ITEM( "class_name"   , className  )
+            J_SERIALIZE_MAP_ITEM( "score"        , score      )
+        J_SERIALIZE_END
+    };
+
+    // Параметры классификации
+    Classifier::Ptr classifier;
+
     // Координаты камеры
     Coordinates::Ptr coordinates;
 
@@ -81,6 +109,7 @@ struct DetectRect
         J_SERIALIZE_MAP_ITEM( "time"             , time           )
         J_SERIALIZE_MAP_ITEM( "number"           , number         )
         J_SERIALIZE_MAP_ITEM( "segment"          , segment        )
+        J_SERIALIZE_MAP_ITEM( "classifier"       , classifier     )
         J_SERIALIZE_MAP_ITEM( "coordinates"      , coordinates    )
     J_SERIALIZE_END
 };

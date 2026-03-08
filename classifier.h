@@ -25,13 +25,13 @@ namespace data {
 
 struct ClassifModelClass
 {
-    // Порядковый индекс расположения класса в выходном слое модели
+    // Порядковый индекс класса в выходном слое модели классификации
     qint32 index = {0};
 
-    // Наименование класса модели
+    // Наименование выходного класса модели классификации
     QString name;
 
-    // Индивидуальные пороговые значения для класса модели
+    // Пороговое значение для класса модели классификации
     float scoreThresh = {0.10};
 
     struct Find
@@ -56,7 +56,7 @@ struct ClassifModel
 {
     //typedef container_ptr<ClassifModel> Ptr;
 
-    // Порядковый индекс модели для классификации
+    // Порядковый индекс модели классификации
     qint32 index = {0};
 
     // Наименование модели (информационный параметр)
@@ -82,9 +82,9 @@ struct ClassifModel
     // Значение параметра по умолчанию равно 0
     qint32 gpuIndex = {0};
 
-    // Индексы классов основной модели (реальной модели или мета-модели)
+    // Список индексов классов основной модели (реальной модели или мета-модели)
     // для которых будет выполняться классификация
-    QSet<qint32>  mainModelIndexes;
+    QSet<qint32>  mainModelClasses;
 
     ClassifModelClass::List classes;
 
@@ -101,7 +101,7 @@ struct ClassifModel
         J_SERIALIZE_MAP_ITEM( "input_size"         , inputSize        )
         J_SERIALIZE_MAP_ITEM( "input_size2"        , inputSize2       )
         J_SERIALIZE_MAP_ITEM( "gpu_index"          , gpuIndex         )
-        J_SERIALIZE_MAP_ITEM( "main_model_indexes" , mainModelIndexes )
+        J_SERIALIZE_MAP_ITEM( "main_model_classes" , mainModelClasses )
         J_SERIALIZE_MAP_ITEM( "classes"            , classes          )
     J_SERIALIZE_END
 };

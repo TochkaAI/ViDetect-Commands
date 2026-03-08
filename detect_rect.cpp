@@ -93,6 +93,26 @@ void DetectRect::Segment::fromRaw(const bserial::RawVector& vect)
     }
 }
 
+void DetectRect::Classifier::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << modelIndex;
+    stream << classIndex;
+    stream << className;
+    stream << score;
+    B_SERIALIZE_RETURN
+}
+
+void DetectRect::Classifier::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> modelIndex;
+    stream >> classIndex;
+    stream >> className;
+    stream >> score;
+    B_DESERIALIZE_END
+}
+
 void DetectRect::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -107,6 +127,7 @@ void DetectRect::toRaw(bserial::DataStream& stream) const
     stream << realClassIndex;
     stream << classes;
     stream << coordinates;
+    stream << classifier;
     B_SERIALIZE_RETURN
 }
 
@@ -124,6 +145,7 @@ void DetectRect::fromRaw(const bserial::RawVector& vect)
     stream >> realClassIndex;
     stream >> classes;
     stream >> coordinates;
+    stream >> classifier;
     B_DESERIALIZE_END
 }
 

@@ -88,21 +88,46 @@ struct LogicSetInfo
     // Целевой порог классов модели
     float score = {0.70};
 
-    // Список индексов реальных классов модели из которых собирается метакласс,
-    // используется как критерий создания логического объекта
+    // Список индексов реальных классов модели из которых собирается мета-
+    // класс, используется как критерий создания логического объекта
     QSet<int> realModelClasses;
+
+    struct ClassifModel
+    {
+        typedef container_ptr<ClassifModel> Ptr;
+
+        // Порядковый индекс модели классификации в файле videtect.clsf.0
+        int index = {-1};
+
+        // Список индексов классов модели классификации, используется как
+        // критерий создания логического объекта
+        QSet<int> classes;
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "index"   , index   )
+            J_SERIALIZE_MAP_ITEM( "classes" , classes )
+        J_SERIALIZE_END
+    };
+
+    // Критерии модели классификации на основе которых происходит  создание
+    // логического объекта. Если параметр определен, то он будет иметь прио-
+    // ритет над механизмом классификации через realModelClasses
+    ClassifModel::Ptr classifModel;
 
     typedef lst::List<LogicSetInfo, lst::CompareItemDummy> List;
 
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "class_index"         , classIndex       )
-        J_SERIALIZE_MAP_ITEM( "class_name"          , className        )
-        J_SERIALIZE_MAP_ITEM( "frames_depth"        , framesDepth      )
-        J_SERIALIZE_MAP_ITEM( "saturate"            , saturate         )
-        J_SERIALIZE_MAP_ITEM( "score"               , score            )
-        J_SERIALIZE_MAP_ITEM( "real_mModel_classes" , realModelClasses )
+        J_SERIALIZE_MAP_ITEM( "class_index"        , classIndex       )
+        J_SERIALIZE_MAP_ITEM( "class_name"         , className        )
+        J_SERIALIZE_MAP_ITEM( "frames_depth"       , framesDepth      )
+        J_SERIALIZE_MAP_ITEM( "saturate"           , saturate         )
+        J_SERIALIZE_MAP_ITEM( "score"              , score            )
+        J_SERIALIZE_MAP_ITEM( "real_model_classes" , realModelClasses )
+        J_SERIALIZE_MAP_ITEM( "classifier_model"   , classifModel     )
     J_SERIALIZE_END
 };
 

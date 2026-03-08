@@ -49,7 +49,7 @@ void ClassifModel::toRaw(bserial::DataStream& stream) const
     stream << inputSize;
     stream << inputSize2;
     stream << gpuIndex;
-    stream << mainModelIndexes;
+    stream << mainModelClasses;
     stream << classes;
     B_SERIALIZE_RETURN
 }
@@ -65,7 +65,7 @@ void ClassifModel::fromRaw(const bserial::RawVector& vect)
     stream >> inputSize;
     stream >> inputSize2;
     stream >> gpuIndex;
-    stream >> mainModelIndexes;
+    stream >> mainModelClasses;
     stream >> classes;
     B_DESERIALIZE_END
 }

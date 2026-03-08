@@ -22,6 +22,22 @@ REGISTRY_COMMAND_SINGLPROC(LogicObjectsReset, "c1e4b7f2-3a85-4d9e-b612-7f0e8c5a1
 
 namespace data {
 
+void LogicSetInfo::ClassifModel::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << index;
+    stream << classes;
+    B_SERIALIZE_RETURN
+}
+
+void LogicSetInfo::ClassifModel::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> index;
+    stream >> classes;
+    B_DESERIALIZE_END
+}
+
 void LogicSetInfo::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -31,6 +47,7 @@ void LogicSetInfo::toRaw(bserial::DataStream& stream) const
     stream << saturate;
     stream << score;
     stream << realModelClasses;
+    stream << classifModel;
     B_SERIALIZE_RETURN
 }
 
@@ -43,6 +60,7 @@ void LogicSetInfo::fromRaw(const bserial::RawVector& vect)
     stream >> saturate;
     stream >> score;
     stream >> realModelClasses;
+    stream >> classifModel;
     B_DESERIALIZE_END
 }
 
