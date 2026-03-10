@@ -166,9 +166,27 @@ void LogicDistances::Request::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void LogicDistances::Request2::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << classIndexes1;
+    stream << classIndexes2;
+    B_SERIALIZE_RETURN
+}
+
+void LogicDistances::Request2::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> classIndexes1;
+    stream >> classIndexes2;
+    B_DESERIALIZE_END
+}
+
 void LogicDistances::Item::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
+    stream << classIndex1;
+    stream << classIndex2;
     stream << logicId1;
     stream << logicId2;
     stream << dx;
@@ -179,6 +197,8 @@ void LogicDistances::Item::toRaw(bserial::DataStream& stream) const
 void LogicDistances::Item::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
+    stream >> classIndex1;
+    stream >> classIndex2;
     stream >> logicId1;
     stream >> logicId2;
     stream >> dx;
@@ -189,16 +209,18 @@ void LogicDistances::Item::fromRaw(const bserial::RawVector& vect)
 void LogicDistances::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
-    stream << request;
     stream << items;
+    stream << request;
+    stream << request2;
     B_SERIALIZE_RETURN
 }
 
 void LogicDistances::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
-    stream >> request;
     stream >> items;
+    stream >> request;
+    stream >> request2;
     B_DESERIALIZE_END
 }
 

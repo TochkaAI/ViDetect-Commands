@@ -286,9 +286,32 @@ struct LogicDistances : Data<&command::LogicDistances,
         J_SERIALIZE_END
     };
 
+    struct Request2
+    {
+        typedef container_ptr<Request2> Ptr;
+
+        // Первое множество классов модели (logicset.model_classes) для которых
+        // будет создаваться выборка дистанций
+        QSet<int> classIndexes1;
+
+        // Второе множество классов модели (logicset.model_classes) для которых
+        // будет создаваться выборка дистанций
+        QSet<int> classIndexes2;
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "class_indexes1" , classIndexes1 )
+            J_SERIALIZE_MAP_ITEM( "class_indexes2" , classIndexes2 )
+        J_SERIALIZE_END
+    };
+
     // Информация о дистанции между двумя логическими объектами
     struct Item
     {
+        qint32 classIndex1 = {-1}; // Индекс класса первого логического объекта
+        qint32 classIndex2 = {-1}; // Индекс класса второго логического объекта
+
         QUuidEx logicId1; // Идентификатор первого логического объекта
         QUuidEx logicId2; // Идентификатор второго логического объекта
 
@@ -300,15 +323,18 @@ struct LogicDistances : Data<&command::LogicDistances,
         DECLARE_B_SERIALIZE_FUNC
 
         J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "logic_id1" , logicId1 )
-            J_SERIALIZE_MAP_ITEM( "logic_id2" , logicId2 )
-            J_SERIALIZE_MAP_ITEM( "dx"        , dx       )
-            J_SERIALIZE_MAP_ITEM( "dy"        , dy       )
+            J_SERIALIZE_MAP_ITEM( "class_index1" , classIndex1 )
+            J_SERIALIZE_MAP_ITEM( "class_index2" , classIndex2 )
+            J_SERIALIZE_MAP_ITEM( "logic_id1"    , logicId1    )
+            J_SERIALIZE_MAP_ITEM( "logic_id2"    , logicId2    )
+            J_SERIALIZE_MAP_ITEM( "dx"           , dx          )
+            J_SERIALIZE_MAP_ITEM( "dy"           , dy          )
         J_SERIALIZE_END
     };
 
     // Параметры запроса
-    Request::Ptr request;
+    Request::Ptr  request;
+    Request2::Ptr request2;
 
     // Результаты запроса
     Item::List items;
@@ -316,8 +342,9 @@ struct LogicDistances : Data<&command::LogicDistances,
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_OPT( "request" , request )
-        J_SERIALIZE_MAP_OPT( "items"   , items   )
+        J_SERIALIZE_MAP_OPT( "request"  , request )
+        J_SERIALIZE_MAP_OPT( "request2" , request2 )
+        J_SERIALIZE_MAP_OPT( "items"    , items   )
     J_SERIALIZE_END
 };
 
