@@ -20,14 +20,15 @@ Product {
     Depends { name: "Detection"; required: false }
     Depends { name: "RapidJson"; required: false }
     Depends { name: "SharedLib" }
+  //Depends { name: "Video" }
     Depends { name: "Yaml" }
     Depends { name: "lib.opencv" }
     Depends { name: "Qt"; submodules: ["core", "network"] }
 
-//    Properties {
-//        condition: lib.opencv.present
-//        lib.opencv.version: project.opencvVersion
-//    }
+   // Properties {
+   //     condition: lib.opencv.present
+   //     lib.opencv.version: project.opencvVersion
+   // }
 
     lib.opencv.version: project.opencvVersion
 
