@@ -87,6 +87,8 @@ void LogicObject::toRaw(bserial::DataStream& stream) const
     stream << saturate;
     stream << timeCreate;
     stream << rects;
+    stream << classifModelIndex;
+    stream << classifClassIndex;
     //stream << averageRect;
     B_SERIALIZE_RETURN
 }
@@ -100,6 +102,8 @@ void LogicObject::fromRaw(const bserial::RawVector& vect)
     stream >> saturate;
     stream >> timeCreate;
     stream >> rects;
+    stream >> classifModelIndex;
+    stream >> classifClassIndex;
     //stream >> averageRect;
     B_DESERIALIZE_END
 }

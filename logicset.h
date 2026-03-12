@@ -165,6 +165,10 @@ struct LogicObject
     // Индекс класса реальной модели
     int realClassIndex = {-1};
 
+    // Индекс модели классификации и класса модели классификации
+    int classifModelIndex = {-1};
+    int classifClassIndex = {-1};
+
     // Порог насыщения (количество рамок) от параметра frames_depth
     int saturate = {0};
 
@@ -184,13 +188,15 @@ struct LogicObject
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "id"               , id             )
-        J_SERIALIZE_MAP_ITEM( "track_id"         , trackId        )
-        J_SERIALIZE_MAP_ITEM( "real_class_index" , realClassIndex )
-        J_SERIALIZE_MAP_ITEM( "saturate"         , saturate       )
-        J_SERIALIZE_MAP_ITEM( "time_create"      , timeCreate     )
-        J_SERIALIZE_MAP_ITEM( "rects"            , rects          )
-        //J_SERIALIZE_MAP_ITEM( "average_rect"  , averageRect  )
+        J_SERIALIZE_MAP_ITEM( "id"                  , id                )
+        J_SERIALIZE_MAP_ITEM( "track_id"            , trackId           )
+        J_SERIALIZE_MAP_ITEM( "real_class_index"    , realClassIndex    )
+        J_SERIALIZE_MAP_ITEM( "classif_model_index" , classifModelIndex )
+        J_SERIALIZE_MAP_ITEM( "classif_class_index" , classifClassIndex )
+        J_SERIALIZE_MAP_ITEM( "saturate"            , saturate          )
+        J_SERIALIZE_MAP_ITEM( "time_create"         , timeCreate        )
+        J_SERIALIZE_MAP_ITEM( "rects"               , rects             )
+        //J_SERIALIZE_MAP_ITEM( "average_rect"      , averageRect       )
     J_SERIALIZE_END
 };
 
