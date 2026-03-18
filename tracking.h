@@ -4,8 +4,10 @@
 #include "pproto/commands/base.h"
 #include "pproto/commands/time_spec.h"
 
-#include "detect_rect.h"
+#include "compare.h"
 #include "model.h"
+#include "detect_rect.h"
+#include "paint_rect.h"
 
 namespace pproto {
 namespace command {
@@ -286,17 +288,6 @@ struct TrackersInfoA : Data<&command::TrackersInfo,
     J_SERIALIZE_MAP_ONE( "items", items )
 };
 
-template<typename T> struct TrackCompare
-{
-    // Сортировка по id
-    int operator() (const T* item1, const T* item2) const
-        {return QUuidEx::compare(item1->id, item2->id);}
-
-    // Поиск по id
-    int operator() (const QUuidEx* id, const T* item2) const
-        {return QUuidEx::compare(*id, item2->id);}
-};
-
 /**
   Описание объекта трекирования для внешней системы
 */
@@ -332,7 +323,7 @@ struct TrackObject
     // average_depth в файле конфигурирования трекеров (videtect.track)
     DetectRect averageRect;
 
-    typedef lst::List<TrackObject, TrackCompare<TrackObject>> List;
+    typedef lst::List<TrackObject, CompareId<TrackObject>> List;
 
     DECLARE_B_SERIALIZE_FUNC
 
@@ -519,89 +510,10 @@ struct TrackersSnapshotA : Data<&command::TrackersSnapshot,
     J_SERIALIZE_END
 };
 
-struct TrackRect
-{
-    // Идентификатор трекируемого объекта, используется для динамической
-    // раскраски объекта
-    QUuidEx id;
-
-    // Признак отображения рамки трекирования в кадре
-    bool visible = {true};
-
-    // Отображать рамки трекирования только для валидированных объектов
-    bool onlyValidated = {false};
-
-    // Надпись для рамки трекирования с привязкой к одному из углов геометри-
-    // ческой области, по умолчанию к верхнему левому углу
-    graph::Caption caption;
-
-    // Геометрическая область рамки трекирования.  Значимыми  являются  только
-    // признак видимости и параметры кисти. Геометрия рамки берется от трекера
-    graph::Rectangle border;
-
-    // Геометрический центр рамки трекирования. Значимыми являются только приз-
-    // нак видимости, параметры кисти, радиус.  Координаты  центра  окружности
-    // берутся от трекера
-    graph::Circle center;
-
-    // Набор графических примитивов, используется для отрисовки дополнительной/
-    // вспомогательной информации по трекируемому объекту
-    graph::Set::Ptr graphset;
-
-    typedef lst::List<TrackRect, TrackCompare<TrackRect>> List;
-
-    DECLARE_B_SERIALIZE_FUNC
-
-    J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "id"             , id            )
-        J_SERIALIZE_MAP_OPT ( "visible"        , visible       )
-        J_SERIALIZE_MAP_OPT ( "only_validated" , onlyValidated )
-        J_SERIALIZE_MAP_OPT ( "caption"        , caption       )
-        J_SERIALIZE_MAP_OPT ( "border"         , border        )
-        J_SERIALIZE_MAP_OPT ( "center"         , center        )
-        J_SERIALIZE_MAP_OPT ( "graphset"       , graphset      )
-    J_SERIALIZE_END
-};
-
-struct TrackRects
-{
-    typedef container_ptr<TrackRects> Ptr;
-
-    // Признак отображения всех рамок трекирования
-    bool visible = {false};
-
-    struct ModelClass
-    {
-        // Порядковый индекс расположения класса в выходном слое модели
-        qint32 index = {0};
-
-        // Параметры отображения рамок трекирования для класса модели
-        TrackRect rect;
-
-        typedef lst::List<ModelClass, ModelClassFind<ModelClass>> List;
-
-        DECLARE_B_SERIALIZE_FUNC
-
-        J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "index" , index )
-            J_SERIALIZE_MAP_ITEM( "rect"  , rect  )
-        J_SERIALIZE_END
-    };
-
-    ModelClass::List classes;
-
-    DECLARE_B_SERIALIZE_FUNC
-
-    J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "visible" , visible )
-        J_SERIALIZE_MAP_ITEM( "classes" , classes )
-    J_SERIALIZE_END
-};
-
 struct TrackRectsInfoA : Data<&command::TrackRectsInfo,
                                Message::Type::Answer>
 {
-    TrackRects::Ptr value;
+    PaintRects::Ptr value;
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "value", value )
@@ -610,7 +522,7 @@ struct TrackRectsInfoA : Data<&command::TrackRectsInfo,
 struct TrackRectsDynamicInfoA : Data<&command::TrackRectsDynamicInfo,
                                       Message::Type::Answer>
 {
-    TrackRect::List items;
+    PaintRect::List items;
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "items", items )
@@ -619,7 +531,7 @@ struct TrackRectsDynamicInfoA : Data<&command::TrackRectsDynamicInfo,
 struct TrackRectsDynamicUpdate : Data<&command::TrackRectsDynamicUpdate,
                                        Message::Type::Command>
 {
-    TrackRect::List items;
+    PaintRect::List items;
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "items", items )

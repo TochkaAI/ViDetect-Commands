@@ -11,6 +11,8 @@ namespace command {
     const QUuidEx COMMAND = command::Pool::Registry{UUID, #COMMAND, true};
 
 REGISTRY_COMMAND_SINGLPROC(LogicSetsInfo,     "4efd50d8-07cd-40e3-8531-6aa7599dd200")
+REGISTRY_COMMAND_SINGLPROC(LogicRectsInfo,    "4fce751d-33e4-4851-99fc-ea56b709c2e1")
+REGISTRY_COMMAND_SINGLPROC(LogicRectsChanged, "8b4e42e4-b6cf-4307-8f5f-22f66b988406")
 REGISTRY_COMMAND_SINGLPROC(LogicSetsSnapshot, "8933a645-35cf-466e-b20f-45a2555295f6")
 REGISTRY_COMMAND_SINGLPROC(LogicDistances,    "bb117fea-ba16-44a9-90bc-c30db24219ac")
 REGISTRY_COMMAND_SINGLPROC(LogicObjectsReset, "c1e4b7f2-3a85-4d9e-b612-7f0e8c5a1d43")
@@ -75,6 +77,20 @@ void LogicSetsInfoA::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
     stream >> items;
+    B_DESERIALIZE_END
+}
+
+void LogicRectsInfoA::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << value;
+    B_SERIALIZE_RETURN
+}
+
+void LogicRectsInfoA::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> value;
     B_DESERIALIZE_END
 }
 

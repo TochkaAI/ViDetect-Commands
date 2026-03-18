@@ -4,8 +4,10 @@
 #include "pproto/commands/base.h"
 #include "pproto/commands/time_spec.h"
 
-#include "detect_rect.h"
+#include "compare.h"
 #include "model.h"
+#include "detect_rect.h"
+#include "paint_rect.h"
 
 namespace pproto {
 namespace command {
@@ -41,6 +43,18 @@ extern const QUuidEx LogicSetsInfo;
   TODO не реализовано
 */
 //extern const QUuidEx LogicSetsEventsSubscript;
+
+/**
+  Команда возвращает информацию о параметрах отображения рамок логических
+  объектов
+*/
+extern const QUuidEx LogicRectsInfo;
+
+/**
+  Событие эмитируется при перечитывании информации о параметрах отображения
+  рамок логических объектов из конфигурационного файла (videtect.rect)
+*/
+extern const QUuidEx LogicRectsChanged;
 
 /**
   Команда возвращает текущее состояние логических объектов
@@ -140,15 +154,13 @@ struct LogicSetsInfoA : Data<&command::LogicSetsInfo,
     J_SERIALIZE_MAP_ONE( "items", items )
 };
 
-template<typename T> struct LogicCompare
+struct LogicRectsInfoA : Data<&command::LogicRectsInfo,
+                               Message::Type::Answer>
 {
-    // Сортировка по id
-    int operator() (const T* item1, const T* item2) const
-        {return QUuidEx::compare(item1->id, item2->id);}
+    PaintRects::Ptr value;
 
-    // Поиск по id
-    int operator() (const QUuidEx* id, const T* item2) const
-        {return QUuidEx::compare(*id, item2->id);}
+    DECLARE_B_SERIALIZE_FUNC
+    J_SERIALIZE_MAP_ONE( "value", value )
 };
 
 /**
@@ -183,7 +195,7 @@ struct LogicObject
     // average_depth в файле конфигурирования трекеров (videtect.track)
     // DetectRect averageRect;
 
-    typedef lst::List<LogicObject, LogicCompare<LogicObject>> List;
+    typedef lst::List<LogicObject, CompareId<LogicObject>> List;
 
     DECLARE_B_SERIALIZE_FUNC
 

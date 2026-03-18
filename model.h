@@ -5,6 +5,7 @@
 #include "pproto/commands/base.h"
 #include "pproto/commands/time_spec.h"
 
+#include "compare.h"
 #include "graphics.h"
 
 namespace pproto {
@@ -43,13 +44,6 @@ enum class UsingModel : quint32
 {
     RealModel = 0, // Реальная модель
     MetaModel = 1, // Мета-модель
-};
-
-template<typename T> struct ModelClassFind
-{
-    // Поиск по index
-    int operator() (const qint32* index, const T* item2) const
-        {return LIST_COMPARE_ITEM(*index, item2->index);}
 };
 
 //---------------- Структуры данных используемые в сообщениях ----------------
