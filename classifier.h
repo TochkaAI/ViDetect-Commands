@@ -5,6 +5,7 @@
 #include "pproto/commands/base.h"
 #include "pproto/commands/time_spec.h"
 
+#include "compare.h"
 #include "graphics.h"
 
 namespace pproto {
@@ -31,24 +32,28 @@ struct ClassifModelClass
     // Наименование выходного класса модели классификации
     QString name;
 
-    // Пороговое значение для класса модели классификации
-    float scoreThresh = {0.10};
-
-    struct Find
+    struct Threshold
     {
-        // Поиск по index
-        int operator() (const qint32* index, const ClassifModelClass* item2) const
-            {return LIST_COMPARE_ITEM(*index, item2->index);}
+        // Пороговое значение для класса модели классификации
+        float score = {0.10};
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "score" , score )
+        J_SERIALIZE_END
     };
 
-    typedef lst::List<ClassifModelClass, Find> List;
+    Threshold threshold;
+
+    typedef lst::List<ClassifModelClass, ModelClassFind<ClassifModelClass>> List;
 
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "index"        , index       )
-        J_SERIALIZE_MAP_ITEM( "name"         , name        )
-        J_SERIALIZE_MAP_ITEM( "score_thresh" , scoreThresh )
+        J_SERIALIZE_MAP_ITEM( "index"     , index     )
+        J_SERIALIZE_MAP_ITEM( "name"      , name      )
+        J_SERIALIZE_MAP_ITEM( "threshold" , threshold )
     J_SERIALIZE_END
 };
 
@@ -82,9 +87,20 @@ struct ClassifModel
     // Значение параметра по умолчанию равно 0
     qint32 gpuIndex = {0};
 
-    // Список индексов классов основной модели (реальной модели или мета-модели)
-    // для которых будет выполняться классификация
-    QSet<qint32>  mainModelClasses;
+    struct MainModel
+    {
+        // Список индексов классов основной модели (реальной модели или мета-модели)
+        // для которых будет выполняться классификация
+        QSet<qint32>  classes;
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "classes" , classes )
+        J_SERIALIZE_END
+    };
+
+    MainModel mainModel;
 
     ClassifModelClass::List classes;
 
@@ -93,16 +109,16 @@ struct ClassifModel
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "index"              , index            )
-        J_SERIALIZE_MAP_ITEM( "name"               , name             )
-        J_SERIALIZE_MAP_ITEM( "path"               , path             )
-        J_SERIALIZE_MAP_ITEM( "file"               , file             )
-        J_SERIALIZE_MAP_ITEM( "image_channels"     , imageChannels    )
-        J_SERIALIZE_MAP_ITEM( "input_size"         , inputSize        )
-        J_SERIALIZE_MAP_ITEM( "input_size2"        , inputSize2       )
-        J_SERIALIZE_MAP_ITEM( "gpu_index"          , gpuIndex         )
-        J_SERIALIZE_MAP_ITEM( "main_model_classes" , mainModelClasses )
-        J_SERIALIZE_MAP_ITEM( "classes"            , classes          )
+        J_SERIALIZE_MAP_ITEM( "index"          , index         )
+        J_SERIALIZE_MAP_ITEM( "name"           , name          )
+        J_SERIALIZE_MAP_ITEM( "path"           , path          )
+        J_SERIALIZE_MAP_ITEM( "file"           , file          )
+        J_SERIALIZE_MAP_ITEM( "image_channels" , imageChannels )
+        J_SERIALIZE_MAP_ITEM( "input_size"     , inputSize     )
+        J_SERIALIZE_MAP_ITEM( "input_size2"    , inputSize2    )
+        J_SERIALIZE_MAP_ITEM( "gpu_index"      , gpuIndex      )
+        J_SERIALIZE_MAP_ITEM( "main_model"     , mainModel     )
+        J_SERIALIZE_MAP_ITEM( "classes"        , classes       )
     J_SERIALIZE_END
 };
 

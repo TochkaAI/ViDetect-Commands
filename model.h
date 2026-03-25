@@ -110,11 +110,25 @@ struct ModelClassBase
 
 struct RealModelClass : ModelClassBase
 {
-    // Индивидуальные пороговые значения для класса модели
-    float cuttingThresh = {0.10};
-    float scoreThresh   = {0.70};
-    float nmsThresh     = {0.50};
-    float segmentThresh = {0.75};
+    struct Threshold
+    {
+        // Индивидуальные пороговые значения для класса модели
+        float cutting = {0.10};
+        float score   = {0.70};
+        float nms     = {0.50};
+        float segment = {0.75};
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "cutting" , cutting )
+            J_SERIALIZE_MAP_ITEM( "score"   , score   )
+            J_SERIALIZE_MAP_ITEM( "nms"     , nms     )
+            J_SERIALIZE_MAP_ITEM( "segment" , segment )
+        J_SERIALIZE_END
+    };
+
+    Threshold threshold;
 
     typedef lst::List<RealModelClass, ModelClassFind<ModelClassBase>> List;
 
@@ -122,21 +136,39 @@ struct RealModelClass : ModelClassBase
 
     J_SERIALIZE_BEGIN
         J_SERIALIZE_BASE( ModelClassBase )
-        J_SERIALIZE_MAP_ITEM( "cutting_thresh" , cuttingThresh )
-        J_SERIALIZE_MAP_ITEM( "score_thresh"   , scoreThresh   )
-        J_SERIALIZE_MAP_ITEM( "nms_thresh"     , nmsThresh     )
-        J_SERIALIZE_MAP_ITEM( "segment_thresh" , segmentThresh )
+        J_SERIALIZE_MAP_ITEM( "threshold" , threshold )
     J_SERIALIZE_END
 };
 
 struct MetaModelClass : ModelClassBase
 {
-    // Список индексов реальных классов модели из которых собирается метакласс
-    QSet<int> realModelClasses;
+    struct RealModel
+    {
+        // Список индексов реальных классов модели из которых собирается метакласс
+        QSet<int> classes;
 
-    // Пороговое значение IoU для агрегирования детектированных рамок реальных
-    // классов в рамку метакласса
-    float iouThresh = {0.70};
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "classes" , classes )
+        J_SERIALIZE_END
+    };
+
+    struct Threshold
+    {
+        // Пороговое значение IoU для агрегирования детектированных рамок реальных
+        // классов в рамку метакласса
+        float iou = {0.70};
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "iou" , iou )
+        J_SERIALIZE_END
+    };
+
+    RealModel realModel;
+    Threshold threshold;
 
     typedef lst::List<MetaModelClass, ModelClassFind<ModelClassBase>> List;
 
@@ -144,8 +176,8 @@ struct MetaModelClass : ModelClassBase
 
     J_SERIALIZE_BEGIN
         J_SERIALIZE_BASE( ModelClassBase )
-        J_SERIALIZE_MAP_ITEM( "real_model_classes" , realModelClasses )
-        J_SERIALIZE_MAP_ITEM( "iou_thresh"         , iouThresh        )
+        J_SERIALIZE_MAP_ITEM( "real_model" , realModel )
+        J_SERIALIZE_MAP_ITEM( "threshold"  , threshold )
     J_SERIALIZE_END
 };
 

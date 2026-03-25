@@ -19,13 +19,26 @@ REGISTRY_COMMAND_SINGLPROC(ClassifModelsInfo, "43c98cce-928d-4203-9acb-de396fd27
 
 namespace data {
 
+void ClassifModelClass::Threshold::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << score;
+    B_SERIALIZE_RETURN
+}
+
+void ClassifModelClass::Threshold::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> score;
+    B_DESERIALIZE_END
+}
 
 void ClassifModelClass::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
     stream << index;
     stream << name;
-    stream << scoreThresh;
+    stream << threshold;
     B_SERIALIZE_RETURN
 }
 
@@ -34,7 +47,21 @@ void ClassifModelClass::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_V1(vect)
     stream >> index;
     stream >> name;
-    stream >> scoreThresh;
+    stream >> threshold;
+    B_DESERIALIZE_END
+}
+
+void ClassifModel::MainModel::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << classes;
+    B_SERIALIZE_RETURN
+}
+
+void ClassifModel::MainModel::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> classes;
     B_DESERIALIZE_END
 }
 
@@ -49,7 +76,7 @@ void ClassifModel::toRaw(bserial::DataStream& stream) const
     stream << inputSize;
     stream << inputSize2;
     stream << gpuIndex;
-    stream << mainModelClasses;
+    stream << mainModel;
     stream << classes;
     B_SERIALIZE_RETURN
 }
@@ -65,7 +92,7 @@ void ClassifModel::fromRaw(const bserial::RawVector& vect)
     stream >> inputSize;
     stream >> inputSize2;
     stream >> gpuIndex;
-    stream >> mainModelClasses;
+    stream >> mainModel;
     stream >> classes;
     B_DESERIALIZE_END
 }

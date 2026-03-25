@@ -71,14 +71,31 @@ void ModelClassBase::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void RealModelClass::Threshold::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << cutting;
+    stream << score;
+    stream << nms;
+    stream << segment;
+    B_SERIALIZE_RETURN
+}
+
+void RealModelClass::Threshold::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> cutting;
+    stream >> score;
+    stream >> nms;
+    stream >> segment;
+    B_DESERIALIZE_END
+}
+
 void RealModelClass::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
     stream << B_BASE_CLASS(ModelClassBase);
-    stream << cuttingThresh;
-    stream << scoreThresh;
-    stream << nmsThresh;
-    stream << segmentThresh;
+    stream << threshold;
     B_SERIALIZE_RETURN
 }
 
@@ -86,10 +103,35 @@ void RealModelClass::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
     stream >> B_BASE_CLASS(ModelClassBase);
-    stream >> cuttingThresh;
-    stream >> scoreThresh;
-    stream >> nmsThresh;
-    stream >> segmentThresh;
+    stream >> threshold;
+    B_DESERIALIZE_END
+}
+
+void MetaModelClass::RealModel::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << classes;
+    B_SERIALIZE_RETURN
+}
+
+void MetaModelClass::RealModel::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> classes;
+    B_DESERIALIZE_END
+}
+
+void MetaModelClass::Threshold::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << iou;
+    B_SERIALIZE_RETURN
+}
+
+void MetaModelClass::Threshold::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> iou;
     B_DESERIALIZE_END
 }
 
@@ -97,8 +139,8 @@ void MetaModelClass::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
     stream << B_BASE_CLASS(ModelClassBase);
-    stream << realModelClasses;
-    stream << iouThresh;
+    stream << realModel;
+    stream << threshold;
     B_SERIALIZE_RETURN
 }
 
@@ -106,8 +148,8 @@ void MetaModelClass::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
     stream >> B_BASE_CLASS(ModelClassBase);
-    stream >> realModelClasses;
-    stream >> iouThresh;
+    stream >> realModel;
+    stream >> threshold;
     B_DESERIALIZE_END
 }
 
