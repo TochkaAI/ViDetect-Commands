@@ -102,9 +102,30 @@ struct LogicSetInfo
     // Целевой порог классов модели
     float score = {0.70};
 
-    // Список индексов реальных классов модели из которых собирается мета-
-    // класс, используется как критерий создания логического объекта
-    QSet<int> realModelClasses;
+    struct RealModel
+    {
+        typedef container_ptr<RealModel> Ptr;
+
+        // Список индексов реальных классов модели из которых собирается мета-
+        // класс, используется как критерий создания логического объекта
+        QSet<int> classes;
+
+        // Индекс класса реальной модели, соответствующий годному объекту. © Ганин
+        int classAccept = {-1};
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "classes"      , classes     )
+            J_SERIALIZE_MAP_ITEM( "class_accept" , classAccept )
+        J_SERIALIZE_END
+
+    };
+
+    // Критерии реальной модели на основе  которых  происходит  создание  логи-
+    // ческого объекта. Если параметр classifModel определен, то он будет иметь
+    // приоритет над параметром realModel
+    RealModel::Ptr realModel;
 
     struct ClassifModel
     {
@@ -117,17 +138,21 @@ struct LogicSetInfo
         // критерий создания логического объекта
         QSet<int> classes;
 
+        // Индекс класса модели классификации, соответствующий годному объекту
+        int classAccept = {-1};
+
         DECLARE_B_SERIALIZE_FUNC
 
         J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "index"   , index   )
-            J_SERIALIZE_MAP_ITEM( "classes" , classes )
+            J_SERIALIZE_MAP_ITEM( "index"        , index       )
+            J_SERIALIZE_MAP_ITEM( "classes"      , classes     )
+            J_SERIALIZE_MAP_ITEM( "class_accept" , classAccept )
         J_SERIALIZE_END
     };
 
-    // Критерии модели классификации на основе которых происходит  создание
-    // логического объекта. Если параметр определен, то он будет иметь прио-
-    // ритет над механизмом классификации через realModelClasses
+    // Критерии модели классификации на основе которых происходит создание логи-
+    // ческого объекта. Если параметр classifModel определен, то он будет иметь
+    // приоритет над параметром realModel
     ClassifModel::Ptr classifModel;
 
     typedef lst::List<LogicSetInfo, lst::CompareItemDummy> List;
@@ -135,13 +160,13 @@ struct LogicSetInfo
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "class_index"        , classIndex       )
-        J_SERIALIZE_MAP_ITEM( "class_name"         , className        )
-        J_SERIALIZE_MAP_ITEM( "frames_depth"       , framesDepth      )
-        J_SERIALIZE_MAP_ITEM( "saturate"           , saturate         )
-        J_SERIALIZE_MAP_ITEM( "score"              , score            )
-        J_SERIALIZE_MAP_ITEM( "real_model_classes" , realModelClasses )
-        J_SERIALIZE_MAP_ITEM( "classifier_model"   , classifModel     )
+        J_SERIALIZE_MAP_ITEM( "class_index"        , classIndex   )
+        J_SERIALIZE_MAP_ITEM( "class_name"         , className    )
+        J_SERIALIZE_MAP_ITEM( "frames_depth"       , framesDepth  )
+        J_SERIALIZE_MAP_ITEM( "saturate"           , saturate     )
+        J_SERIALIZE_MAP_ITEM( "score"              , score        )
+        J_SERIALIZE_MAP_ITEM( "real_model"         , realModel    )
+        J_SERIALIZE_MAP_ITEM( "classifier_model"   , classifModel )
     J_SERIALIZE_END
 };
 
