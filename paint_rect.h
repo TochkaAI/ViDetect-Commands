@@ -7,6 +7,8 @@
 #include "compare.h"
 #include "graphics.h"
 
+#include <tuple>
+
 namespace pproto {
 namespace data {
 
@@ -54,6 +56,42 @@ struct PaintRect
     J_SERIALIZE_END
 };
 
+struct PaintClassif
+{
+    qint32 modelIndex = {-1};
+    qint32 classIndex = {-1};
+
+    PaintRect rect;
+
+    struct Compare
+    {
+        int operator() (const PaintClassif* item1, const PaintClassif* item2) const
+        {
+            LIST_COMPARE_MULTI_ITEM(item1->modelIndex, item2->modelIndex)
+            LIST_COMPARE_MULTI_ITEM(item1->classIndex, item2->classIndex);
+            return 0;
+        }
+        int operator() (const std::tuple<qint32 /*model index*/, qint32 /*class index*/>* item1,
+                        const PaintClassif* item2) const
+        {
+            LIST_COMPARE_MULTI_ITEM(std::get<0>(*item1), item2->modelIndex)
+            LIST_COMPARE_MULTI_ITEM(std::get<1>(*item1), item2->classIndex)
+            return 0;
+        }
+    };
+
+    typedef lst::List<PaintClassif, Compare> List;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "model_index" , modelIndex )
+        J_SERIALIZE_MAP_OPT ( "class_index" , classIndex )
+        J_SERIALIZE_MAP_OPT ( "rect"        , rect       )
+    J_SERIALIZE_END
+};
+
+
 struct PaintRects
 {
     typedef container_ptr<PaintRects> Ptr;
@@ -66,16 +104,20 @@ struct PaintRects
         // Порядковый индекс расположения класса в выходном слое модели
         qint32 index = {0};
 
-        // Параметры отображения рамок трекирования для класса модели
+        // Параметры отображения рамок трекируемого объекта или логического
+        // объекта
         PaintRect rect;
+
+        PaintClassif::List classifiers;
 
         typedef lst::List<ModelClass, ModelClassFind<ModelClass>> List;
 
         DECLARE_B_SERIALIZE_FUNC
 
         J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "index" , index )
-            J_SERIALIZE_MAP_ITEM( "rect"  , rect  )
+            J_SERIALIZE_MAP_ITEM( "index"       , index       )
+            J_SERIALIZE_MAP_ITEM( "rect"        , rect        )
+            J_SERIALIZE_MAP_ITEM( "classifiers" , classifiers )
         J_SERIALIZE_END
     };
 
