@@ -65,6 +65,22 @@ void ClassifModel::MainModel::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void ClassifModel::RectScale::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << height;
+    stream << width;
+    B_SERIALIZE_RETURN
+}
+
+void ClassifModel::RectScale::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> height;
+    stream >> width;
+    B_DESERIALIZE_END
+}
+
 void ClassifModel::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -77,6 +93,7 @@ void ClassifModel::toRaw(bserial::DataStream& stream) const
     stream << inputSize2;
     stream << gpuIndex;
     stream << mainModel;
+    stream << rectScale;
     stream << classes;
     B_SERIALIZE_RETURN
 }
@@ -93,6 +110,7 @@ void ClassifModel::fromRaw(const bserial::RawVector& vect)
     stream >> inputSize2;
     stream >> gpuIndex;
     stream >> mainModel;
+    stream >> rectScale;
     stream >> classes;
     B_DESERIALIZE_END
 }

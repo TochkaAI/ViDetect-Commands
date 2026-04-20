@@ -61,6 +61,32 @@ struct ClassifModel
 {
     //typedef container_ptr<ClassifModel> Ptr;
 
+    struct MainModel
+    {
+        // Список индексов классов основной модели (реальной модели или мета-модели)
+        // для которых будет выполняться классификация
+        QSet<qint32>  classes;
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "classes" , classes )
+        J_SERIALIZE_END
+    };
+
+    struct RectScale
+    {
+        float height = {1};
+        float width  = {1};
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "height" , height )
+            J_SERIALIZE_MAP_ITEM( "width"  , width  )
+        J_SERIALIZE_END
+    };
+
     // Порядковый индекс модели классификации
     qint32 index = {0};
 
@@ -87,20 +113,13 @@ struct ClassifModel
     // Значение параметра по умолчанию равно 0
     qint32 gpuIndex = {0};
 
-    struct MainModel
-    {
-        // Список индексов классов основной модели (реальной модели или мета-модели)
-        // для которых будет выполняться классификация
-        QSet<qint32>  classes;
-
-        DECLARE_B_SERIALIZE_FUNC
-
-        J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "classes" , classes )
-        J_SERIALIZE_END
-    };
-
+    // Список индексов классов основной модели (реальной модели или мета-модели)
+    // для которых будет выполняться классификация
     MainModel mainModel;
+
+    // Масштабные коэффициенты увеличения рамки детектора перед классификацией.
+    // Значения параметров должны быть больше либо равны 1
+    RectScale rectScale;
 
     ClassifModelClass::List classes;
 
@@ -118,6 +137,7 @@ struct ClassifModel
         J_SERIALIZE_MAP_ITEM( "input_size2"    , inputSize2    )
         J_SERIALIZE_MAP_ITEM( "gpu_index"      , gpuIndex      )
         J_SERIALIZE_MAP_ITEM( "main_model"     , mainModel     )
+        J_SERIALIZE_MAP_ITEM( "rect_scale"     , rectScale     )
         J_SERIALIZE_MAP_ITEM( "classes"        , classes       )
     J_SERIALIZE_END
 };
