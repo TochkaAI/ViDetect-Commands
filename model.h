@@ -149,9 +149,7 @@ struct MetaModelClass : ModelClassBase
 
         DECLARE_B_SERIALIZE_FUNC
 
-        J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "classes" , classes )
-        J_SERIALIZE_END
+        J_SERIALIZE_MAP_ONE( "classes" , classes )
     };
 
     struct Threshold
@@ -162,9 +160,7 @@ struct MetaModelClass : ModelClassBase
 
         DECLARE_B_SERIALIZE_FUNC
 
-        J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "iou" , iou )
-        J_SERIALIZE_END
+        J_SERIALIZE_MAP_ONE( "iou" , iou )
     };
 
     RealModel realModel;
