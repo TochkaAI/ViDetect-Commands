@@ -39,9 +39,7 @@ struct ClassifModelClass
 
         DECLARE_B_SERIALIZE_FUNC
 
-        J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "score" , score )
-        J_SERIALIZE_END
+        J_SERIALIZE_MAP_ONE( "score" , score )
     };
 
     Threshold threshold;
@@ -59,8 +57,6 @@ struct ClassifModelClass
 
 struct ClassifModel
 {
-    //typedef container_ptr<ClassifModel> Ptr;
-
     struct MainModel
     {
         // Список индексов классов основной модели (реальной модели или мета-модели)
@@ -69,9 +65,7 @@ struct ClassifModel
 
         DECLARE_B_SERIALIZE_FUNC
 
-        J_SERIALIZE_BEGIN
-            J_SERIALIZE_MAP_ITEM( "classes" , classes )
-        J_SERIALIZE_END
+        J_SERIALIZE_MAP_ONE( "classes" , classes )
     };
 
     struct RectScale
@@ -84,6 +78,37 @@ struct ClassifModel
         J_SERIALIZE_BEGIN
             J_SERIALIZE_MAP_ITEM( "height" , height )
             J_SERIALIZE_MAP_ITEM( "width"  , width  )
+        J_SERIALIZE_END
+    };
+
+    struct QualityMonitor
+    {
+        // Признак активности механизма контроля качества модели классификации
+        bool active = {true};
+
+        QString path;
+        QString prefix;
+
+        // Параметр определяет минимальную разницу скора классификации между
+        // первой (максимальной) и второй оценками. Если разница меньше ука-
+        // занного значения, происходит сохранение контрольного изображения
+        float deltaScore = {0.10};
+
+        // Время следующей итерации сохранения контрольного изображения
+        qint32 timing = {30}; /*в секундах*/
+
+        // Формат сохранения файла. Допустимые значения: jpg, png
+        QString fileFormat = {"jpg"};
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "active"      , active     )
+            J_SERIALIZE_MAP_ITEM( "path"        , path       )
+            J_SERIALIZE_MAP_ITEM( "prefix"      , prefix     )
+            J_SERIALIZE_MAP_ITEM( "delta_score" , deltaScore )
+            J_SERIALIZE_MAP_ITEM( "timing"      , timing     )
+            J_SERIALIZE_MAP_ITEM( "file_format" , fileFormat )
         J_SERIALIZE_END
     };
 
@@ -121,6 +146,9 @@ struct ClassifModel
     // Значения параметров должны быть больше либо равны 1
     RectScale rectScale;
 
+    // Контроль качества модели классификации
+    QualityMonitor qualityMonitor;
+
     ClassifModelClass::List classes;
 
     typedef lst::List<ClassifModel, lst::CompareItemDummy> List;
@@ -128,17 +156,18 @@ struct ClassifModel
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "index"          , index         )
-        J_SERIALIZE_MAP_ITEM( "name"           , name          )
-        J_SERIALIZE_MAP_ITEM( "path"           , path          )
-        J_SERIALIZE_MAP_ITEM( "file"           , file          )
-        J_SERIALIZE_MAP_ITEM( "image_channels" , imageChannels )
-        J_SERIALIZE_MAP_ITEM( "input_size"     , inputSize     )
-        J_SERIALIZE_MAP_ITEM( "input_size2"    , inputSize2    )
-        J_SERIALIZE_MAP_ITEM( "gpu_index"      , gpuIndex      )
-        J_SERIALIZE_MAP_ITEM( "main_model"     , mainModel     )
-        J_SERIALIZE_MAP_ITEM( "rect_scale"     , rectScale     )
-        J_SERIALIZE_MAP_ITEM( "classes"        , classes       )
+        J_SERIALIZE_MAP_ITEM( "index"           , index          )
+        J_SERIALIZE_MAP_ITEM( "name"            , name           )
+        J_SERIALIZE_MAP_ITEM( "path"            , path           )
+        J_SERIALIZE_MAP_ITEM( "file"            , file           )
+        J_SERIALIZE_MAP_ITEM( "image_channels"  , imageChannels  )
+        J_SERIALIZE_MAP_ITEM( "input_size"      , inputSize      )
+        J_SERIALIZE_MAP_ITEM( "input_size2"     , inputSize2     )
+        J_SERIALIZE_MAP_ITEM( "gpu_index"       , gpuIndex       )
+        J_SERIALIZE_MAP_ITEM( "main_model"      , mainModel      )
+        J_SERIALIZE_MAP_ITEM( "rect_scale"      , rectScale      )
+        J_SERIALIZE_MAP_ITEM( "quality_monitor" , qualityMonitor )
+        J_SERIALIZE_MAP_ITEM( "classes"         , classes        )
     J_SERIALIZE_END
 };
 

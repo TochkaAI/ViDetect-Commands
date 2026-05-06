@@ -81,6 +81,30 @@ void ClassifModel::RectScale::fromRaw(const bserial::RawVector& vect)
     B_DESERIALIZE_END
 }
 
+void ClassifModel::QualityMonitor::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << active;
+    stream << path;
+    stream << prefix;
+    stream << deltaScore;
+    stream << timing;
+    stream << fileFormat;
+    B_SERIALIZE_RETURN
+}
+
+void ClassifModel::QualityMonitor::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> active;
+    stream >> path;
+    stream >> prefix;
+    stream >> deltaScore;
+    stream >> timing;
+    stream >> fileFormat;
+    B_DESERIALIZE_END
+}
+
 void ClassifModel::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -94,6 +118,7 @@ void ClassifModel::toRaw(bserial::DataStream& stream) const
     stream << gpuIndex;
     stream << mainModel;
     stream << rectScale;
+    stream << qualityMonitor;
     stream << classes;
     B_SERIALIZE_RETURN
 }
@@ -111,6 +136,7 @@ void ClassifModel::fromRaw(const bserial::RawVector& vect)
     stream >> gpuIndex;
     stream >> mainModel;
     stream >> rectScale;
+    stream >> qualityMonitor;
     stream >> classes;
     B_DESERIALIZE_END
 }
