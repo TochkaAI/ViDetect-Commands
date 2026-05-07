@@ -22,6 +22,24 @@ REGISTRY_COMMAND_SINGLPROC(VideoSnapshot,     "e45f4c80-f142-11f0-9a81-171f19f91
 
 namespace data {
 
+void VideoSnapshot::Request::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << type;
+    stream << number;
+    stream << time;
+    B_SERIALIZE_RETURN
+}
+
+void VideoSnapshot::Request::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> type;
+    stream >> number;
+    stream >> time;
+    B_DESERIALIZE_END
+}
+
 void VideoSnapshot::Frame::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -45,20 +63,16 @@ void VideoSnapshot::Frame::fromRaw(const bserial::RawVector& vect)
 void VideoSnapshot::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
-    stream << number;
-    stream << time;
+    stream << request;
     stream << frame;
-    //stream << compression;
     B_SERIALIZE_RETURN
 }
 
 void VideoSnapshot::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
-    stream >> number;
-    stream >> time;
+    stream >> request;
     stream >> frame;
-    //stream >> compression;
     B_DESERIALIZE_END
 }
 

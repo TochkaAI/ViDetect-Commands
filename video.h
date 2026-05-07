@@ -30,8 +30,7 @@ extern const QUuidEx VideoStreamClosed;
 extern const QUuidEx VideoStreamIsOpen;
 
 /**
-  Команда для получения кадра по номеру  или времени  создания  из  временного
-  буфера кадров
+  Команда для получения кадра по запросу из временного буфера кадров
 */
 extern const QUuidEx VideoSnapshot;
 
@@ -46,16 +45,30 @@ struct VideoSnapshot : Data<&command::VideoSnapshot,
                              Message::Type::Command,
                              Message::Type::Answer>
 {
-    // Номер запрашиваемого кадра. Если номер кадра равен -1, то параметр будет
-    // проигнорирован и поиск будет выполнен по полю time
-    quint64 number = quint64(-1);
+    struct Request
+    {
+        enum class Type : quint32
+        {
+            Number = 0, // Запрос кадра по номеру
+            Time   = 1, // Запрос кадра по времени
+            Last   = 2  // Запрос последнего кадра
+        };
 
-    // Время запрашиваемого кадра (UTC). Поиск по этому параметру выполняется,
-    // когда значение поля number равно -1
-    TimeSpec time;
+        Type     type   = {Type::Number};
+        quint64  number = quint64(-1);
+        TimeSpec time;
 
-    // Признак сжатия кадра
-    //VideoFrameCompression compression = {VideoFrameCompression::None};
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "type"   , type   )
+            J_SERIALIZE_MAP_ITEM( "number" , number )
+            J_SERIALIZE_MAP_ITEM( "time"   , time   )
+        J_SERIALIZE_END
+    };
+
+    // Параметры запроса кадра из временного буфера кадров
+    Request request;
 
     struct Frame
     {
@@ -82,10 +95,8 @@ struct VideoSnapshot : Data<&command::VideoSnapshot,
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_OPT( "number"      , number      )
-        J_SERIALIZE_MAP_OPT( "time"        , time        )
-      //J_SERIALIZE_MAP_OPT( "compression" , compression )
-        J_SERIALIZE_MAP_OPT( "frame"       , frame       )
+        J_SERIALIZE_MAP_OPT( "request" , request )
+        J_SERIALIZE_MAP_OPT( "frame"   , frame   )
     J_SERIALIZE_END
 };
 
