@@ -6,6 +6,8 @@
 #include "shared/config/appl_conf.h"
 #include "shared/qt/logger_operators.h"
 
+#include "qutils/config/load_config.h"
+
 #define log_error_m   alog::logger().error  (alog_line_location, "LoadConfig")
 #define log_warn_m    alog::logger().warn   (alog_line_location, "LoadConfig")
 #define log_info_m    alog::logger().info   (alog_line_location, "LoadConfig")
@@ -15,25 +17,6 @@
 
 namespace pproto {
 namespace graph {
-
-bool loadIdentity(const YamlConfig* conf, const YAML::Node& baseNode,
-                  const string& nodeName, data::Identity& identity)
-{
-    YAML::Node node = conf->node(baseNode, nodeName);
-    if (!node)
-        return false;
-
-    if (node.IsNull())
-    {
-        identity = data::Identity();
-        return true;
-    }
-
-    conf->getValue(node, "id",    identity.id,    false);
-    conf->getValue(node, "index", identity.index, false);
-    conf->getValue(node, "name",  identity.name , false);
-    return true;
-}
 
 bool loadColor(const YamlConfig* conf, const YAML::Node& baseBase,
                const string& nodeName, data::graph::Color& color)
