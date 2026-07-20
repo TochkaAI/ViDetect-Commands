@@ -17,10 +17,10 @@ Product {
 
     Depends { name: "cpp" }
     Depends { name: "PProto" }
+    Depends { name: "QUtils" }
     Depends { name: "Detection"; required: false }
     Depends { name: "RapidJson"; required: false }
     Depends { name: "SharedLib" }
-  //Depends { name: "Video" }
     Depends { name: "Yaml" }
     Depends { name: "lib.opencv" }
     Depends { name: "Qt"; submodules: ["core", "network"] }

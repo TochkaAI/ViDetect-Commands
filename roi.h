@@ -2,6 +2,7 @@
 
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
+#include "qutils/commands/identity.h"
 
 #include "graphics.h"
 
@@ -19,7 +20,7 @@ namespace data {
 struct Roi
 {
     // Идентификационный признак
-    graph::Identity identity;
+    Identity identity;
 
     // Признак отображения примитива в кадре
     bool visible = {true};
@@ -44,7 +45,7 @@ struct Roi
         J_SERIALIZE_MAP_ITEM( "border"   , border   )
     J_SERIALIZE_END
 
-    typedef lst::List<Roi, graph::Identity::Find<Roi>> List;
+    typedef lst::List<Roi, Identity::Find<Roi>> List;
 };
 
 } // namespace data

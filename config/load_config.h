@@ -11,7 +11,7 @@ using namespace std;
 namespace graph {
 
 bool loadIdentity(const YamlConfig* conf, const YAML::Node& baseNode,
-                  const string& nodeName, data::graph::Identity& identity);
+                  const string& nodeName, data::Identity& identity);
 
 bool loadColor(const YamlConfig* conf, const YAML::Node& baseBase,
                const string& nodeName, data::graph::Color& color);

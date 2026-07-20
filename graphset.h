@@ -2,6 +2,7 @@
 
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
+#include "qutils/commands/identity.h"
 
 #include "graphics.h"
 
@@ -105,7 +106,7 @@ struct GraphsetDynamicUpdate : Data<&command::GraphsetDynamicUpdate,
 struct GraphsetDynamicRemove : Data<&command::GraphsetDynamicRemove,
                                      Message::Type::Command>
 {
-    QList<graph::Identity> items;
+    QList<Identity> items;
 
     DECLARE_B_SERIALIZE_FUNC
     J_SERIALIZE_MAP_ONE( "items", items )
@@ -121,8 +122,8 @@ struct GraphsetVisible : Data<&command::GraphsetVisible,
     {
         struct Item
         {
-            graph::Identity identity; // Идентификационный признак
-            bool visible = {true};    // Признак отображения примитива в кадре
+            Identity identity;     // Идентификационный признак
+            bool visible = {true}; // Признак отображения примитива в кадре
 
             DECLARE_B_SERIALIZE_FUNC
 

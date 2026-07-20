@@ -17,7 +17,7 @@ namespace pproto {
 namespace graph {
 
 bool loadIdentity(const YamlConfig* conf, const YAML::Node& baseNode,
-                  const string& nodeName, data::graph::Identity& identity)
+                  const string& nodeName, data::Identity& identity)
 {
     YAML::Node node = conf->node(baseNode, nodeName);
     if (!node)
@@ -25,7 +25,7 @@ bool loadIdentity(const YamlConfig* conf, const YAML::Node& baseNode,
 
     if (node.IsNull())
     {
-        identity = data::graph::Identity();
+        identity = data::Identity();
         return true;
     }
 
