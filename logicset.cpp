@@ -12,6 +12,7 @@ namespace command {
 
 REGISTRY_COMMAND_SINGLPROC(LogicSetsInfo,     "4efd50d8-07cd-40e3-8531-6aa7599dd200")
 REGISTRY_COMMAND_SINGLPROC(LogicRectsInfo,    "4fce751d-33e4-4851-99fc-ea56b709c2e1")
+REGISTRY_COMMAND_SINGLPROC(LogicObjectInfo,   "a595916c-a66a-4388-986e-7fe041516def")
 REGISTRY_COMMAND_SINGLPROC(LogicRectsChanged, "8b4e42e4-b6cf-4307-8f5f-22f66b988406")
 REGISTRY_COMMAND_SINGLPROC(LogicSetsSnapshot, "8933a645-35cf-466e-b20f-45a2555295f6")
 REGISTRY_COMMAND_SINGLPROC(LogicDistances,    "bb117fea-ba16-44a9-90bc-c30db24219ac")
@@ -157,6 +158,22 @@ void LogicSetSnapshot::fromRaw(const bserial::RawVector& vect)
     stream >> classIndex;
     stream >> className;
     stream >> objects;
+    B_DESERIALIZE_END
+}
+
+void LogicObjectInfo::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << id;
+    stream << object;
+    B_SERIALIZE_RETURN
+}
+
+void LogicObjectInfo::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> id;
+    stream >> object;
     B_DESERIALIZE_END
 }
 

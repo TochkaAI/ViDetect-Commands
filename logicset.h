@@ -51,6 +51,11 @@ extern const QUuidEx LogicSetsInfo;
 extern const QUuidEx LogicRectsInfo;
 
 /**
+  Команда возвращает информацию о логическом объекта по его идентификатору
+*/
+extern const QUuidEx LogicObjectInfo;
+
+/**
   Событие эмитируется при перечитывании информации о параметрах отображения
   рамок логических объектов из конфигурационного файла (videtect.rect)
 */
@@ -193,6 +198,8 @@ struct LogicRectsInfoA : Data<&command::LogicRectsInfo,
 */
 struct LogicObject
 {
+    typedef container_ptr<LogicObject> Ptr;
+
     // Идентификатор логического объекта
     QUuidEx id;
 
@@ -264,6 +271,24 @@ struct LogicSetSnapshot
         J_SERIALIZE_MAP_ITEM( "class_index" , classIndex )
         J_SERIALIZE_MAP_ITEM( "class_name"  , className  )
         J_SERIALIZE_MAP_ITEM( "objects"     , objects    )
+    J_SERIALIZE_END
+};
+
+struct LogicObjectInfo : Data<&command::LogicObjectInfo,
+                               Message::Type::Command,
+                               Message::Type::Answer>
+{
+    // Идентификатор запрашиваемого логического объекта
+    QUuidEx id;
+
+    // Поле содержит запрашиваемый логический объект в ответном сообщении
+    LogicObject::Ptr object;
+
+    DECLARE_B_SERIALIZE_FUNC
+
+    J_SERIALIZE_BEGIN
+        J_SERIALIZE_MAP_ITEM( "id"     , id     )
+        J_SERIALIZE_MAP_OPT ( "object" , object )
     J_SERIALIZE_END
 };
 
