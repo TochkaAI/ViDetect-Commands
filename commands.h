@@ -29,6 +29,13 @@ extern const QUuidEx ProcessingPause;
 */
 extern const QUuidEx ProcessingInfo;
 
+/**
+  Команда возвращает статус лицензии в поле tag(0). Значение 1 соответствует
+  активной  лицензии,  значение 0 возвращается, когда лицензия неактивна или
+  отсутствует
+*/
+extern const QUuidEx LicenseActive;
+
 } // namespace command
 
 struct ConfChange
