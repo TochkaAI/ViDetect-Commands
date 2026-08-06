@@ -1,6 +1,6 @@
 import qbs
 import qbs.FileInfo
-import QbsUtl
+//import QbsUtl
 
 Product {
     name: "ViDetect"
@@ -22,13 +22,15 @@ Product {
     Depends { name: "RapidJson"; required: false }
     Depends { name: "SharedLib" }
     Depends { name: "Yaml" }
-    Depends { name: "lib.opencv" }
+    Depends { name: "lib.opencv" /*required: false*/ }
     Depends { name: "Qt"; submodules: ["core", "network"] }
 
-   // Properties {
-   //     condition: lib.opencv.present
-   //     lib.opencv.version: project.opencvVersion
-   // }
+    // Примечание: для зависимостей типа lib.opencv директива required
+    //             не работает
+    // Properties {
+    //     condition: lib.opencv.present
+    //     lib.opencv.version: project.opencvVersion
+    // }
 
     lib.opencv.version: project.opencvVersion
 
@@ -36,6 +38,10 @@ Product {
         var def = project.cppDefines;
         if (Detection.present)
             def.push("DETECTION_IS_PRESENT");
+
+        if (project.opencvIsPresent === true)
+            def.push("OPENCV_IS_PRESENT");
+
         return def;
     }
     cpp.cxxFlags: project.cxxFlags
@@ -43,9 +49,8 @@ Product {
 
     cpp.includePaths: [".."]
 
-    cpp.systemIncludePaths: QbsUtl.concatPaths(
-        lib.opencv.includePath
-    )
+    cpp.systemIncludePaths: [lib.opencv.includePath]
+    //cpp.systemIncludePaths: QbsUtl.concatPaths(lib.opencv.includePath)
 
     files: [
         "config/load_config.cpp",
@@ -86,6 +91,16 @@ Product {
 
     Export {
         Depends { name: "cpp" }
+        cpp.defines: {
+            var def = [];
+            if (exportingProduct.Detection.present)
+                def.push("DETECTION_IS_PRESENT");
+
+            if (project.opencvIsPresent === true)
+                def.push("OPENCV_IS_PRESENT");
+
+            return def;
+        }
         cpp.includePaths: [
             FileInfo.joinPaths(exportingProduct.sourceDirectory, ".."),
         ]
