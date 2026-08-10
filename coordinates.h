@@ -25,25 +25,32 @@ struct Coordinates : Data<&command::Coordinates,
 {
     typedef container_ptr<Coordinates> Ptr;
 
-    float x     = {0};
-    float y     = {0};
-    float z     = {0};
-    float alpha = {0};
-    float beta  = {0};
-    float gamma = {0};
+    Coordinates();
+
+    union {
+        struct {
+            double x  = {0}; // Координата по оси  X (в метрах)
+            double y  = {0}; // Координата по оси  Y (в метрах)
+            double z  = {0}; // Координата по оси  Z (в метрах)
+            double rx = {0}; // Поворот вокруг оси X (в радианах)
+            double ry = {0}; // Поворот вокруг оси Y (в радианах)
+            double rz = {0}; // Поворот вокруг оси Z (в радианах)
+        };
+        double data[6];
+    };
 
     data::TimeSpec time; // Время получения координат (UTC)
 
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
-        J_SERIALIZE_MAP_ITEM( "x"     , x     )
-        J_SERIALIZE_MAP_ITEM( "y"     , y     )
-        J_SERIALIZE_MAP_ITEM( "z"     , z     )
-        J_SERIALIZE_MAP_ITEM( "alpha" , alpha )
-        J_SERIALIZE_MAP_ITEM( "beta"  , beta  )
-        J_SERIALIZE_MAP_ITEM( "gamma" , gamma )
-        J_SERIALIZE_MAP_ITEM( "time"  , time  )
+        J_SERIALIZE_ITEM( x    )
+        J_SERIALIZE_ITEM( y    )
+        J_SERIALIZE_ITEM( z    )
+        J_SERIALIZE_ITEM( rx   )
+        J_SERIALIZE_ITEM( ry   )
+        J_SERIALIZE_ITEM( rz   )
+        J_SERIALIZE_ITEM( time )
     J_SERIALIZE_END
 };
 

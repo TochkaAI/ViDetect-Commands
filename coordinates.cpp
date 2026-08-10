@@ -19,15 +19,21 @@ REGISTRY_COMMAND_SINGLPROC(Coordinates, "fcaca1f1-e59a-40e4-bbe5-e34cddad656b")
 
 namespace data {
 
+Coordinates::Coordinates()
+{
+    memset(data, 0, sizeof(data));
+}
+
 void Coordinates::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
-    stream << x;
-    stream << y;
-    stream << z;
-    stream << alpha;
-    stream << beta;
-    stream << gamma;
+    // stream << x;
+    // stream << y;
+    // stream << z;
+    // stream << rx;
+    // stream << ry;
+    // stream << rz;
+    stream.writeRawData((char*)data, sizeof(data));
     stream << time;
     B_SERIALIZE_RETURN
 }
@@ -35,12 +41,13 @@ void Coordinates::toRaw(bserial::DataStream& stream) const
 void Coordinates::fromRaw(const bserial::RawVector& vect)
 {
     B_DESERIALIZE_V1(vect)
-    stream >> x;
-    stream >> y;
-    stream >> z;
-    stream >> alpha;
-    stream >> beta;
-    stream >> gamma;
+    // stream >> x;
+    // stream >> y;
+    // stream >> z;
+    // stream >> rx;
+    // stream >> ry;
+    // stream >> rz;
+    stream.readRawData((char*)data, sizeof(data));
     stream >> time;
     B_DESERIALIZE_END
 }
