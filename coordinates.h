@@ -20,8 +20,7 @@ extern const QUuidEx Coordinates;
 namespace data {
 
 struct Coordinates : Data<&command::Coordinates,
-                           Message::Type::Command,
-                           Message::Type::Answer>
+                           Message::Type::Event>
 {
     typedef container_ptr<Coordinates> Ptr;
 
