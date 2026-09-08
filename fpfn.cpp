@@ -54,6 +54,9 @@ void FpFnInfo::toRaw(bserial::DataStream& stream) const
     stream << classes;
     stream << fileFormat;
     stream << markupSave;
+    B_SERIALIZE_V2
+    stream << originSave;
+    stream << pidSave;
     B_SERIALIZE_RETURN
 }
 
@@ -68,6 +71,9 @@ void FpFnInfo::fromRaw(const bserial::RawVector& vect)
     stream >> classes;
     stream >> fileFormat;
     stream >> markupSave;
+    B_DESERIALIZE_V2(vect)
+    stream >> originSave;
+    stream >> pidSave;
     B_DESERIALIZE_END
 }
 

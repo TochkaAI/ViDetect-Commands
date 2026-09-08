@@ -103,6 +103,12 @@ struct FpFnInfo
 
     ModelClass::List classes;
 
+    // Сохранять исходное изображение
+    bool originSave = {false};
+
+    // Сохранять изображение после PID-предобработки
+    bool pidSave = {false};
+
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
@@ -114,6 +120,8 @@ struct FpFnInfo
         J_SERIALIZE_MAP_ITEM( "markup_save"  , markupSave  )
         J_SERIALIZE_MAP_ITEM( "markup_brush" , markupBrush )
         J_SERIALIZE_MAP_ITEM( "classes"      , classes     )
+        J_SERIALIZE_MAP_ITEM( "origin"       , originSave  )
+        J_SERIALIZE_MAP_ITEM( "pid"          , pidSave     )
     J_SERIALIZE_END
 };
 
