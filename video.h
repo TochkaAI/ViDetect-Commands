@@ -67,9 +67,18 @@ struct VideoSnapshot : Data<&command::VideoSnapshot,
             TimeNearest = 3  // Запрос ближайшего кадра по времени
         };
 
+        enum class View : quint32
+        {
+            Origin = 0,
+            Pid    = 1
+        };
+
         Type     type   = {Type::Number};
         quint64  number = quint64(-1);
         TimeSpec time;
+
+        // Вариант запрашиваемого изображения
+        View view = {View::Origin};
 
         DECLARE_B_SERIALIZE_FUNC
 
@@ -77,6 +86,7 @@ struct VideoSnapshot : Data<&command::VideoSnapshot,
             J_SERIALIZE_MAP_ITEM( "type"   , type   )
             J_SERIALIZE_MAP_ITEM( "number" , number )
             J_SERIALIZE_MAP_ITEM( "time"   , time   )
+            J_SERIALIZE_MAP_OPT ( "view"   , view   )
         J_SERIALIZE_END
     };
 
@@ -134,4 +144,3 @@ struct VideoSnapshot : Data<&command::VideoSnapshot,
 
 } // namespace data
 } // namespace pproto
-
