@@ -2,6 +2,7 @@
 
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
+#include "pproto/commands/time_spec.h"
 
 namespace pproto {
 namespace command {
@@ -160,6 +161,10 @@ struct SaverStart : Data<&command::SaverStart,
     // Если поле пусто, то будет использоваться стандартное именование
     QString fileName;
 
+    // UTC endpoint of a historical paired clip; zero keeps the legacy live window.
+    TimeSpec eventTime;
+    quint32 historySeconds = {10};
+
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
@@ -168,6 +173,8 @@ struct SaverStart : Data<&command::SaverStart,
         J_SERIALIZE_MAP_ITEM( "max_save_time" , maxSaveTime )
         J_SERIALIZE_MAP_ITEM( "auto_stop"     , autoStop    )
         J_SERIALIZE_MAP_ITEM( "file_name"     , fileName    )
+        J_SERIALIZE_MAP_ITEM( "event_time"    , eventTime   )
+        J_SERIALIZE_MAP_ITEM( "history_seconds", historySeconds )
     J_SERIALIZE_END
 };
 
