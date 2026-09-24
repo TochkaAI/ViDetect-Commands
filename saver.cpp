@@ -81,6 +81,9 @@ void SaverStart::toRaw(bserial::DataStream& stream) const
     stream << maxSaveTime;
     stream << autoStop;
     stream << fileName;
+    B_SERIALIZE_V2
+    stream << eventTime;
+    stream << historySeconds;
     B_SERIALIZE_RETURN
 }
 
@@ -92,6 +95,9 @@ void SaverStart::fromRaw(const bserial::RawVector& vect)
     stream >> maxSaveTime;
     stream >> autoStop;
     stream >> fileName;
+    B_DESERIALIZE_V2(vect)
+    stream >> eventTime;
+    stream >> historySeconds;
     B_DESERIALIZE_END
 }
 
