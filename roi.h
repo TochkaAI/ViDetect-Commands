@@ -2,7 +2,7 @@
 
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
-#include "qutils/commands/identity.h"
+#include "pproto/commands/identity.h"
 
 #include "graphics.h"
 
@@ -20,7 +20,7 @@ namespace data {
 struct Roi
 {
     // Идентификационный признак
-    Identity identity;
+    IdentityS identity;
 
     // Признак отображения примитива в кадре
     bool visible = {true};

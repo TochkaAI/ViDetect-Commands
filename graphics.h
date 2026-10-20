@@ -2,7 +2,7 @@
 
 #include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
-#include "qutils/commands/identity.h"
+#include "pproto/commands/identity.h"
 
 #ifdef OPENCV_IS_PRESENT
 #include <opencv2/opencv.hpp>
@@ -117,7 +117,7 @@ struct Offset
 struct Caption
 {
     // Идентификационный признак
-    Identity identity;
+    IdentityS identity;
 
     // Признак отображения примитива в кадре
     bool visible = {true};
@@ -182,7 +182,7 @@ struct Caption
 struct Line
 {
     // Идентификационный признак
-    Identity identity;
+    IdentityS identity;
 
     // Признак отображения примитива в кадре
     bool visible = {true};
@@ -221,7 +221,7 @@ struct Line
 struct Polyline
 {
     // Идентификационный признак
-    Identity identity;
+    IdentityS identity;
 
     // Признак отображения примитива в кадре
     bool visible = {true};
@@ -257,7 +257,7 @@ struct Polyline
 struct Rectangle
 {
     // Идентификационный признак
-    Identity identity;
+    IdentityS identity;
 
     // Признак отображения примитива в кадре
     bool visible = {true};
@@ -310,7 +310,7 @@ struct Rectangle
 struct Circle
 {
     // Идентификационный признак
-    Identity identity;
+    IdentityS identity;
 
     // Признак отображения примитива в кадре
     bool visible = {true};
@@ -352,7 +352,7 @@ struct Set
     typedef container_ptr<Set> Ptr;
 
     // Идентификационный признак
-    Identity identity;
+    IdentityS identity;
 
     // Признак отображения всего набора графических примитивов
     bool visible = {true};

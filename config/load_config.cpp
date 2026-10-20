@@ -3,10 +3,8 @@
 #include "shared/break_point.h"
 #include "shared/logger/logger.h"
 #include "shared/logger/format.h"
-#include "shared/config/appl_conf.h"
+#include "shared/qt/identity_func.h"
 #include "shared/qt/logger_operators.h"
-
-#include "qutils/config/load_config.h"
 
 #define log_error_m   alog::logger().error  (alog_line_location, "LoadConfig")
 #define log_warn_m    alog::logger().warn   (alog_line_location, "LoadConfig")
