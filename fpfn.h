@@ -62,10 +62,25 @@ struct FpFnInfo
 
     // Сохранять файл с отрисованной разметкой. Файл используется как подсказка
     // для разметчика
-    bool markupSave = {true};
+    bool markupSave = {false};
 
     // Кисть для отрисовки рамки трекирования в файле с разметкой
     graph::Brush markupBrush;
+
+    // Флаги сохранения оригинального и модифицированного изображений
+    struct FrameSave
+    {
+        bool origin = {true};
+        bool data = {false};
+
+        DECLARE_B_SERIALIZE_FUNC
+
+        J_SERIALIZE_BEGIN
+            J_SERIALIZE_MAP_ITEM( "origin" , origin )
+            J_SERIALIZE_MAP_ITEM( "data"   , data   )
+        J_SERIALIZE_END
+    };
+    FrameSave frameSave;
 
     struct ModelClass
     {
@@ -103,12 +118,6 @@ struct FpFnInfo
 
     ModelClass::List classes;
 
-    // Сохранять исходное изображение
-    bool originSave = {false};
-
-    // Сохранять изображение после PID-предобработки
-    bool pidSave = {false};
-
     DECLARE_B_SERIALIZE_FUNC
 
     J_SERIALIZE_BEGIN
@@ -119,9 +128,8 @@ struct FpFnInfo
         J_SERIALIZE_MAP_ITEM( "visible_rois" , visibleRois )
         J_SERIALIZE_MAP_ITEM( "markup_save"  , markupSave  )
         J_SERIALIZE_MAP_ITEM( "markup_brush" , markupBrush )
+        J_SERIALIZE_MAP_ITEM( "frame_save"   , frameSave   )
         J_SERIALIZE_MAP_ITEM( "classes"      , classes     )
-        J_SERIALIZE_MAP_ITEM( "origin"       , originSave  )
-        J_SERIALIZE_MAP_ITEM( "pid"          , pidSave     )
     J_SERIALIZE_END
 };
 

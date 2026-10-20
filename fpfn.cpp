@@ -19,6 +19,22 @@ REGISTRY_COMMAND_SINGLPROC(FpFnInfo, "0db958aa-d392-4157-9ed8-901f258e69d9")
 
 namespace data {
 
+void FpFnInfo::FrameSave::toRaw(bserial::DataStream& stream) const
+{
+    B_SERIALIZE_V1
+    stream << origin;
+    stream << data;
+    B_SERIALIZE_RETURN
+}
+
+void FpFnInfo::FrameSave::fromRaw(const bserial::RawVector& vect)
+{
+    B_DESERIALIZE_V1(vect)
+    stream >> origin;
+    stream >> data;
+    B_DESERIALIZE_END
+}
+
 void FpFnInfo::ModelClass::toRaw(bserial::DataStream& stream) const
 {
     B_SERIALIZE_V1
@@ -54,9 +70,8 @@ void FpFnInfo::toRaw(bserial::DataStream& stream) const
     stream << classes;
     stream << fileFormat;
     stream << markupSave;
-    B_SERIALIZE_V2
-    stream << originSave;
-    stream << pidSave;
+  //B_SERIALIZE_V2
+    stream << frameSave;
     B_SERIALIZE_RETURN
 }
 
@@ -71,9 +86,8 @@ void FpFnInfo::fromRaw(const bserial::RawVector& vect)
     stream >> classes;
     stream >> fileFormat;
     stream >> markupSave;
-    B_DESERIALIZE_V2(vect)
-    stream >> originSave;
-    stream >> pidSave;
+  //B_DESERIALIZE_V2(vect)
+    stream >> frameSave;
     B_DESERIALIZE_END
 }
 
