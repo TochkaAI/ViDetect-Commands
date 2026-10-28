@@ -45,7 +45,7 @@ struct Roi
         J_SERIALIZE_MAP_ITEM( "border"   , border   )
     J_SERIALIZE_END
 
-    typedef lst::List<Roi, Identity::Find<Roi>> List;
+    typedef lst::List<Roi, Identity::Compare<Roi>> List;
 };
 
 } // namespace data

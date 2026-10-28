@@ -176,7 +176,7 @@ struct Caption
         J_SERIALIZE_MAP_OPT( "corner_bind" , cornerBind )
     J_SERIALIZE_END
 
-    typedef lst::List<Caption, Identity::Find<Caption>> List;
+    typedef lst::List<Caption, Identity::Compare<Caption>> List;
 };
 
 struct Line
@@ -215,7 +215,7 @@ struct Line
         J_SERIALIZE_MAP_OPT( "point2"   , point2   )
     J_SERIALIZE_END
 
-    typedef lst::List<Line, Identity::Find<Line>> List;
+    typedef lst::List<Line, Identity::Compare<Line>> List;
 };
 
 struct Polyline
@@ -251,7 +251,7 @@ struct Polyline
         J_SERIALIZE_MAP_OPT( "closed"   , closed   )
     J_SERIALIZE_END
 
-    typedef lst::List<Polyline, Identity::Find<Polyline>> List;
+    typedef lst::List<Polyline, Identity::Compare<Polyline>> List;
 };
 
 struct Rectangle
@@ -304,7 +304,7 @@ struct Rectangle
         J_SERIALIZE_MAP_OPT( "point2"   , point2   )
     J_SERIALIZE_END
 
-    typedef lst::List<Rectangle, Identity::Find<Rectangle>> List;
+    typedef lst::List<Rectangle, Identity::Compare<Rectangle>> List;
 };
 
 struct Circle
@@ -340,7 +340,7 @@ struct Circle
         J_SERIALIZE_MAP_OPT( "filled"   , filled   )
     J_SERIALIZE_END
 
-    typedef lst::List<Circle, Identity::Find<Circle>> List;
+    typedef lst::List<Circle, Identity::Compare<Circle>> List;
 };
 
 
@@ -394,7 +394,7 @@ struct Set
         J_SERIALIZE_MAP_OPT ( "circles"    , circles    )
     J_SERIALIZE_END
 
-    typedef lst::List<Set, Identity::Find<Set>> List;
+    typedef lst::List<Set, Identity::Compare<Set>> List;
 };
 
 } // namespace graph
