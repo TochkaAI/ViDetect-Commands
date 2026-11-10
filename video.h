@@ -61,9 +61,10 @@ struct VideoSnapshot : Data<&command::VideoSnapshot,
     {
         enum class Type : quint32
         {
-            Number = 0, // Запрос кадра по номеру
-            Time   = 1, // Запрос кадра по времени
-            Last   = 2  // Запрос последнего кадра
+            Number      = 0, // Запрос кадра по номеру
+            Time        = 1, // Запрос кадра по точному времени
+            Last        = 2, // Запрос последнего кадра
+            TimeNearest = 3  // Запрос ближайшего кадра по времени
         };
 
         Type     type   = {Type::Number};
