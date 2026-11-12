@@ -69,6 +69,8 @@ Product {
         "graphics.h",
         "graphset.cpp",
         "graphset.h",
+        "license.cpp",
+        "license.h",
         "logicset.cpp",
         "logicset.h",
         "model.cpp",
