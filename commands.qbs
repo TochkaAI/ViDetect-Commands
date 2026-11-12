@@ -18,6 +18,7 @@ Product {
     Depends { name: "cpp" }
     Depends { name: "PProto" }
     Depends { name: "QUtils" }
+    Depends { name: "CobotCtl";  required: false }
     Depends { name: "Detection"; required: false }
     Depends { name: "RapidJson"; required: false }
     Depends { name: "SharedLib" }
@@ -85,8 +86,6 @@ Product {
         "tracking.h",
         "video.cpp",
         "video.h",
-        "coordinates.cpp",
-        "coordinates.h",
     ]
 
     Export {

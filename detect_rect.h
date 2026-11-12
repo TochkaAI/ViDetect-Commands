@@ -4,7 +4,9 @@
 #include "pproto/commands/base.h"
 #include "pproto/commands/time_spec.h"
 
-#include "coordinates.h"
+#include "cobotctl/commands/cobot_pose.h"
+#include "cobotctl/commands/coordinates.h"
+
 #include "graphics.h"
 
 namespace pproto {
