@@ -1,4 +1,4 @@
-#include "model.h"
+#include "commands/model.h"
 #include "pproto/commands/pool.h"
 
 namespace pproto {

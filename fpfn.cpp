@@ -1,4 +1,4 @@
-#include "fpfn.h"
+#include "commands/fpfn.h"
 #include "pproto/commands/pool.h"
 
 namespace pproto {

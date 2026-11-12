@@ -1,8 +1,6 @@
 #pragma once
 
-#include "shared/container_ptr.h"
 #include "pproto/commands/base.h"
-
 #include "roi.h"
 
 #ifdef DETECTION_IS_PRESENT

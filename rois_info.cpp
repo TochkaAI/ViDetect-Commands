@@ -1,4 +1,4 @@
-#include "rois_info.h"
+#include "commands/rois_info.h"
 #include "pproto/commands/pool.h"
 
 namespace pproto {

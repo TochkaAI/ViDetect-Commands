@@ -1,4 +1,4 @@
-#include "paint_rect.h"
+#include "commands/paint_rect.h"
 
 namespace pproto {
 namespace data {

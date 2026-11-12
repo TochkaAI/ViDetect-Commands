@@ -1,4 +1,4 @@
-#include "classifier.h"
+#include "commands/classifier.h"
 #include "pproto/commands/pool.h"
 
 namespace pproto {

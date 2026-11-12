@@ -1,5 +1,4 @@
-#include "graphics.h"
-#include "pproto/commands/pool.h"
+#include "commands/graphics.h"
 
 namespace pproto {
 namespace data {

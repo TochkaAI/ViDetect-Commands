@@ -1,4 +1,4 @@
-#include "detect_rect.h"
+#include "commands/detect_rect.h"
 
 namespace pproto {
 namespace data {
