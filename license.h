@@ -12,7 +12,7 @@ namespace command {
   активной  лицензии,  значение 0 возвращается, когда лицензия неактивна или
   отсутствует
 */
-extern const QUuidEx LicenseActive;
+DECLARE_PPROTO_COMMAND(LicenseActive)
 
 } // namespace command
 } // namespace pproto

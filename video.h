@@ -15,36 +15,36 @@ namespace command {
   потока поле сообщения tag(0) будет содержать значение 1 (TRUE), если  поток
   не удалось открыть - поле tag(0) будет содержать значение 0 (FALSE)
 */
-extern const QUuidEx VideoStreamOpened;
+DECLARE_PPROTO_COMMAND(VideoStreamOpened)
 
 /**
   Событие эмитируется при закрытиии видеопотока
 */
-extern const QUuidEx VideoStreamClosed;
+DECLARE_PPROTO_COMMAND(VideoStreamClosed)
 
 /*
   Событие эмитируется для Daheng-камер если в течении 60 секунд будет потеряно
   0.8*FPS кадров
 */
-extern const QUuidEx VideoLostManyFrames;
+DECLARE_PPROTO_COMMAND(VideoLostManyFrames)
 
 /*
   Событие эмитируется для Daheng-камер если подряд произошли три неудачные
   попытки захвата кадра
 */
-extern const QUuidEx VideoFailedCapture;
+DECLARE_PPROTO_COMMAND(VideoFailedCapture)
 
 /**
   Команда возвращает статус видеопотока открыт/закрыт в поле tag(0). Значение 0
   сигнализирует о том, что видеопоток недоступен (закрыт),  значение 1 сигнали-
   зирует об активном видеопотоке (открыт)
 */
-extern const QUuidEx VideoStreamIsOpen;
+DECLARE_PPROTO_COMMAND(VideoStreamIsOpen)
 
 /**
   Команда для получения кадра по запросу из временного буфера кадров
 */
-extern const QUuidEx VideoSnapshot;
+DECLARE_PPROTO_COMMAND(VideoSnapshot)
 
 
 } // namespace command

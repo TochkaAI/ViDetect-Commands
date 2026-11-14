@@ -16,41 +16,41 @@ namespace command {
   Возвращает информацию о наборе графических примитивов полученном из конфигу-
   рационного файла (videtect.graph)
 */
-extern const QUuidEx GraphsetInfo;
+DECLARE_PPROTO_COMMAND(GraphsetInfo)
 
 /**
   Событие эмитируется при перечитывании набора графических примитивов из конфи-
   гурационного файла (videtect.graph)
 */
-extern const QUuidEx GraphsetChanged;
+DECLARE_PPROTO_COMMAND(GraphsetChanged)
 
 /**
   Команда возвращает информацию о наборе графических примитивов созданных дина-
   мически при помощи команды GraphsetDynamicUpdate
 */
-extern const QUuidEx GraphsetDynamicInfo;
+DECLARE_PPROTO_COMMAND(GraphsetDynamicInfo)
 
 /**
   Команда создает/обновляет динамический набор графических примитивов
 */
-extern const QUuidEx GraphsetDynamicUpdate;
+DECLARE_PPROTO_COMMAND(GraphsetDynamicUpdate)
 
 /**
   Команда удаляет элементы graph::Set из динамического набора графических
   примитивов
 */
-extern const QUuidEx GraphsetDynamicRemove;
+DECLARE_PPROTO_COMMAND(GraphsetDynamicRemove)
 
 /**
   Событие эмитируется при обновлении динамического набора графических примитивов
 */
-extern const QUuidEx GraphsetDynamicChanged;
+DECLARE_PPROTO_COMMAND(GraphsetDynamicChanged)
 
 /**
   Команда для конфигурирования видимости набора графических примитивов
   TODO Не реализовано.
 */
-extern const QUuidEx GraphsetVisible;
+DECLARE_PPROTO_COMMAND(GraphsetVisible)
 
 } // namespace command
 

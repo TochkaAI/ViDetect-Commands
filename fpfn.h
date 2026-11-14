@@ -11,10 +11,9 @@ namespace command {
 //----------------------------- Список команд --------------------------------
 
 /**
-  Возвращает информацию настройках FP/FN
-  TODO Не реализовано.
+  Возвращает информацию о настройках FP/FN
 */
-extern const QUuidEx FpFnInfo;
+DECLARE_PPROTO_COMMAND(FpFnInfo)
 
 } // namespace command
 

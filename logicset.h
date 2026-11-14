@@ -16,66 +16,66 @@ namespace command {
 /**
   Команда возвращает информацию по критериям отбора для логических объектов
 */
-extern const QUuidEx LogicSetsInfo;
+DECLARE_PPROTO_COMMAND(LogicSetsInfo)
 
 /**
   Команда для конфигурирования критериев отбора для логических объектов
   TODO не реализовано
 */
-//extern const QUuidEx LogicSetsConfig;
+//DECLARE_PPROTO_COMMAND(LogicSetsConfig;
 
 /**
   Событие для логического объекта
   TODO не реализовано
 */
-//extern const QUuidEx LogicSetEvent;
+//DECLARE_PPROTO_COMMAND(LogicSetEvent;
 
 /**
   Команда возвращает информацию об эмитируемых событиях
   TODO не реализовано
 */
-//extern const QUuidEx LogicSetsEventsInfo;
+//DECLARE_PPROTO_COMMAND(LogicSetsEventsInfo;
 
 /**
   Команда выполняет подписку на получение событий LogicSetEvent от системы
   контроля логических объектов
   TODO не реализовано
 */
-//extern const QUuidEx LogicSetsEventsSubscript;
+//DECLARE_PPROTO_COMMAND(LogicSetsEventsSubscript;
 
 /**
   Команда возвращает информацию о параметрах отображения рамок логических
   объектов
 */
-extern const QUuidEx LogicRectsInfo;
+DECLARE_PPROTO_COMMAND(LogicRectsInfo)
 
 /**
   Команда возвращает информацию о логическом объекта по его идентификатору
 */
-extern const QUuidEx LogicObjectInfo;
+DECLARE_PPROTO_COMMAND(LogicObjectInfo)
 
 /**
   Событие эмитируется при перечитывании информации о параметрах отображения
   рамок логических объектов из конфигурационного файла (videtect.rect)
 */
-extern const QUuidEx LogicRectsChanged;
+DECLARE_PPROTO_COMMAND(LogicRectsChanged)
 
 /**
   Команда возвращает текущее состояние логических объектов
 */
-extern const QUuidEx LogicSetsSnapshot;
+DECLARE_PPROTO_COMMAND(LogicSetsSnapshot)
 
 /**
   Возвращает информацию о дистанциях между логическими объектами
 */
-extern const QUuidEx LogicDistances;
+DECLARE_PPROTO_COMMAND(LogicDistances)
 
 /**
   Команда выполняет сброс всех логических объектов и дистанций между ними.
   После выполнения команды логические объекты начнут нарождаться заново
   на основе существующих объектов трекирования
 */
-extern const QUuidEx LogicObjectsReset;
+DECLARE_PPROTO_COMMAND(LogicObjectsReset)
 
 } // namespace command
 

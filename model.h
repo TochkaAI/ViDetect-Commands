@@ -14,14 +14,14 @@ namespace command {
 /**
   Команда возвращает информацию по используемой модели и классам
 */
-extern const QUuidEx ModelInfo;
+DECLARE_PPROTO_COMMAND(ModelInfo)
 
 /**
   Команда для конфигурирования классов модели. Допускается изменять наименование
   класса модели и параметр skip
   TODO не реализовано
 */
-extern const QUuidEx ModelConfig;
+//DECLARE_PPROTO_COMMAND(ModelConfig)
 
 } // namespace command
 

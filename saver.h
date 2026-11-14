@@ -11,12 +11,12 @@ namespace command {
 /**
   Возвращает информацию о параметрах сейвера
 */
-extern const QUuidEx SaverInfo;
+DECLARE_PPROTO_COMMAND(SaverInfo)
 
 /**
   Возвращает информацию о параметрах сейвера
 */
-extern const QUuidEx SaverBufferInfo;
+DECLARE_PPROTO_COMMAND(SaverBufferInfo)
 
 /**
   Команда устанавливающая размер буффера кадров динамического сейвера
@@ -24,17 +24,17 @@ extern const QUuidEx SaverBufferInfo;
   Кадры из буффера будут записаны в начало видео для просмотра
   предыстории события.
 */
-extern const QUuidEx SetSaverBuffer;
+DECLARE_PPROTO_COMMAND(SetSaverBuffer)
 
 /**
   Команда для запуска записи динамическим сейвером
 */
-extern const QUuidEx SaverStart;
+DECLARE_PPROTO_COMMAND(SaverStart)
 
 /**
   Команда для завершения записи динамическим сейвером
 */
-extern const QUuidEx SaverStop;
+DECLARE_PPROTO_COMMAND(SaverStop)
 
 
 } // namespace command
