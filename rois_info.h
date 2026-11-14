@@ -16,7 +16,7 @@ namespace command {
   Возвращает информацию о ROIs
   TODO Не реализовано.
 */
-extern const QUuidEx RoisInfo;
+DECLARE_PPROTO_COMMAND(RoisInfo)
 
 } // namespace command
 

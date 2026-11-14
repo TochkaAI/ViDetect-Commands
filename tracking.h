@@ -17,75 +17,75 @@ namespace command {
 /**
   Команда возвращает информацию по используемым трекерам
 */
-extern const QUuidEx TrackersInfo;
+DECLARE_PPROTO_COMMAND(TrackersInfo)
 
 /**
   Команда для конфигурирования трекеров
   TODO не реализовано
 */
-//extern const QUuidEx TrackersConfig;
+//DECLARE_PPROTO_COMMAND(TrackersConfig;
 
 /**
   Событие трекера
 */
-extern const QUuidEx TrackerEvent;
+DECLARE_PPROTO_EVENT(TrackerEvent)
 
 /**
   Команда возвращает информацию об эмитируемых событиях для всех трекеров
 */
-extern const QUuidEx TrackersEventsInfo;
+DECLARE_PPROTO_COMMAND(TrackersEventsInfo)
 
 /**
   Команда выполняет подписку на получение событий TrackerEvent от системы
   трекирования
 */
-extern const QUuidEx TrackersEventsSubscript;
+DECLARE_PPROTO_COMMAND(TrackersEventsSubscript)
 
 /**
   Команда возвращает текущее состояние трекируемых объектов во всех трекерах
 */
-extern const QUuidEx TrackersSnapshot;
+DECLARE_PPROTO_COMMAND(TrackersSnapshot)
 
 /**
   Команда возвращает информацию о параметрах отображения рамок трекирования
 */
-extern const QUuidEx TrackRectsInfo;
+DECLARE_PPROTO_COMMAND(TrackRectsInfo)
 
 /**
   Событие эмитируется при перечитывании информации о параметрах отображения
   рамок трекирования из конфигурационного файла (videtect.rect)
 */
-extern const QUuidEx TrackRectsChanged;
+DECLARE_PPROTO_EVENT(TrackRectsChanged)
 
 /**
   Команда возвращает информацию об индивидуальных параметрах отображения рамок
   трекирования
 */
-extern const QUuidEx TrackRectsDynamicInfo;
+DECLARE_PPROTO_COMMAND(TrackRectsDynamicInfo)
 
 /**
   Команда обновляет или добавляет элементы TrackRect в список индивидуальных
   параметров отображения для рамок трекируемых объектов
 */
-extern const QUuidEx TrackRectsDynamicUpdate;
+DECLARE_PPROTO_COMMAND(TrackRectsDynamicUpdate)
 
 /**
   Команда удаляет элементы TrackRect из списка индивидуальных параметров
   отображения для рамок трекируемых объектов
 */
-extern const QUuidEx TrackRectsDynamicRemove;
+DECLARE_PPROTO_COMMAND(TrackRectsDynamicRemove)
 
 /**
   Событие эмитируется при изменении списка индивидуальных параметров отображе-
   ния для рамок трекируемых объектов
 */
-extern const QUuidEx TrackRectsDynamicChanged;
+DECLARE_PPROTO_EVENT(TrackRectsDynamicChanged)
 
 /**
   Команда обновляет или устанавливает глобальный идентификатор для трекируемого
   объекта
 */
-extern const QUuidEx TrackGlobalIdUpdate;
+DECLARE_PPROTO_COMMAND(TrackGlobalIdUpdate)
 
 } // namespace command
 

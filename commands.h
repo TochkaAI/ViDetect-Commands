@@ -13,19 +13,19 @@ namespace command {
   факта изменения конфигурационных файлов. Описание отслеживаемых конфиг-файлов
   смотри в структуре ConfChange
 */
-extern const QUuidEx ConfigChanged;
+DECLARE_PPROTO_EVENT(ConfigChanged)
 
 /**
   Команда останавливает/возобновляет обработку  кадров  нейросетью.  Остановка
   осуществляется через передачу в поле tag(0)  значения 1.  Для  возобновления
   обработки кадров надо передать в tag(0) значения 0
 */
-extern const QUuidEx ProcessingPause;
+DECLARE_PPROTO_COMMAND(ProcessingPause)
 
 /**
   Команда возвращает информацию о процессе обработки
 */
-extern const QUuidEx ProcessingInfo;
+DECLARE_PPROTO_COMMAND(ProcessingInfo)
 
 } // namespace command
 

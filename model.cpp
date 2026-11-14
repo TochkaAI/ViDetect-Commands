@@ -4,16 +4,7 @@
 namespace pproto {
 namespace command {
 
-#define REGISTRY_COMMAND_SINGLPROC(COMMAND, UUID) \
-    const QUuidEx COMMAND = command::Pool::Registry{UUID, #COMMAND, false};
-
-#define REGISTRY_COMMAND_MULTIPROC(COMMAND, UUID) \
-    const QUuidEx COMMAND = command::Pool::Registry{UUID, #COMMAND, true};
-
-REGISTRY_COMMAND_SINGLPROC(ModelInfo, "d8f7f3f5-2965-4b1a-9508-3e18f85d0fcc")
-
-#undef REGISTRY_COMMAND_SINGLPROC
-#undef REGISTRY_COMMAND_MULTIPROC
+REGISTRY_PPROTO_COMMAND(ModelInfo, "d8f7f3f5-2965-4b1a-9508-3e18f85d0fcc", SINGLPROC)
 
 } // namespace command
 

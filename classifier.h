@@ -16,7 +16,7 @@ namespace command {
 /**
   Команда возвращает информацию об используемых моделях для классификации
 */
-extern const QUuidEx ClassifModelsInfo;
+DECLARE_PPROTO_COMMAND(ClassifModelsInfo)
 
 } // namespace command
 
