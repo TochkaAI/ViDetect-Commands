@@ -1,4 +1,4 @@
-#include "commands/graphset.h"
+#include "graphset.h"
 #include "pproto/commands/pool.h"
 
 namespace pproto {

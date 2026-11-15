@@ -47,7 +47,7 @@ Product {
     cpp.cxxFlags: project.cxxFlags
     cpp.cxxLanguageVersion: project.cxxLanguageVersion
 
-    cpp.includePaths: [".."]
+    cpp.includePaths: ["."]
 
     cpp.systemIncludePaths: [lib.opencv.includePath]
     //cpp.systemIncludePaths: QbsUtl.concatPaths(lib.opencv.includePath)
@@ -102,6 +102,7 @@ Product {
             return def;
         }
         cpp.includePaths: [
+            FileInfo.joinPaths(exportingProduct.sourceDirectory, "."),
             FileInfo.joinPaths(exportingProduct.sourceDirectory, ".."),
         ]
     }
