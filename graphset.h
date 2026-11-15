@@ -22,7 +22,7 @@ DECLARE_PPROTO_COMMAND(GraphsetInfo)
   Событие эмитируется при перечитывании набора графических примитивов из конфи-
   гурационного файла (videtect.graph)
 */
-DECLARE_PPROTO_COMMAND(GraphsetChanged)
+DECLARE_PPROTO_EVENT(GraphsetChanged)
 
 /**
   Команда возвращает информацию о наборе графических примитивов созданных дина-
@@ -44,7 +44,7 @@ DECLARE_PPROTO_COMMAND(GraphsetDynamicRemove)
 /**
   Событие эмитируется при обновлении динамического набора графических примитивов
 */
-DECLARE_PPROTO_COMMAND(GraphsetDynamicChanged)
+DECLARE_PPROTO_EVENT(GraphsetDynamicChanged)
 
 /**
   Команда для конфигурирования видимости набора графических примитивов

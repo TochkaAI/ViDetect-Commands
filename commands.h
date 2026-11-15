@@ -13,7 +13,7 @@ namespace command {
   факта изменения конфигурационных файлов. Описание отслеживаемых конфиг-файлов
   смотри в структуре ConfChange
 */
-DECLARE_PPROTO_COMMAND(ConfigChanged)
+DECLARE_PPROTO_EVENT(ConfigChanged)
 
 /**
   Команда останавливает/возобновляет обработку  кадров  нейросетью.  Остановка

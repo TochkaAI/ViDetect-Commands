@@ -28,7 +28,7 @@ DECLARE_PPROTO_COMMAND(LogicSetsInfo)
   Событие для логического объекта
   TODO не реализовано
 */
-//DECLARE_PPROTO_COMMAND(LogicSetEvent;
+//DECLARE_PPROTO_EVENT(LogicSetEvent;
 
 /**
   Команда возвращает информацию об эмитируемых событиях
@@ -58,7 +58,7 @@ DECLARE_PPROTO_COMMAND(LogicObjectInfo)
   Событие эмитируется при перечитывании информации о параметрах отображения
   рамок логических объектов из конфигурационного файла (videtect.rect)
 */
-DECLARE_PPROTO_COMMAND(LogicRectsChanged)
+DECLARE_PPROTO_EVENT(LogicRectsChanged)
 
 /**
   Команда возвращает текущее состояние логических объектов

@@ -15,24 +15,24 @@ namespace command {
   потока поле сообщения tag(0) будет содержать значение 1 (TRUE), если  поток
   не удалось открыть - поле tag(0) будет содержать значение 0 (FALSE)
 */
-DECLARE_PPROTO_COMMAND(VideoStreamOpened)
+DECLARE_PPROTO_EVENT(VideoStreamOpened)
 
 /**
   Событие эмитируется при закрытиии видеопотока
 */
-DECLARE_PPROTO_COMMAND(VideoStreamClosed)
+DECLARE_PPROTO_EVENT(VideoStreamClosed)
 
 /*
   Событие эмитируется для Daheng-камер если в течении 60 секунд будет потеряно
   0.8*FPS кадров
 */
-DECLARE_PPROTO_COMMAND(VideoLostManyFrames)
+DECLARE_PPROTO_EVENT(VideoLostManyFrames)
 
 /*
   Событие эмитируется для Daheng-камер если подряд произошли три неудачные
   попытки захвата кадра
 */
-DECLARE_PPROTO_COMMAND(VideoFailedCapture)
+DECLARE_PPROTO_EVENT(VideoFailedCapture)
 
 /**
   Команда возвращает статус видеопотока открыт/закрыт в поле tag(0). Значение 0

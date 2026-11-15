@@ -28,7 +28,7 @@ DECLARE_PPROTO_COMMAND(TrackersInfo)
 /**
   Событие трекера
 */
-DECLARE_PPROTO_COMMAND(TrackerEvent)
+DECLARE_PPROTO_EVENT(TrackerEvent)
 
 /**
   Команда возвращает информацию об эмитируемых событиях для всех трекеров
@@ -55,7 +55,7 @@ DECLARE_PPROTO_COMMAND(TrackRectsInfo)
   Событие эмитируется при перечитывании информации о параметрах отображения
   рамок трекирования из конфигурационного файла (videtect.rect)
 */
-DECLARE_PPROTO_COMMAND(TrackRectsChanged)
+DECLARE_PPROTO_EVENT(TrackRectsChanged)
 
 /**
   Команда возвращает информацию об индивидуальных параметрах отображения рамок
@@ -79,7 +79,7 @@ DECLARE_PPROTO_COMMAND(TrackRectsDynamicRemove)
   Событие эмитируется при изменении списка индивидуальных параметров отображе-
   ния для рамок трекируемых объектов
 */
-DECLARE_PPROTO_COMMAND(TrackRectsDynamicChanged)
+DECLARE_PPROTO_EVENT(TrackRectsDynamicChanged)
 
 /**
   Команда обновляет или устанавливает глобальный идентификатор для трекируемого
