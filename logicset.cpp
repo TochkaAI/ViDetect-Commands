@@ -1,4 +1,4 @@
-#include "commands/logicset.h"
+#include "logicset.h"
 #include "pproto/commands/pool.h"
 
 namespace pproto {

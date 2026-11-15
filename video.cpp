@@ -1,4 +1,4 @@
-#include "commands/video.h"
+#include "video.h"
 #include "pproto/commands/pool.h"
 
 namespace pproto {

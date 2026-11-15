@@ -1,4 +1,4 @@
-#include "commands/license.h"
+#include "license.h"
 #include "pproto/commands/pool.h"
 
 namespace pproto {

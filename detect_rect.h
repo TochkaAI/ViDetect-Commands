@@ -4,8 +4,8 @@
 #include "pproto/commands/base.h"
 #include "pproto/commands/time_spec.h"
 
-#include "cobotctl/commands/cobot_pose.h"
-#include "cobotctl/commands/coordinates.h"
+#include "commands/cobot_pose.h"
+#include "commands/cobot_coord.h"
 
 #include "graphics.h"
 
@@ -80,7 +80,7 @@ struct DetectRect
     Classifier::Ptr classifier;
 
     // Координаты камеры
-    Coordinates::Ptr coordinates;
+    CobotCoordinates::Ptr coordinates;
 
 #ifdef OPENCV_IS_PRESENT
     // Точка с координатами point1 (синоним top/left)
