@@ -21,6 +21,7 @@ void VideoSnapshot::Request::toRaw(bserial::DataStream& stream) const
     stream << type;
     stream << number;
     stream << time;
+    stream << origin;
     B_SERIALIZE_RETURN
 }
 
@@ -30,6 +31,7 @@ void VideoSnapshot::Request::fromRaw(const bserial::RawVector& vect)
     stream >> type;
     stream >> number;
     stream >> time;
+    stream >> origin;
     B_DESERIALIZE_END
 }
 
@@ -98,4 +100,3 @@ void VideoSnapshot::fromRaw(const bserial::RawVector& vect)
 
 } // namespace data
 } // namespace pproto
-

@@ -71,12 +71,18 @@ struct VideoSnapshot : Data<&command::VideoSnapshot,
         quint64  number = quint64(-1);
         TimeSpec time;
 
+        // Признак определяет из какого поля видеоданных формируется  видеопоток.
+        // Значение TRUE соответствует полю video::Frame::origin, значение FALSE
+        // соответствует video::Frame::data
+        bool origin = {true};
+
         DECLARE_B_SERIALIZE_FUNC
 
         J_SERIALIZE_BEGIN
             J_SERIALIZE_MAP_ITEM( "type"   , type   )
             J_SERIALIZE_MAP_ITEM( "number" , number )
             J_SERIALIZE_MAP_ITEM( "time"   , time   )
+            J_SERIALIZE_MAP_OPT ( "origin" , origin )
         J_SERIALIZE_END
     };
 
@@ -134,4 +140,3 @@ struct VideoSnapshot : Data<&command::VideoSnapshot,
 
 } // namespace data
 } // namespace pproto
-
